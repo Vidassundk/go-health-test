@@ -1,3 +1,4 @@
+import { Toasts } from "@backpackapp-io/react-native-toast";
 import {
   Merriweather_400Regular,
   Merriweather_700Bold,
@@ -14,6 +15,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -43,13 +45,16 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SafeAreaProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="health-quiz" />
-        </Stack>
-        <StatusBar style="light" />
-      </SafeAreaProvider>
+      <GestureHandlerRootView>
+        <SafeAreaProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="health-quiz" />
+          </Stack>
+          <StatusBar style="light" />
+        </SafeAreaProvider>
+        <Toasts />
+      </GestureHandlerRootView>
     </QueryClientProvider>
   );
 }

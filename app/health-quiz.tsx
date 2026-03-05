@@ -2,11 +2,19 @@ import GlowingBackground from "@/components/GlowingBackground";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { COLORS } from "@/constants/colors";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
+import { showErrorToast } from "@/utils/toast";
+import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function QuizScreen() {
-  const { isLoading } = useQuizQuestions();
+  const { isLoading, isError, error } = useQuizQuestions();
+
+  useEffect(() => {
+    if (isError && error) {
+      showErrorToast(error.message);
+    }
+  }, [isError, error]);
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "bottom"]}>

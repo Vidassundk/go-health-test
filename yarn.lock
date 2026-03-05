@@ -765,6 +765,18 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.28.5"
 
+"@backpackapp-io/react-native-toast@^0.13.0":
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/@backpackapp-io/react-native-toast/-/react-native-toast-0.13.0.tgz#f53feead8cb9bc6556370ad102e5b748e92a1d90"
+  integrity sha512-kutFSE1vi77ybNV24JSnKQ4WUgWZ+LcYsrdAyl5ztEWGP7FRsfinsuaOrBQwDBGxm0rzMFeKM5K7fRHa/Hvy8A==
+
+"@backpackapp-io/react-native-toast@^0.15.1":
+  version "0.15.1"
+  resolved "https://registry.yarnpkg.com/@backpackapp-io/react-native-toast/-/react-native-toast-0.15.1.tgz#734212ba37a41fa313f29a3ea56be4245dc6784b"
+  integrity sha512-elToeJZaM/NT8JlN9g/VAh1bJE47tkPDiy3MeYOKGI5YEfKBMjFmG+vxaEbfe5QKW1uVW0X9y/SI6kojLeWuSQ==
+  dependencies:
+    "@backpackapp-io/react-native-toast" "^0.13.0"
+
 "@egjs/hammerjs@^2.0.17":
   version "2.0.17"
   resolved "https://registry.yarnpkg.com/@egjs/hammerjs/-/hammerjs-2.0.17.tgz#5dc02af75a6a06e4c2db0202cae38c9263895124"

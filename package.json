@@ -9,6 +9,7 @@
     "lint": "expo lint"
   },
   "dependencies": {
+    "@backpackapp-io/react-native-toast": "^0.15.1",
     "@expo-google-fonts/merriweather": "^0.4.2",
     "@expo-google-fonts/poppins": "^0.4.1",
     "@expo-google-fonts/reddit-sans": "^0.4.2",

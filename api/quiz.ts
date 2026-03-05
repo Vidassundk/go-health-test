@@ -1,4 +1,4 @@
-import { quizApiConfig } from "@/config/api";
+import { getQuizApiUrl } from "@/config/api";
 import type { QuizApiResponse } from "@/types/quiz";
 
 export class QuizApiError extends Error {
@@ -13,7 +13,7 @@ export class QuizApiError extends Error {
 }
 
 export async function fetchQuizQuestions(): Promise<QuizApiResponse["data"]> {
-  const response = await fetch(quizApiConfig.baseUrl);
+  const response = await fetch(getQuizApiUrl());
 
   if (!response.ok) {
     throw new QuizApiError(
