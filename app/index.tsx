@@ -1,34 +1,44 @@
 import AppButton from "@/components/AppButton";
 import AppText from "@/components/AppText";
-import GlowingBackground from "@/components/GlowingBackground";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
+import { useScreenFade } from "@/hooks/useScreenFade";
 import { useRouter } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { Animated, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { fadeStyle, fadeOutThen, isTransitioning } = useScreenFade();
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
-      <GlowingBackground />
-      <View style={styles.contentArea}>
-        <View style={styles.appGreetingSection}>
-          <AppText variant="display">{locale.home.greeting}</AppText>
-          <AppText color={COLORS.textAlt} variant="bodyCompact">
-            {locale.home.subtext}
-          </AppText>
+    <Animated.View style={[styles.screen, fadeStyle]}>
+      <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+        <View style={styles.contentArea}>
+          <View style={styles.appGreetingSection}>
+            <AppText variant="display">{locale.home.greeting}</AppText>
+            <AppText color={COLORS.textAlt} variant="bodyCompact">
+              {locale.home.subtext}
+            </AppText>
+          </View>
         </View>
-      </View>
-      <AppButton label="Next" onPress={() => router.push("/health-quiz")} />
-    </SafeAreaView>
+        <AppButton
+          label="Next"
+          disabled={isTransitioning}
+          onPress={() =>
+            fadeOutThen(() => router.push("/health-quiz"), "forward")
+          }
+        />
+      </SafeAreaView>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
   container: {
-    backgroundColor: COLORS.background,
     flex: 1,
     padding: 20,
   },

@@ -1,9 +1,10 @@
 import GlowObject from "@/components/GlowObject";
+import { COLORS } from "@/constants/colors";
 import { StyleSheet, View } from "react-native";
 
 export default function GlowingBackground() {
   return (
-    <View style={styles.container}>
+    <View pointerEvents="none" style={styles.container}>
       <GlowObject
         width={195}
         height={48}
@@ -30,6 +31,7 @@ export default function GlowingBackground() {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: COLORS.background,
     alignItems: "center",
     position: "absolute",
     top: -10,

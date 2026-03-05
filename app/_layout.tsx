@@ -1,3 +1,4 @@
+import GlowingBackground from "@/components/GlowingBackground";
 import { Toasts } from "@backpackapp-io/react-native-toast";
 import {
   Merriweather_400Regular,
@@ -47,7 +48,15 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView>
         <SafeAreaProvider>
-          <Stack screenOptions={{ headerShown: false }}>
+          <GlowingBackground />
+
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: "transparent" },
+              animation: "none",
+            }}
+          >
             <Stack.Screen name="index" />
             <Stack.Screen name="health-quiz" />
           </Stack>
