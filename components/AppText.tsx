@@ -1,24 +1,24 @@
 import React, { forwardRef } from "react";
 import { StyleSheet, Text, TextProps } from "react-native";
+import { COLORS } from "@/constants/colors";
 import { TYPOGRAPHY } from "@/constants/typography";
 
 export type TypographyVariant = keyof typeof TYPOGRAPHY;
 
-const DEFAULT_COLOR = "#FDFCFE";
-
 export type AppTextProps = TextProps & {
   variant?: TypographyVariant;
+  color?: string;
 };
 
 const AppText = forwardRef<Text, AppTextProps>(
-  ({ variant = "body", style, ...props }, ref) => {
+  ({ variant = "body", style, color, ...props }, ref) => {
     const variantStyle = variant ? TYPOGRAPHY[variant] : undefined;
 
     return (
       <Text
         ref={ref}
         style={[
-          { color: DEFAULT_COLOR },
+          { color: color ?? COLORS.text },
           variantStyle,
           StyleSheet.flatten(style),
         ]}
