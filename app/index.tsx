@@ -25,9 +25,7 @@ export default function HomeScreen() {
         <AppButton
           label="Next"
           disabled={isTransitioning}
-          onPress={() =>
-            fadeOutThen(() => router.push("/health-quiz"), "forward")
-          }
+          onPress={() => fadeOutThen(() => router.push("/health-quiz"), "back")}
         />
       </SafeAreaView>
     </Animated.View>

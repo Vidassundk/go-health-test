@@ -32,7 +32,7 @@ export default function QuizScreen() {
               if (isTransitioning) {
                 return;
               }
-              fadeOutThen(() => router.back(), "back");
+              fadeOutThen(() => router.back(), "forward");
             }}
             accessibilityRole="button"
             accessibilityLabel="Go back"
