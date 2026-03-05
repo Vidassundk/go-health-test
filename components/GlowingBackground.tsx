@@ -8,8 +8,7 @@ export default function GlowingBackground() {
         width={195}
         height={48}
         color="#E2B0FF"
-        fillOpacity={1}
-        layerOpacity={0.6268}
+        layerOpacity={0.7268}
         blur={50}
         radius={20}
         style={{ marginBottom: -18, zIndex: 1 }}
@@ -29,7 +28,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     position: "absolute",
-    top: 0,
+    top: 4,
     right: 0,
     left: 0,
     bottom: 0,
