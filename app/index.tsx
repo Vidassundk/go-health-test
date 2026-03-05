@@ -3,10 +3,13 @@ import AppText from "@/components/AppText";
 import GlowingBackground from "@/components/GlowingBackground";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
+import { useRouter } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
+  const router = useRouter();
+
   return (
     <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <GlowingBackground />
@@ -18,7 +21,7 @@ export default function HomeScreen() {
           </AppText>
         </View>
       </View>
-      <AppButton label="Next" />
+      <AppButton label="Next" onPress={() => router.push("/health-quiz")} />
     </SafeAreaView>
   );
 }
