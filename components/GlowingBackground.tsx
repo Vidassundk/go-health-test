@@ -11,6 +11,8 @@ export default function GlowingBackground() {
         layerOpacity={0.7268}
         blur={50}
         radius={20}
+        animate
+        phaseOffset={0}
         style={{ marginBottom: -18, zIndex: 1 }}
       />
       <GlowObject
@@ -19,6 +21,8 @@ export default function GlowingBackground() {
         color="#4717E9"
         blur={54}
         radius={20}
+        animate
+        phaseOffset={0.4}
       />
     </View>
   );
@@ -28,7 +32,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     position: "absolute",
-    top: 4,
+    top: -10,
     right: 0,
     left: 0,
     bottom: 0,

@@ -5,8 +5,17 @@ import {
   Paint,
   RoundedRect,
 } from "@shopify/react-native-skia";
-import React from "react";
+import React, { useEffect } from "react";
 import { View, type StyleProp, type ViewStyle } from "react-native";
+import {
+  useDerivedValue,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
+
+const DRIFT_AMPLITUDE = 8;
+const DRIFT_DURATION_MS = 4000;
 
 export interface GlowObjectProps {
   width: number;
@@ -17,6 +26,10 @@ export interface GlowObjectProps {
   layerOpacity?: number;
   blur: number;
   style?: StyleProp<ViewStyle>;
+  /** Enable subtle looping drift animation */
+  animate?: boolean;
+  /** 0–1 phase offset for staggering multiple glows */
+  phaseOffset?: number;
 }
 
 export default function GlowObject({
@@ -28,8 +41,29 @@ export default function GlowObject({
   layerOpacity = 1,
   blur,
   style,
+  animate = false,
+  phaseOffset = 0,
 }: GlowObjectProps) {
   const blurPadding = Math.ceil(blur * 3) * 2;
+  const progress = useSharedValue(0);
+
+  useEffect(() => {
+    if (!animate) return;
+    progress.value = withRepeat(
+      withTiming(1, { duration: DRIFT_DURATION_MS }),
+      -1,
+      true
+    );
+  }, [animate, progress]);
+
+  const driftTransform = useDerivedValue(() => {
+    "worklet";
+    if (!animate) return [{ translateX: 0 }, { translateY: 0 }];
+    const t = progress.value * Math.PI * 2 + phaseOffset * Math.PI * 2;
+    const translateX = Math.sin(t) * DRIFT_AMPLITUDE;
+    const translateY = Math.cos(t * 0.7) * DRIFT_AMPLITUDE * 0.8;
+    return [{ translateX }, { translateY }];
+  });
 
   return (
     <View
@@ -59,7 +93,7 @@ export default function GlowObject({
             </Paint>
           }
         >
-          <Group opacity={fillOpacity}>
+          <Group opacity={fillOpacity} transform={driftTransform}>
             <RoundedRect
               x={blurPadding / 2}
               y={blurPadding / 2}
