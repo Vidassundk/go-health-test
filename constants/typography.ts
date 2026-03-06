@@ -74,6 +74,5 @@ export const TYPOGRAPHY: Record<string, TextStyle> = {
     fontSize: 14,
     lineHeight: 20,
     letterSpacing: 0,
-    textAlign: "center",
   },
 };

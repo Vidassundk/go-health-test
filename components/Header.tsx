@@ -15,8 +15,6 @@ export default function Header({ children, style, ...viewProps }: HeaderProps) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
     height: HEADER_HEIGHT,
     flexDirection: "row",
     alignItems: "center",

@@ -53,7 +53,11 @@ export default function RootLayout() {
           <Stack
             screenOptions={{
               headerShown: false,
-              contentStyle: { backgroundColor: "transparent" },
+              contentStyle: {
+                backgroundColor: "transparent",
+                paddingHorizontal: 20,
+                paddingBottom: 20,
+              },
               animation: "none",
             }}
           >

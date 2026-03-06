@@ -1,8 +1,10 @@
 import Header, { HEADER_HEIGHT } from "@/components/Header";
 import IconButton from "@/components/IconButton";
 import { ArrowIcon } from "@/components/Icons/ArrowIcon";
+import { QuizFlow } from "@/components/quiz";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { COLORS } from "@/constants/colors";
+import { useQuizEngine } from "@/hooks/useQuizEngine";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
 import { useScreenFade } from "@/hooks/useScreenFade";
 import { showErrorToast } from "@/utils/toast";
@@ -12,7 +14,12 @@ import { Animated, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function QuizScreen() {
-  const { isLoading, isError, error } = useQuizQuestions();
+  const { questions, isLoading, isError, error } = useQuizQuestions();
+  const engine = useQuizEngine(questions, {
+    onSubmit: (answers) => {
+      console.log("Quiz submitted:", answers);
+    },
+  });
   const router = useRouter();
   const { fadeStyle, fadeOutThen, isTransitioning } = useScreenFade();
 
@@ -39,10 +46,25 @@ export default function QuizScreen() {
           />
         </Header>
         <View style={styles.contentArea}>
-          {isLoading && (
+          {isLoading ? (
             <View style={styles.bufferingWrapper}>
               <SpinningBuffer size={40} color={COLORS.text} />
             </View>
+          ) : engine.currentQuestion ? (
+            <QuizFlow
+              question={engine.currentQuestion}
+              value={engine.answers[engine.currentQuestion.key]}
+              setAnswer={engine.setAnswer}
+              isFirst={engine.isFirst}
+              isLast={engine.isLast}
+              currentStep={engine.currentIndex + 1}
+              totalSteps={engine.totalSteps}
+              onBack={engine.goBack}
+              onNext={engine.goNext}
+              validationError={engine.validationError}
+            />
+          ) : (
+            <View />
           )}
         </View>
       </SafeAreaView>
@@ -58,10 +80,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentArea: {
-    marginTop: -HEADER_HEIGHT,
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    marginTop: -HEADER_HEIGHT,
+    paddingTop: HEADER_HEIGHT,
+    alignItems: "stretch",
   },
   bufferingWrapper: {
     alignItems: "center",
