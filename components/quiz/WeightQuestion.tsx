@@ -2,11 +2,11 @@ import AppText from "@/components/AppText";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { COLORS } from "@/constants/colors";
 import { WHEEL_ITEM_HEIGHT } from "@/constants/wheelPicker";
+import { useWheelPickerReady } from "@/hooks/useWheelPickerReady";
 import type { QuizQuestion } from "@/types/quiz";
 import WheelPicker from "@quidone/react-native-wheel-picker";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
-import { useWheelPickerReady } from "@/hooks/useWheelPickerReady";
 import {
   WheelPickerChrome,
   wheelPickerItemTextStyle,
@@ -78,7 +78,9 @@ export function WeightQuestion({
 
   if (!isReady || isTransitioning) {
     return (
-      <View style={[wheelPickerStyles.container, wheelPickerStyles.placeholder]}>
+      <View
+        style={[wheelPickerStyles.container, wheelPickerStyles.placeholder]}
+      >
         <SpinningBuffer size={40} color={COLORS.text} />
       </View>
     );

@@ -1,7 +1,10 @@
 import { AppOptionSelectChrome } from "@/components/AppOptionSelectChrome";
 import { COLORS } from "@/constants/colors";
 import { TYPOGRAPHY } from "@/constants/typography";
-import { WHEEL_CENTER_OFFSET, WHEEL_CHROME_HEIGHT } from "@/constants/wheelPicker";
+import {
+  WHEEL_CENTER_OFFSET,
+  WHEEL_CHROME_HEIGHT,
+} from "@/constants/wheelPicker";
 import type React from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -37,6 +40,7 @@ export const wheelPickerStyles = StyleSheet.create({
   placeholder: {
     minHeight: 240,
     justifyContent: "center",
+    marginTop: 50,
   },
   pickerRowWrapper: {
     position: "relative",
