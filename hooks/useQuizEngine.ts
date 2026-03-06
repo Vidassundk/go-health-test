@@ -31,7 +31,7 @@ function isStepValid(question: QuizQuestion, value: unknown): boolean {
   switch (question.type) {
     case "weight": {
       const n = Number(value);
-      return !isNaN(n) && n >= 20 && n <= 500;
+      return !isNaN(n) && n >= 44 && n <= 1100;
     }
     case "age": {
       const n = Number(value);

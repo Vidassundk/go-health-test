@@ -21,12 +21,6 @@ function getInputConfig(question: QuizQuestion): {
   suffix?: string;
 } {
   switch (question.type) {
-    case "weight":
-      return {
-        keyboardType: "numeric",
-        placeholder: "0",
-        suffix: "kg",
-      };
     case "age":
       return {
         keyboardType: "number-pad",
@@ -55,7 +49,7 @@ export function InputQuestion({ question, value, onChange }: Props) {
           style={styles.input}
           value={stringValue}
           onChangeText={(text) => {
-            if (question.type === "weight" || question.type === "age") {
+            if (question.type === "age") {
               const n = parseInt(text, 10);
               onChange(text === "" ? "" : isNaN(n) ? "" : n);
             } else {

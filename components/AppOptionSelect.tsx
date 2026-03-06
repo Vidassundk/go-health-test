@@ -1,21 +1,21 @@
-import AppText from "@/components/AppText";
 import AppOptionSelectOuter from "@/components/AppOptionSelectOuter";
-import { COLORS } from "@/constants/colors";
+import AppText from "@/components/AppText";
 import {
   CROSSFADE_DURATION_MS,
   STAGGER_DELAY_MS,
 } from "@/constants/animations";
+import { COLORS } from "@/constants/colors";
+import { usePressProgress } from "@/hooks/usePressProgress";
 import type { QuestionOption } from "@/types/quiz";
 import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
-  interpolateColor,
+  interpolate,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
   withTiming,
 } from "react-native-reanimated";
-import { usePressProgress } from "@/hooks/usePressProgress";
 
 const BORDER_RADIUS = 20;
 const INSET = 1;
@@ -26,7 +26,12 @@ export type AppOptionSelectProps = {
   onPress: () => void;
 };
 
-export function AppOptionSelect({ opt, selected, onPress }: AppOptionSelectProps) {
+export function AppOptionSelect({
+  opt,
+  selected,
+  onPress,
+}: AppOptionSelectProps) {
+  const hasLabel = Boolean(opt.title);
   const [layout, setLayout] = useState<{
     width: number;
     height: number;
@@ -56,12 +61,8 @@ export function AppOptionSelect({ opt, selected, onPress }: AppOptionSelectProps
     );
   }, [selected, outerSelectedProgress, innerSelectedProgress]);
 
-  const innerAnimatedStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      innerSelectedProgress.value,
-      [0, 1],
-      [COLORS.background, COLORS.optionInnerActive]
-    ),
+  const overlayAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(innerSelectedProgress.value, [0, 1], [0, 0.4]),
   }));
 
   const innerRadius = BORDER_RADIUS - INSET;
@@ -69,6 +70,7 @@ export function AppOptionSelect({ opt, selected, onPress }: AppOptionSelectProps
   return (
     <View
       style={styles.optionWrapper}
+      pointerEvents={hasLabel ? "auto" : "none"}
       onLayout={(e) => {
         const { width, height } = e.nativeEvent.layout;
         setLayout((prev) =>
@@ -87,22 +89,34 @@ export function AppOptionSelect({ opt, selected, onPress }: AppOptionSelectProps
           pressProgress={pressProgress}
         />
       )}
-      <Animated.View
+      <View
         style={[
+          styles.inner,
           { margin: INSET, borderRadius: innerRadius },
-          innerAnimatedStyle,
+          !hasLabel && styles.innerFill,
         ]}
       >
+        <Animated.View
+          style={[
+            styles.overlay,
+            {
+              borderRadius: innerRadius,
+              backgroundColor: COLORS.optionInnerActive,
+            },
+            overlayAnimatedStyle,
+          ]}
+          pointerEvents="none"
+        />
         <Pressable
           onPress={onPress}
           onPressIn={onPressIn}
           onPressOut={onPressOut}
-          style={styles.pressable}
+          style={hasLabel ? styles.pressable : styles.pressableFill}
           android_ripple={null}
         >
-          <AppText variant="bodyBold">{opt.title}</AppText>
+          {hasLabel && <AppText variant="bodyBold">{opt.title}</AppText>}
         </Pressable>
-      </Animated.View>
+      </View>
     </View>
   );
 }
@@ -111,8 +125,22 @@ const styles = StyleSheet.create({
   optionWrapper: {
     position: "relative",
   },
+  inner: {
+    backgroundColor: COLORS.background,
+    overflow: "hidden",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
   pressable: {
     paddingHorizontal: 20,
     paddingVertical: 26,
+  },
+  pressableFill: {
+    flex: 1,
+    minHeight: 1,
+  },
+  innerFill: {
+    flex: 1,
   },
 });

@@ -48,9 +48,9 @@ export function QuizFlow({
           question={question}
           value={value}
           onChange={(v) => setAnswer(question.key, v)}
+          isTransitioning={isTransitioning}
         />
       </View>
-
       <AppButton
         label={isLast ? "Submit" : "Next"}
         onPress={onNext}

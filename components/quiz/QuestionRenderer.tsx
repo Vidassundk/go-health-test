@@ -3,17 +3,24 @@ import { CredentialsQuestion } from "./CredentialsQuestion";
 import { GenericInputQuestion } from "./GenericInputQuestion";
 import { InputQuestion } from "./InputQuestion";
 import { OptionsQuestion } from "./OptionsQuestion";
+import { WeightQuestion } from "./WeightQuestion";
 
 type Props = {
   question: QuizQuestion;
   value: unknown;
   onChange: (value: unknown) => void;
+  isTransitioning?: boolean;
 };
 
 const OPTIONS_TYPES = ["single", "multiple"] as const;
-const INPUT_TYPES = ["weight", "name", "age"] as const;
+const INPUT_TYPES = ["name", "age"] as const;
 
-export function QuestionRenderer({ question, value, onChange }: Props) {
+export function QuestionRenderer({
+  question,
+  value,
+  onChange,
+  isTransitioning = false,
+}: Props) {
   if (OPTIONS_TYPES.includes(question.type as (typeof OPTIONS_TYPES)[number])) {
     return (
       <OptionsQuestion
@@ -30,6 +37,17 @@ export function QuestionRenderer({ question, value, onChange }: Props) {
         question={question}
         value={value as { email: string; password: string } | undefined}
         onChange={onChange as (v: { email: string; password: string }) => void}
+      />
+    );
+  }
+
+  if (question.type === "weight") {
+    return (
+      <WeightQuestion
+        question={question}
+        value={value as string | number | undefined}
+        onChange={onChange as (v: number) => void}
+        isTransitioning={isTransitioning}
       />
     );
   }
