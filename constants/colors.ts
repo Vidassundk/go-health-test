@@ -3,6 +3,8 @@ export const COLORS = {
   text: "#FDFCFE",
   textAlt: "#BCB1FF",
   error: "#F44F43",
+  optionBorderInactive: "#4A4884",
+  optionInnerActive: "#33325B",
 } as const;
 
 export const BUTTON_GRADIENT_COLORS = [
@@ -11,3 +13,5 @@ export const BUTTON_GRADIENT_COLORS = [
   "#34CBBF",
   "#34CBBF",
 ] as const;
+
+export const GRADIENT_POSITIONS = [0, 0.5006, 0.7352, 1] as const;

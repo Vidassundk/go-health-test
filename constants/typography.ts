@@ -51,7 +51,6 @@ export const TYPOGRAPHY: Record<string, TextStyle> = {
     fontSize: 15,
     lineHeight: 20,
     letterSpacing: -0.24,
-    textAlign: "center",
   },
 
   bodyCompact: {

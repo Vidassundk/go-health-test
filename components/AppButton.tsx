@@ -1,29 +1,20 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from "react-native-reanimated";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import { Canvas } from "@shopify/react-native-skia";
 import AppText from "./AppText";
-import GradientBackground from "./GradientBackground";
+import GradientLayer from "./GradientLayer";
+import { usePressProgress } from "@/hooks/usePressProgress";
 
 type AppButtonProps = {
   label: string;
 } & Omit<React.ComponentPropsWithoutRef<typeof Pressable>, "children">;
 
 const BORDER_RADIUS = 20;
-const PRESS_DURATION_MS = 80;
 const LABEL_SCALE_DOWN = 0.98;
 const LABEL_TRANSLATE_Y = 0;
 const BUTTON_SCALE_DOWN = 0.99;
 const PRESS_OVERLAY_OPACITY = 0.12;
-
-const RELEASE_SPRING = {
-  damping: 20,
-  stiffness: 200,
-};
 
 const AppButton = ({
   label,
@@ -35,17 +26,11 @@ const AppButton = ({
     width: number;
     height: number;
   } | null>(null);
-  const pressProgress = useSharedValue(0);
-
-  const handlePressIn = (e: Parameters<NonNullable<typeof onPressIn>>[0]) => {
-    pressProgress.value = withTiming(1, { duration: PRESS_DURATION_MS });
-    onPressIn?.(e);
-  };
-
-  const handlePressOut = (e: Parameters<NonNullable<typeof onPressOut>>[0]) => {
-    pressProgress.value = withSpring(0, RELEASE_SPRING);
-    onPressOut?.(e);
-  };
+  const { pressProgress, onPressIn: handlePressIn, onPressOut: handlePressOut } =
+    usePressProgress({
+      onPressIn: onPressIn ?? undefined,
+      onPressOut: onPressOut ?? undefined,
+    });
 
   const buttonAnimatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -81,12 +66,14 @@ const AppButton = ({
       <Animated.View style={[styles.buttonInner, buttonAnimatedStyle]}>
         {layout && (
           <>
-            <GradientBackground
-              width={layout.width}
-              height={layout.height}
-              borderRadius={BORDER_RADIUS}
-              pressProgress={pressProgress}
-            />
+            <Canvas style={{ position: "absolute", width: layout.width, height: layout.height }}>
+              <GradientLayer
+                width={layout.width}
+                height={layout.height}
+                borderRadius={BORDER_RADIUS}
+                pressProgress={pressProgress}
+              />
+            </Canvas>
             <Animated.View
               style={[
                 styles.pressOverlay,
@@ -108,7 +95,7 @@ const AppButton = ({
           {...pressableProps}
         >
           <Animated.View style={labelAnimatedStyle}>
-            <AppText variant="bodyBold" color="#fff">
+            <AppText style={styles.button} variant="bodyBold" color="#fff">
               {label}
             </AppText>
           </Animated.View>
@@ -136,6 +123,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: BORDER_RADIUS,
   },
+  button: { textAlign: "center" },
 });
 
 export default AppButton;
