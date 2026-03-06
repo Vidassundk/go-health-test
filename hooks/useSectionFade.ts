@@ -3,58 +3,53 @@ import {
   createFadeOutAnimation,
   type TransitionDirection,
 } from "@/utils/fadeTransition";
-import { useFocusEffect } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import { Animated } from "react-native";
 
-let lastTransitionDirection: TransitionDirection | null = null;
-
-export function useScreenFade() {
+export function useSectionFade() {
   const opacity = useRef(new Animated.Value(1)).current;
   const translateX = useRef(new Animated.Value(0)).current;
   const isTransitioningRef = useRef(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const lastDirectionRef = useRef<TransitionDirection | null>(null);
 
-  useFocusEffect(
-    useCallback(() => {
-      opacity.stopAnimation();
-      translateX.stopAnimation();
-      isTransitioningRef.current = false;
-      setIsTransitioning(false);
+  const runFadeIn = useCallback(() => {
+    createFadeInAnimation(
+      opacity,
+      translateX,
+      lastDirectionRef.current
+    ).start(({ finished }) => {
+      if (finished) {
+        isTransitioningRef.current = false;
+        setIsTransitioning(false);
+      }
+    });
+  }, [opacity, translateX]);
 
-      createFadeInAnimation(
-        opacity,
-        translateX,
-        lastTransitionDirection
-      ).start();
-    }, [opacity, translateX])
-  );
-
-  const fadeOutThen = useCallback(
+  const transitionTo = useCallback(
     (action: () => void, direction: TransitionDirection = "forward") => {
       if (isTransitioningRef.current) {
         return;
       }
 
-      lastTransitionDirection = direction;
+      lastDirectionRef.current = direction;
       isTransitioningRef.current = true;
       setIsTransitioning(true);
 
       createFadeOutAnimation(opacity, translateX, direction).start(
         ({ finished }) => {
-          isTransitioningRef.current = false;
-          setIsTransitioning(false);
           if (finished) {
             action();
+            runFadeIn();
           }
         }
       );
     },
-    [opacity, translateX]
+    [opacity, translateX, runFadeIn]
   );
 
   return {
-    fadeOutThen,
+    transitionTo,
     isTransitioning,
     fadeStyle: {
       opacity,

@@ -7,6 +7,7 @@ import { COLORS } from "@/constants/colors";
 import { useQuizEngine } from "@/hooks/useQuizEngine";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
 import { useScreenFade } from "@/hooks/useScreenFade";
+import { useSectionFade } from "@/hooks/useSectionFade";
 import { showErrorToast } from "@/utils/toast";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
@@ -22,6 +23,11 @@ export default function QuizScreen() {
   });
   const router = useRouter();
   const { fadeStyle, fadeOutThen, isTransitioning } = useScreenFade();
+  const {
+    fadeStyle: sectionFadeStyle,
+    transitionTo,
+    isTransitioning: isSectionTransitioning,
+  } = useSectionFade();
 
   useEffect(() => {
     if (isError && error) {
@@ -36,10 +42,14 @@ export default function QuizScreen() {
           <IconButton
             icon={<ArrowIcon size={22} color={COLORS.text} />}
             onPress={() => {
-              if (isTransitioning) {
+              if (isTransitioning || isSectionTransitioning) {
                 return;
               }
-              fadeOutThen(() => router.back(), "forward");
+              if (engine.isFirst) {
+                fadeOutThen(() => router.back(), "forward");
+              } else {
+                transitionTo(engine.goBack, "forward");
+              }
             }}
             accessibilityRole="button"
             accessibilityLabel="Go back"
@@ -51,18 +61,29 @@ export default function QuizScreen() {
               <SpinningBuffer size={40} color={COLORS.text} />
             </View>
           ) : engine.currentQuestion ? (
-            <QuizFlow
-              question={engine.currentQuestion}
-              value={engine.answers[engine.currentQuestion.key]}
-              setAnswer={engine.setAnswer}
-              isFirst={engine.isFirst}
-              isLast={engine.isLast}
-              currentStep={engine.currentIndex + 1}
-              totalSteps={engine.totalSteps}
-              onBack={engine.goBack}
-              onNext={engine.goNext}
-              validationError={engine.validationError}
-            />
+            <Animated.View style={[styles.quizContent, sectionFadeStyle]}>
+              <QuizFlow
+                question={engine.currentQuestion}
+                value={engine.answers[engine.currentQuestion.key]}
+                setAnswer={engine.setAnswer}
+                isFirst={engine.isFirst}
+                isLast={engine.isLast}
+                currentStep={engine.currentIndex + 1}
+                totalSteps={engine.totalSteps}
+                onBack={() => transitionTo(engine.goBack, "back")}
+                onNext={() => {
+                  if (engine.isLast) {
+                    engine.goNext();
+                  } else if (!engine.validateCurrent()) {
+                    transitionTo(engine.goNext, "back");
+                  } else {
+                    engine.goNext();
+                  }
+                }}
+                validationError={engine.validationError}
+                isTransitioning={isSectionTransitioning}
+              />
+            </Animated.View>
           ) : (
             <View />
           )}
@@ -84,6 +105,9 @@ const styles = StyleSheet.create({
     marginTop: -HEADER_HEIGHT,
     paddingTop: HEADER_HEIGHT,
     alignItems: "stretch",
+  },
+  quizContent: {
+    flex: 1,
   },
   bufferingWrapper: {
     alignItems: "center",

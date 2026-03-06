@@ -91,6 +91,12 @@ export function useQuizEngine(
     []
   );
 
+  const validateCurrent = useCallback((): string | null => {
+    if (!currentQuestion) return null;
+    const value = answers[currentQuestion.key];
+    return validateQuestion(currentQuestion, value);
+  }, [currentQuestion, answers]);
+
   const goNext = useCallback(() => {
     if (!currentQuestion) return;
 
@@ -134,6 +140,7 @@ export function useQuizEngine(
     isLast,
     goNext,
     goBack,
+    validateCurrent,
     validationError,
     setValidationError,
   };

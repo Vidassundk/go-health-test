@@ -1,6 +1,6 @@
 import AppText from "@/components/AppText";
-import type { QuizQuestion, QuestionOption } from "@/types/quiz";
 import { COLORS } from "@/constants/colors";
+import type { QuestionOption, QuizQuestion } from "@/types/quiz";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
@@ -37,10 +37,7 @@ export function OptionsQuestion({ question, value, onChange }: Props) {
         <Pressable
           key={opt.value}
           onPress={() => handlePress(opt)}
-          style={[
-            styles.option,
-            isSelected(opt) && styles.optionSelected,
-          ]}
+          style={[styles.option, isSelected(opt) && styles.optionSelected]}
         >
           <AppText
             variant="body"

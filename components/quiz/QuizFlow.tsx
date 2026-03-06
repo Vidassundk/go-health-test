@@ -17,6 +17,7 @@ type Props = {
   onBack: () => void;
   onNext: () => void;
   validationError: string | null;
+  isTransitioning?: boolean;
 };
 
 export function QuizFlow({
@@ -28,6 +29,7 @@ export function QuizFlow({
   onBack,
   onNext,
   validationError,
+  isTransitioning = false,
 }: Props) {
   return (
     <View style={styles.container}>
@@ -53,7 +55,11 @@ export function QuizFlow({
         )}
       </View>
 
-      <AppButton label={isLast ? "Submit" : "Next"} onPress={onNext} />
+      <AppButton
+        label={isLast ? "Submit" : "Next"}
+        onPress={onNext}
+        disabled={isTransitioning}
+      />
     </View>
   );
 }
