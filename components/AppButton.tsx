@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
-import { useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { useAnimatedStyle , useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated";
 import { Canvas, Group, RoundedRect } from "@shopify/react-native-skia";
 import AppText from "./AppText";
 import GradientLayer from "./GradientLayer";

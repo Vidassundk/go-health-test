@@ -1,6 +1,4 @@
-import Header, { HEADER_HEIGHT } from "@/components/Header";
-import IconButton from "@/components/IconButton";
-import { ArrowIcon } from "@/components/Icons/ArrowIcon";
+import QuizHeader, { HEADER_HEIGHT } from "@/components/QuizHeader";
 import { QuizFlow } from "@/components/quiz";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { COLORS } from "@/constants/colors";
@@ -10,7 +8,7 @@ import { useScreenFade } from "@/hooks/useScreenFade";
 import { useSectionFade } from "@/hooks/useSectionFade";
 import { showErrorToast } from "@/utils/toast";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -35,26 +33,26 @@ export default function QuizScreen() {
     }
   }, [isError, error]);
 
+  const handleBackPress = useCallback(() => {
+    if (engine.isFirst) {
+      fadeOutThen(() => router.back(), "forward");
+    } else {
+      transitionTo(engine.goBack, "forward");
+    }
+  }, [engine.isFirst, engine.goBack, fadeOutThen, router, transitionTo]);
+
   return (
     <Animated.View style={[styles.screen, fadeStyle]}>
       <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
-        <Header>
-          <IconButton
-            icon={<ArrowIcon size={22} color={COLORS.text} />}
-            onPress={() => {
-              if (isTransitioning || isSectionTransitioning) {
-                return;
-              }
-              if (engine.isFirst) {
-                fadeOutThen(() => router.back(), "forward");
-              } else {
-                transitionTo(engine.goBack, "forward");
-              }
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-          />
-        </Header>
+        <QuizHeader
+          onBackPress={handleBackPress}
+          progress={
+            engine.totalSteps > 0
+              ? (engine.currentIndex + 1) / engine.totalSteps
+              : 0
+          }
+          isBackDisabled={isTransitioning || isSectionTransitioning}
+        />
         <View style={styles.contentArea}>
           {isLoading ? (
             <View style={styles.bufferingWrapper}>
@@ -72,16 +70,11 @@ export default function QuizScreen() {
                 totalSteps={engine.totalSteps}
                 onBack={() => transitionTo(engine.goBack, "back")}
                 canProceed={engine.isCurrentStepValid}
-                onNext={() => {
-                  if (engine.isLast) {
-                    engine.goNext();
-                  } else if (!engine.validateCurrent()) {
-                    transitionTo(engine.goNext, "back");
-                  } else {
-                    engine.goNext();
-                  }
-                }}
-                validationError={engine.validationError}
+                onNext={() =>
+                  engine.isLast
+                    ? engine.goNext()
+                    : transitionTo(engine.goNext, "back")
+                }
                 isTransitioning={isSectionTransitioning}
               />
             </Animated.View>

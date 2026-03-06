@@ -16,7 +16,6 @@ type Props = {
   totalSteps: number;
   onBack: () => void;
   onNext: () => void;
-  validationError: string | null;
   isTransitioning?: boolean;
   canProceed?: boolean;
 };
@@ -27,7 +26,6 @@ export function QuizFlow({
   setAnswer,
   isLast,
   onNext,
-  validationError,
   isTransitioning = false,
   canProceed = true,
 }: Props) {
@@ -51,11 +49,6 @@ export function QuizFlow({
           value={value}
           onChange={(v) => setAnswer(question.key, v)}
         />
-        {validationError && (
-          <AppText variant="body" color={COLORS.error} style={styles.error}>
-            {validationError}
-          </AppText>
-        )}
       </View>
 
       <AppButton
@@ -80,8 +73,5 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 12,
     justifyContent: "flex-start",
-  },
-  error: {
-    marginTop: 4,
   },
 });

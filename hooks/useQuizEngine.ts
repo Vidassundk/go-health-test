@@ -23,40 +23,34 @@ function getVisibleQuestions(
   return questions.filter((q) => isVisible(q, answers));
 }
 
-function validateQuestion(
-  question: QuizQuestion,
-  value: unknown
-): string | null {
+function isStepValid(question: QuizQuestion, value: unknown): boolean {
   if (value === undefined || value === null || value === "") {
-    return "This field is required";
+    return false;
   }
 
   switch (question.type) {
     case "weight": {
       const n = Number(value);
-      if (isNaN(n) || n < 20 || n > 500) return "Please enter a valid weight";
-      return null;
+      return !isNaN(n) && n >= 20 && n <= 500;
     }
     case "age": {
       const n = Number(value);
-      if (isNaN(n) || n < 1 || n > 120) return "Please enter a valid age";
-      return null;
+      return !isNaN(n) && n >= 1 && n <= 120;
     }
     case "credentials": {
       const v = value as { email?: string; password?: string };
-      if (!v?.email?.trim()) return "Email is required";
-      if (!v?.password || String(v.password).length < 6)
-        return "Password must be at least 6 characters";
-      return null;
+      return (
+        !!v?.email?.trim() &&
+        !!v?.password &&
+        String(v.password).length >= 6
+      );
     }
     case "single":
-      if (!value || (typeof value === "string" && !value.trim()))
-        return "Please select an option";
-      return null;
+      return !!(value && (typeof value !== "string" || value.trim()));
     case "multiple":
-      return null;
+      return true;
     default:
-      return null;
+      return true;
   }
 }
 
@@ -71,7 +65,6 @@ export function useQuizEngine(
   const { onSubmit } = options ?? {};
   const [answers, setAnswersState] = useState<QuizAnswers>({});
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [validationError, setValidationError] = useState<string | null>(null);
 
   const visibleQuestions = useMemo(() => {
     if (!questions) return [];
@@ -83,36 +76,18 @@ export function useQuizEngine(
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === totalSteps - 1 && totalSteps > 0;
 
-  const setAnswer = useCallback(
-    (key: string, value: unknown) => {
-      setAnswersState((prev) => ({ ...prev, [key]: value }));
-      setValidationError(null);
-    },
-    []
-  );
-
-  const validateCurrent = useCallback((): string | null => {
-    if (!currentQuestion) return null;
-    const value = answers[currentQuestion.key];
-    return validateQuestion(currentQuestion, value);
-  }, [currentQuestion, answers]);
+  const setAnswer = useCallback((key: string, value: unknown) => {
+    setAnswersState((prev) => ({ ...prev, [key]: value }));
+  }, []);
 
   const isCurrentStepValid = useMemo(() => {
-    return validateCurrent() === null;
-  }, [validateCurrent]);
+    if (!currentQuestion) return true;
+    const value = answers[currentQuestion.key];
+    return isStepValid(currentQuestion, value);
+  }, [currentQuestion, answers]);
 
   const goNext = useCallback(() => {
-    if (!currentQuestion) return;
-
-    const value = answers[currentQuestion.key];
-    const error = validateQuestion(currentQuestion, value);
-
-    if (error) {
-      setValidationError(error);
-      return;
-    }
-
-    setValidationError(null);
+    if (!currentQuestion || !isCurrentStepValid) return;
 
     if (isLast) {
       onSubmit?.(answers);
@@ -120,10 +95,9 @@ export function useQuizEngine(
     }
 
     setCurrentIndex((i) => Math.min(i + 1, visibleQuestions.length - 1));
-  }, [currentQuestion, answers, isLast, visibleQuestions.length, onSubmit]);
+  }, [currentQuestion, isCurrentStepValid, answers, isLast, visibleQuestions.length, onSubmit]);
 
   const goBack = useCallback(() => {
-    setValidationError(null);
     setCurrentIndex((i) => Math.max(0, i - 1));
   }, []);
 
@@ -144,9 +118,6 @@ export function useQuizEngine(
     isLast,
     goNext,
     goBack,
-    validateCurrent,
     isCurrentStepValid,
-    validationError,
-    setValidationError,
   };
 }
