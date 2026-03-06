@@ -62,6 +62,7 @@ export function QuizFlow({
       </View>
       <View style={styles.footer}>
         <AppButton
+          key={question.key}
           label={isLast ? "Submit" : "Next"}
           onPress={() => {
             setSubmitAttempted(true);
