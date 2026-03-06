@@ -1,14 +1,15 @@
+import { QuizFlow, QuizSummary } from "@/components/quiz";
 import QuizHeader, { HEADER_HEIGHT } from "@/components/QuizHeader";
-import { QuizFlow } from "@/components/quiz";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { COLORS } from "@/constants/colors";
+import type { QuizAnswers } from "@/hooks/useQuizEngine";
 import { useQuizEngine } from "@/hooks/useQuizEngine";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
 import { useScreenFade } from "@/hooks/useScreenFade";
 import { useSectionFade } from "@/hooks/useSectionFade";
 import { showErrorToast } from "@/utils/toast";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Animated,
   KeyboardAvoidingView,
@@ -20,18 +21,23 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function QuizScreen() {
   const { questions, isLoading, isError, error } = useQuizQuestions();
-  const engine = useQuizEngine(questions, {
-    onSubmit: (answers) => {
-      console.log("Quiz submitted:", answers);
-    },
-  });
-  const router = useRouter();
-  const { fadeStyle, fadeOutThen, isTransitioning } = useScreenFade();
+  const [showSummary, setShowSummary] = useState(false);
+  const [submittedAnswers, setSubmittedAnswers] = useState<QuizAnswers | null>(
+    null
+  );
   const {
     fadeStyle: sectionFadeStyle,
     transitionTo,
     isTransitioning: isSectionTransitioning,
   } = useSectionFade();
+  const engine = useQuizEngine(questions, {
+    onSubmit: (answers) => {
+      setSubmittedAnswers(answers);
+      transitionTo(() => setShowSummary(true), "back");
+    },
+  });
+  const router = useRouter();
+  const { fadeStyle, fadeOutThen, isTransitioning } = useScreenFade();
 
   useEffect(() => {
     if (isError && error) {
@@ -40,12 +46,21 @@ export default function QuizScreen() {
   }, [isError, error]);
 
   const handleBackPress = useCallback(() => {
-    if (engine.isFirst) {
+    if (showSummary) {
+      transitionTo(() => setShowSummary(false), "forward");
+    } else if (engine.isFirst) {
       fadeOutThen(() => router.back(), "forward");
     } else {
       transitionTo(engine.goBack, "forward");
     }
-  }, [engine.isFirst, engine.goBack, fadeOutThen, router, transitionTo]);
+  }, [
+    showSummary,
+    engine.isFirst,
+    engine.goBack,
+    fadeOutThen,
+    router,
+    transitionTo,
+  ]);
 
   return (
     <Animated.View style={[styles.screen, fadeStyle]}>
@@ -53,7 +68,9 @@ export default function QuizScreen() {
         <QuizHeader
           onBackPress={handleBackPress}
           progress={
-            engine.totalSteps > 0
+            showSummary
+              ? 1
+              : engine.totalSteps > 0
               ? (engine.currentIndex + 1) / engine.totalSteps
               : 0
           }
@@ -62,12 +79,16 @@ export default function QuizScreen() {
         <KeyboardAvoidingView
           style={styles.contentArea}
           behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? HEADER_HEIGHT : 0}
+          keyboardVerticalOffset={Platform.OS === "ios" ? HEADER_HEIGHT / 2 : 0}
         >
           {isLoading ? (
             <View style={styles.bufferingWrapper}>
               <SpinningBuffer size={40} color={COLORS.text} />
             </View>
+          ) : showSummary && submittedAnswers ? (
+            <Animated.View style={[styles.quizContent, sectionFadeStyle]}>
+              <QuizSummary answers={submittedAnswers} />
+            </Animated.View>
           ) : engine.currentQuestion ? (
             <Animated.View style={[styles.quizContent, sectionFadeStyle]}>
               <QuizFlow
