@@ -60,14 +60,16 @@ export function QuizFlow({
           onSubmitAttempt={() => setSubmitAttempted(true)}
         />
       </View>
-      <AppButton
-        label={isLast ? "Submit" : "Next"}
-        onPress={() => {
-          setSubmitAttempted(true);
-          onNext();
-        }}
-        disabled={question.type === "credentials" ? false : !canProceed}
-      />
+      <View style={styles.footer}>
+        <AppButton
+          label={isLast ? "Submit" : "Next"}
+          onPress={() => {
+            setSubmitAttempted(true);
+            onNext();
+          }}
+          disabled={question.type === "credentials" ? false : !canProceed}
+        />
+      </View>
     </View>
   );
 }
@@ -85,5 +87,9 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 12,
     justifyContent: "flex-start",
+  },
+  footer: {
+    backgroundColor: COLORS.background,
+    paddingTop: 8,
   },
 });

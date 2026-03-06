@@ -1,6 +1,5 @@
+import { AnimatedError } from "@/components/AnimatedError";
 import { AppTextInput } from "@/components/AppTextInput";
-import AppText from "@/components/AppText";
-import { COLORS } from "@/constants/colors";
 import type { QuizQuestion } from "@/types/quiz";
 import React, { useEffect, useRef } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
@@ -53,9 +52,7 @@ export function CredentialsQuestion({
         ref={emailRef}
         error={Boolean(emailError)}
         value={email}
-        onChangeText={(email) =>
-          onChange({ ...value, email, password })
-        }
+        onChangeText={(email) => onChange({ ...value, email, password })}
         placeholder="Email"
         keyboardType="email-address"
         autoCapitalize="none"
@@ -64,18 +61,12 @@ export function CredentialsQuestion({
         returnKeyType="next"
         onSubmitEditing={() => passwordRef.current?.focus()}
       />
-      {emailError && (
-        <AppText variant="body" color={COLORS.error} style={styles.error}>
-          {emailError}
-        </AppText>
-      )}
+      <AnimatedError error={emailError} />
       <AppTextInput
         ref={passwordRef}
         error={Boolean(passwordError)}
         value={password}
-        onChangeText={(password) =>
-          onChange({ ...value, email, password })
-        }
+        onChangeText={(password) => onChange({ ...value, email, password })}
         placeholder="Password (min 6 characters)"
         secureTextEntry
         textContentType="password"
@@ -86,11 +77,7 @@ export function CredentialsQuestion({
           onConfirm?.();
         }}
       />
-      {passwordError && (
-        <AppText variant="body" color={COLORS.error} style={styles.error}>
-          {passwordError}
-        </AppText>
-      )}
+      <AnimatedError error={passwordError} />
     </View>
   );
 }
@@ -99,8 +86,5 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     gap: 12,
-  },
-  error: {
-    marginTop: 4,
   },
 });
