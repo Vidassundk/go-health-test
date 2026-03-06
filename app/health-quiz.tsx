@@ -9,7 +9,13 @@ import { useSectionFade } from "@/hooks/useSectionFade";
 import { showErrorToast } from "@/utils/toast";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect } from "react";
-import { Animated, StyleSheet, View } from "react-native";
+import {
+  Animated,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function QuizScreen() {
@@ -53,7 +59,11 @@ export default function QuizScreen() {
           }
           isBackDisabled={isTransitioning || isSectionTransitioning}
         />
-        <View style={styles.contentArea}>
+        <KeyboardAvoidingView
+          style={styles.contentArea}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? HEADER_HEIGHT : 0}
+        >
           {isLoading ? (
             <View style={styles.bufferingWrapper}>
               <SpinningBuffer size={40} color={COLORS.text} />
@@ -81,7 +91,7 @@ export default function QuizScreen() {
           ) : (
             <View />
           )}
-        </View>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </Animated.View>
   );

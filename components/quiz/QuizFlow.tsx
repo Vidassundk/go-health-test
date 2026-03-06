@@ -1,7 +1,7 @@
 import AppText from "@/components/AppText";
 import { COLORS } from "@/constants/colors";
 import type { QuizQuestion } from "@/types/quiz";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import AppButton from "../AppButton";
 import { QuestionRenderer } from "./QuestionRenderer";
@@ -29,6 +29,12 @@ export function QuizFlow({
   isTransitioning = false,
   canProceed = true,
 }: Props) {
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+
+  useEffect(() => {
+    setSubmitAttempted(false);
+  }, [question.key]);
+
   return (
     <View
       style={styles.container}
@@ -49,12 +55,18 @@ export function QuizFlow({
           value={value}
           onChange={(v) => setAnswer(question.key, v)}
           isTransitioning={isTransitioning}
+          onConfirm={onNext}
+          submitAttempted={submitAttempted}
+          onSubmitAttempt={() => setSubmitAttempted(true)}
         />
       </View>
       <AppButton
         label={isLast ? "Submit" : "Next"}
-        onPress={onNext}
-        disabled={!canProceed}
+        onPress={() => {
+          setSubmitAttempted(true);
+          onNext();
+        }}
+        disabled={question.type === "credentials" ? false : !canProceed}
       />
     </View>
   );

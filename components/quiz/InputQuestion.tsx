@@ -1,7 +1,7 @@
 import AppText from "@/components/AppText";
 import type { QuizQuestion } from "@/types/quiz";
 import { COLORS } from "@/constants/colors";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   KeyboardTypeOptions,
   StyleSheet,
@@ -13,6 +13,8 @@ type Props = {
   question: QuizQuestion;
   value: string | number | undefined;
   onChange: (value: string | number) => void;
+  isTransitioning?: boolean;
+  onConfirm?: () => void;
 };
 
 function getInputConfig(question: QuizQuestion): {
@@ -31,21 +33,43 @@ function getInputConfig(question: QuizQuestion): {
   }
 }
 
-export function InputQuestion({ question, value, onChange }: Props) {
+export function InputQuestion({
+  question,
+  value,
+  onChange,
+  isTransitioning = false,
+  onConfirm,
+}: Props) {
   const config = getInputConfig(question);
   const stringValue =
     value !== undefined && value !== null ? String(value) : "";
+  const inputRef = useRef<TextInput>(null);
+  const prevTransitioningRef = useRef(true);
+
+  useEffect(() => {
+    if (prevTransitioningRef.current && !isTransitioning) {
+      prevTransitioningRef.current = false;
+      inputRef.current?.focus();
+    } else if (isTransitioning) {
+      prevTransitioningRef.current = true;
+    }
+  }, [isTransitioning]);
 
   return (
     <View style={styles.container}>
       <View style={styles.inputRow}>
         <TextInput
+          ref={inputRef}
           style={styles.input}
           value={stringValue}
           onChangeText={(text) => onChange(text)}
           keyboardType={config.keyboardType}
           placeholder={config.placeholder}
           placeholderTextColor={COLORS.textAlt}
+          textContentType="name"
+          autoComplete="name"
+          returnKeyType="go"
+          onSubmitEditing={onConfirm}
         />
         {config.suffix && (
           <AppText style={styles.suffix} color={COLORS.textAlt}>

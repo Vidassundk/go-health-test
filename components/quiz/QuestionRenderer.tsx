@@ -11,6 +11,9 @@ type Props = {
   value: unknown;
   onChange: (value: unknown) => void;
   isTransitioning?: boolean;
+  onConfirm?: () => void;
+  submitAttempted?: boolean;
+  onSubmitAttempt?: () => void;
 };
 
 const OPTIONS_TYPES = ["single", "multiple"] as const;
@@ -21,6 +24,9 @@ export function QuestionRenderer({
   value,
   onChange,
   isTransitioning = false,
+  onConfirm,
+  submitAttempted = false,
+  onSubmitAttempt,
 }: Props) {
   if (OPTIONS_TYPES.includes(question.type as (typeof OPTIONS_TYPES)[number])) {
     return (
@@ -38,6 +44,10 @@ export function QuestionRenderer({
         question={question}
         value={value as { email: string; password: string } | undefined}
         onChange={onChange as (v: { email: string; password: string }) => void}
+        isTransitioning={isTransitioning}
+        onConfirm={onConfirm}
+        submitAttempted={submitAttempted}
+        onSubmitAttempt={onSubmitAttempt}
       />
     );
   }
@@ -70,6 +80,8 @@ export function QuestionRenderer({
         question={question}
         value={value as string | number | undefined}
         onChange={onChange as (v: string | number) => void}
+        isTransitioning={isTransitioning}
+        onConfirm={onConfirm}
       />
     );
   }
@@ -79,6 +91,8 @@ export function QuestionRenderer({
       question={question}
       value={value as string | undefined}
       onChange={onChange as (v: string) => void}
+      isTransitioning={isTransitioning}
+      onConfirm={onConfirm}
     />
   );
 }
