@@ -115,6 +115,7 @@ export function WeightQuestion({
               data={wholeLbData}
               value={whole}
               onValueChanged={({ item: { value: v } }) => handleWholeChange(v)}
+              onValueChanging={({ item: { value: v } }) => handleWholeChange(v)}
               itemHeight={WHEEL_ITEM_HEIGHT}
               visibleItemCount={5}
               enableScrollByTapOnItem
@@ -132,6 +133,9 @@ export function WeightQuestion({
               data={decimalData}
               value={decimal}
               onValueChanged={({ item: { value: v } }) =>
+                handleDecimalChange(v)
+              }
+              onValueChanging={({ item: { value: v } }) =>
                 handleDecimalChange(v)
               }
               itemHeight={WHEEL_ITEM_HEIGHT}

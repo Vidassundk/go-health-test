@@ -79,6 +79,7 @@ export function AgeQuestion({
             data={ageData}
             value={age}
             onValueChanged={({ item: { value: v } }) => handleChange(v)}
+            onValueChanging={({ item: { value: v } }) => handleChange(v)}
             itemHeight={WHEEL_ITEM_HEIGHT}
             visibleItemCount={5}
             enableScrollByTapOnItem
