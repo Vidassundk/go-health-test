@@ -1,4 +1,5 @@
 import type { QuizQuestion } from "@/types/quiz";
+import { AgeQuestion } from "./AgeQuestion";
 import { CredentialsQuestion } from "./CredentialsQuestion";
 import { GenericInputQuestion } from "./GenericInputQuestion";
 import { InputQuestion } from "./InputQuestion";
@@ -13,7 +14,7 @@ type Props = {
 };
 
 const OPTIONS_TYPES = ["single", "multiple"] as const;
-const INPUT_TYPES = ["name", "age"] as const;
+const INPUT_TYPES = ["name"] as const;
 
 export function QuestionRenderer({
   question,
@@ -44,6 +45,17 @@ export function QuestionRenderer({
   if (question.type === "weight") {
     return (
       <WeightQuestion
+        question={question}
+        value={value as string | number | undefined}
+        onChange={onChange as (v: number) => void}
+        isTransitioning={isTransitioning}
+      />
+    );
+  }
+
+  if (question.type === "age") {
+    return (
+      <AgeQuestion
         question={question}
         value={value as string | number | undefined}
         onChange={onChange as (v: number) => void}

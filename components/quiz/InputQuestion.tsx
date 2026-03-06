@@ -21,12 +21,6 @@ function getInputConfig(question: QuizQuestion): {
   suffix?: string;
 } {
   switch (question.type) {
-    case "age":
-      return {
-        keyboardType: "number-pad",
-        placeholder: "0",
-        suffix: undefined,
-      };
     case "name":
     default:
       return {
@@ -48,14 +42,7 @@ export function InputQuestion({ question, value, onChange }: Props) {
         <TextInput
           style={styles.input}
           value={stringValue}
-          onChangeText={(text) => {
-            if (question.type === "age") {
-              const n = parseInt(text, 10);
-              onChange(text === "" ? "" : isNaN(n) ? "" : n);
-            } else {
-              onChange(text);
-            }
-          }}
+          onChangeText={(text) => onChange(text)}
           keyboardType={config.keyboardType}
           placeholder={config.placeholder}
           placeholderTextColor={COLORS.textAlt}
