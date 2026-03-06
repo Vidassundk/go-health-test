@@ -18,6 +18,7 @@ type Props = {
   onNext: () => void;
   validationError: string | null;
   isTransitioning?: boolean;
+  canProceed?: boolean;
 };
 
 export function QuizFlow({
@@ -28,9 +29,13 @@ export function QuizFlow({
   onNext,
   validationError,
   isTransitioning = false,
+  canProceed = true,
 }: Props) {
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      pointerEvents={isTransitioning ? "none" : undefined}
+    >
       <View style={styles.header}>
         <AppText variant="caption" color={COLORS.textAlt}>
           {question.subtitle}
@@ -56,7 +61,7 @@ export function QuizFlow({
       <AppButton
         label={isLast ? "Submit" : "Next"}
         onPress={onNext}
-        disabled={isTransitioning}
+        disabled={!canProceed}
       />
     </View>
   );

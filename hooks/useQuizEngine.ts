@@ -97,6 +97,10 @@ export function useQuizEngine(
     return validateQuestion(currentQuestion, value);
   }, [currentQuestion, answers]);
 
+  const isCurrentStepValid = useMemo(() => {
+    return validateCurrent() === null;
+  }, [validateCurrent]);
+
   const goNext = useCallback(() => {
     if (!currentQuestion) return;
 
@@ -141,6 +145,7 @@ export function useQuizEngine(
     goNext,
     goBack,
     validateCurrent,
+    isCurrentStepValid,
     validationError,
     setValidationError,
   };

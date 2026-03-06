@@ -71,6 +71,7 @@ export default function QuizScreen() {
                 currentStep={engine.currentIndex + 1}
                 totalSteps={engine.totalSteps}
                 onBack={() => transitionTo(engine.goBack, "back")}
+                canProceed={engine.isCurrentStepValid}
                 onNext={() => {
                   if (engine.isLast) {
                     engine.goNext();

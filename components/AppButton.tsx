@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
-import { Canvas } from "@shopify/react-native-skia";
+import { useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated";
+import { Canvas, Group, RoundedRect } from "@shopify/react-native-skia";
 import AppText from "./AppText";
 import GradientLayer from "./GradientLayer";
 import { usePressProgress } from "@/hooks/usePressProgress";
+import { COLORS } from "@/constants/colors";
+import { CROSSFADE_DURATION_MS } from "@/constants/animations";
 
 type AppButtonProps = {
   label: string;
@@ -18,6 +21,7 @@ const PRESS_OVERLAY_OPACITY = 0.12;
 
 const AppButton = ({
   label,
+  disabled,
   onPressIn,
   onPressOut,
   ...pressableProps
@@ -26,6 +30,15 @@ const AppButton = ({
     width: number;
     height: number;
   } | null>(null);
+  const enabledProgress = useSharedValue(disabled ? 0 : 1);
+
+  useEffect(() => {
+    enabledProgress.value = withTiming(disabled ? 0 : 1, {
+      duration: CROSSFADE_DURATION_MS,
+    });
+  }, [disabled, enabledProgress]);
+
+  const solidOpacity = useDerivedValue(() => 1 - enabledProgress.value);
   const { pressProgress, onPressIn: handlePressIn, onPressOut: handlePressOut } =
     usePressProgress({
       onPressIn: onPressIn ?? undefined,
@@ -67,11 +80,22 @@ const AppButton = ({
         {layout && (
           <>
             <Canvas style={{ position: "absolute", width: layout.width, height: layout.height }}>
+              <Group opacity={solidOpacity}>
+                <RoundedRect
+                  x={0}
+                  y={0}
+                  width={layout.width}
+                  height={layout.height}
+                  r={BORDER_RADIUS}
+                  color={COLORS.optionInnerActive}
+                />
+              </Group>
               <GradientLayer
                 width={layout.width}
                 height={layout.height}
                 borderRadius={BORDER_RADIUS}
                 pressProgress={pressProgress}
+                opacity={enabledProgress}
               />
             </Canvas>
             <Animated.View
@@ -90,6 +114,7 @@ const AppButton = ({
         )}
         <Pressable
           style={styles.pressable}
+          disabled={disabled}
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
           {...pressableProps}
