@@ -1,3 +1,4 @@
+import { AppTextInput } from "@/components/AppTextInput";
 import AppText from "@/components/AppText";
 import { COLORS } from "@/constants/colors";
 import type { QuizQuestion } from "@/types/quiz";
@@ -48,15 +49,14 @@ export function CredentialsQuestion({
 
   return (
     <View style={styles.container}>
-      <TextInput
+      <AppTextInput
         ref={emailRef}
-        style={[styles.input, emailError && styles.inputError]}
+        error={Boolean(emailError)}
         value={email}
         onChangeText={(email) =>
           onChange({ ...value, email, password })
         }
         placeholder="Email"
-        placeholderTextColor={COLORS.textAlt}
         keyboardType="email-address"
         autoCapitalize="none"
         textContentType="emailAddress"
@@ -69,15 +69,14 @@ export function CredentialsQuestion({
           {emailError}
         </AppText>
       )}
-      <TextInput
+      <AppTextInput
         ref={passwordRef}
-        style={[styles.input, passwordError && styles.inputError]}
+        error={Boolean(passwordError)}
         value={password}
         onChangeText={(password) =>
           onChange({ ...value, email, password })
         }
         placeholder="Password (min 6 characters)"
-        placeholderTextColor={COLORS.textAlt}
         secureTextEntry
         textContentType="password"
         autoComplete="password"
@@ -100,17 +99,6 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     gap: 12,
-  },
-  input: {
-    padding: 16,
-    borderWidth: 1,
-    borderColor: COLORS.textAlt,
-    borderRadius: 8,
-    color: COLORS.text,
-    fontSize: 16,
-  },
-  inputError: {
-    borderColor: COLORS.error,
   },
   error: {
     marginTop: 4,

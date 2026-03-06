@@ -1,5 +1,5 @@
+import { AppTextInput } from "@/components/AppTextInput";
 import type { QuizQuestion } from "@/types/quiz";
-import { COLORS } from "@/constants/colors";
 import React, { useEffect, useRef } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 
@@ -31,13 +31,11 @@ export function GenericInputQuestion({
 
   return (
     <View style={styles.container}>
-      <TextInput
+      <AppTextInput
         ref={inputRef}
-        style={styles.input}
         value={value ?? ""}
         onChangeText={onChange}
         placeholder="Your answer"
-        placeholderTextColor={COLORS.textAlt}
         keyboardType="default"
         autoComplete="off"
         returnKeyType="go"
@@ -50,13 +48,5 @@ export function GenericInputQuestion({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-  },
-  input: {
-    padding: 16,
-    borderWidth: 1,
-    borderColor: COLORS.textAlt,
-    borderRadius: 8,
-    color: COLORS.text,
-    fontSize: 16,
   },
 });

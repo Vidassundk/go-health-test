@@ -1,3 +1,4 @@
+import { AppTextInput } from "@/components/AppTextInput";
 import AppText from "@/components/AppText";
 import type { QuizQuestion } from "@/types/quiz";
 import { COLORS } from "@/constants/colors";
@@ -58,14 +59,13 @@ export function InputQuestion({
   return (
     <View style={styles.container}>
       <View style={styles.inputRow}>
-        <TextInput
+        <AppTextInput
           ref={inputRef}
-          style={styles.input}
+          containerStyle={styles.input}
           value={stringValue}
           onChangeText={(text) => onChange(text)}
           keyboardType={config.keyboardType}
           placeholder={config.placeholder}
-          placeholderTextColor={COLORS.textAlt}
           textContentType="name"
           autoComplete="name"
           returnKeyType="go"
@@ -92,12 +92,6 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: COLORS.textAlt,
-    borderRadius: 8,
-    color: COLORS.text,
-    fontSize: 16,
   },
   suffix: {
     fontSize: 16,

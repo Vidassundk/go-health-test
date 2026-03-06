@@ -1,4 +1,8 @@
-import { BUTTON_GRADIENT_COLORS, GRADIENT_POSITIONS } from "@/constants/colors";
+import {
+  BUTTON_GRADIENT_COLORS,
+  ERROR_GRADIENT_COLORS,
+  GRADIENT_POSITIONS,
+} from "@/constants/colors";
 import { Group, LinearGradient, RoundedRect } from "@shopify/react-native-skia";
 import React from "react";
 import type { SharedValue } from "react-native-reanimated";
@@ -12,6 +16,7 @@ type GradientLayerProps = {
   pressProgress?: SharedValue<number>;
   entranceProgress?: SharedValue<number>;
   opacity?: SharedValue<number>;
+  error?: boolean;
 };
 
 export default function GradientLayer({
@@ -21,17 +26,19 @@ export default function GradientLayer({
   pressProgress: pressProgressProp,
   entranceProgress,
   opacity,
+  error = false,
 }: GradientLayerProps) {
   const fallback = useSharedValue(0);
   const pressProgress = pressProgressProp ?? fallback;
   const { start, end } = useGradientShift(width, pressProgress, entranceProgress);
+  const colors = error ? [...ERROR_GRADIENT_COLORS] : [...BUTTON_GRADIENT_COLORS];
 
   const content = (
     <RoundedRect x={0} y={0} width={width} height={height} r={borderRadius}>
       <LinearGradient
         start={start}
         end={end}
-        colors={[...BUTTON_GRADIENT_COLORS]}
+        colors={colors}
         positions={[...GRADIENT_POSITIONS]}
       />
     </RoundedRect>

@@ -1,14 +1,10 @@
-import { COLORS } from "@/constants/colors";
+import GradientLayer from "@/components/GradientLayer";
 import { OPTION_INACTIVE_OPACITY } from "@/constants/animations";
-import {
-  Canvas,
-  Group,
-  RoundedRect,
-} from "@shopify/react-native-skia";
+import { COLORS } from "@/constants/colors";
+import { Canvas, Group, RoundedRect } from "@shopify/react-native-skia";
 import React from "react";
 import type { SharedValue } from "react-native-reanimated";
 import { useDerivedValue, useSharedValue } from "react-native-reanimated";
-import GradientLayer from "@/components/GradientLayer";
 
 type AppOptionSelectOuterProps = {
   width: number;
@@ -16,6 +12,7 @@ type AppOptionSelectOuterProps = {
   borderRadius: number;
   selectedProgress: SharedValue<number>;
   pressProgress?: SharedValue<number>;
+  error?: boolean;
 };
 
 export default function AppOptionSelectOuter({
@@ -24,6 +21,7 @@ export default function AppOptionSelectOuter({
   borderRadius,
   selectedProgress,
   pressProgress: pressProgressProp,
+  error = false,
 }: AppOptionSelectOuterProps) {
   const fallback = useSharedValue(0);
   const pressProgress = pressProgressProp ?? fallback;
@@ -48,7 +46,7 @@ export default function AppOptionSelectOuter({
           width={width}
           height={height}
           r={borderRadius}
-          color={COLORS.optionBorderInactive}
+          color={error ? COLORS.optionBorderError : COLORS.optionBorderInactive}
         />
       </Group>
       <GradientLayer
@@ -58,6 +56,8 @@ export default function AppOptionSelectOuter({
         pressProgress={pressProgress}
         entranceProgress={selectedProgress}
         opacity={selectedProgress}
+        error={error}
+        s
       />
     </Canvas>
   );
