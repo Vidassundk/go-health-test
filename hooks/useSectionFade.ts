@@ -54,7 +54,12 @@ export function useSectionFade() {
         animationRef.current = null;
         if (finished) {
           action();
-          runFadeIn();
+          // Defer fade-in until after React commits the new content (Zustand update
+          // is sync but React re-render is async). Double rAF ensures we're past
+          // the commit so we don't briefly fade in the previous section.
+          requestAnimationFrame(() => {
+            requestAnimationFrame(runFadeIn);
+          });
         }
       });
     },
