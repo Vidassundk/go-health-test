@@ -1,5 +1,6 @@
 import { QuizFlow, QuizSummary } from "@/components/quiz";
 import QuizHeader, { HEADER_HEIGHT } from "@/components/QuizHeader";
+import { WheelPickerReadyInit } from "@/components/WheelPickerReadyInit";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { COLORS } from "@/constants/colors";
 import { useGlowContext } from "@/contexts/GlowContext";
@@ -27,6 +28,7 @@ export default function QuizScreen() {
   const {
     fadeStyle: sectionFadeStyle,
     transitionTo,
+    interruptAndRun,
     isTransitioning: isSectionTransitioning,
   } = useSectionFade();
   const engine = useQuizEngine(questions, {
@@ -54,6 +56,8 @@ export default function QuizScreen() {
       transitionTo(() => setShowSummary(false), "forward");
     } else if (engine.isFirst) {
       fadeOutThen(() => router.back(), "forward");
+    } else if (isSectionTransitioning) {
+      interruptAndRun(engine.goBack);
     } else {
       transitionTo(engine.goBack, "forward");
     }
@@ -65,11 +69,14 @@ export default function QuizScreen() {
     fadeOutThen,
     router,
     transitionTo,
+    interruptAndRun,
+    isSectionTransitioning,
   ]);
 
   return (
     <Animated.View style={[styles.screen, fadeStyle]}>
       <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+        <WheelPickerReadyInit />
         <QuizHeader
           onBackPress={handleBackPress}
           progress={
@@ -79,7 +86,7 @@ export default function QuizScreen() {
                 : (engine.currentIndex + 1) / (engine.totalSteps + 1)
               : 0
           }
-          isBackDisabled={isTransitioning || isSectionTransitioning}
+          isBackDisabled={isTransitioning}
         />
         <KeyboardAvoidingView
           style={styles.contentArea}

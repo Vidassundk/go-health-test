@@ -12,13 +12,25 @@ export function useSectionFade() {
   const isTransitioningRef = useRef(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const lastDirectionRef = useRef<TransitionDirection | null>(null);
+  const animationRef = useRef<Animated.CompositeAnimation | null>(null);
+
+  const resetToIdle = useCallback(() => {
+    opacity.setValue(1);
+    translateX.setValue(0);
+    isTransitioningRef.current = false;
+    setIsTransitioning(false);
+    animationRef.current = null;
+  }, [opacity, translateX]);
 
   const runFadeIn = useCallback(() => {
-    createFadeInAnimation(
+    const anim = createFadeInAnimation(
       opacity,
       translateX,
       lastDirectionRef.current
-    ).start(({ finished }) => {
+    );
+    animationRef.current = anim;
+    anim.start(({ finished }) => {
+      animationRef.current = null;
       if (finished) {
         isTransitioningRef.current = false;
         setIsTransitioning(false);
@@ -36,20 +48,35 @@ export function useSectionFade() {
       isTransitioningRef.current = true;
       setIsTransitioning(true);
 
-      createFadeOutAnimation(opacity, translateX, direction).start(
-        ({ finished }) => {
-          if (finished) {
-            action();
-            runFadeIn();
-          }
+      const anim = createFadeOutAnimation(opacity, translateX, direction);
+      animationRef.current = anim;
+      anim.start(({ finished }) => {
+        animationRef.current = null;
+        if (finished) {
+          action();
+          runFadeIn();
         }
-      );
+      });
     },
     [opacity, translateX, runFadeIn]
   );
 
+  const interruptAndRun = useCallback(
+    (action: () => void) => {
+      if (!isTransitioningRef.current) {
+        action();
+        return;
+      }
+      animationRef.current?.stop();
+      resetToIdle();
+      action();
+    },
+    [resetToIdle]
+  );
+
   return {
     transitionTo,
+    interruptAndRun,
     isTransitioning,
     fadeStyle: {
       opacity,

@@ -2,10 +2,13 @@ import AppText from "@/components/AppText";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { COLORS } from "@/constants/colors";
 import { WHEEL_ITEM_HEIGHT } from "@/constants/wheelPicker";
-import { useWheelPickerReady } from "@/hooks/useWheelPickerReady";
+import {
+  selectWheelPickerReady,
+  useWheelPickerStore,
+} from "@/stores/wheelPickerStore";
 import type { QuizQuestion } from "@/types/quiz";
 import WheelPicker from "@quidone/react-native-wheel-picker";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import {
   WheelPickerChrome,
@@ -40,7 +43,15 @@ export function WeightQuestion({
   onChange,
   isTransitioning = false,
 }: Props) {
-  const isReady = useWheelPickerReady();
+  const isReady = useWheelPickerStore(selectWheelPickerReady);
+  const setShowingBuffer = useWheelPickerStore((s) => s.setShowingBuffer);
+
+  const isShowingBuffer = !isReady || isTransitioning;
+
+  useLayoutEffect(() => {
+    setShowingBuffer(isShowingBuffer);
+    return () => setShowingBuffer(false);
+  }, [isShowingBuffer, setShowingBuffer]);
 
   const { whole, decimal } = useMemo(() => {
     if (value === undefined || value === null) {
@@ -76,7 +87,7 @@ export function WeightQuestion({
     [whole, onChange]
   );
 
-  if (!isReady || isTransitioning) {
+  if (isShowingBuffer) {
     return (
       <View
         style={[wheelPickerStyles.container, wheelPickerStyles.placeholder]}

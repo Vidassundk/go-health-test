@@ -6,6 +6,10 @@ import {
   selectSetAnswer,
   useQuizStore,
 } from "@/stores/quizStore";
+import {
+  selectWheelPickerShowingBuffer,
+  useWheelPickerStore,
+} from "@/stores/wheelPickerStore";
 import React, { memo, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import AppButton from "../AppButton";
@@ -29,6 +33,11 @@ function QuizFlowInner({
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const value = useQuizStore(selectAnswer(question.key));
   const setAnswer = useQuizStore(selectSetAnswer);
+  const isWheelPickerShowingBuffer = useWheelPickerStore(
+    selectWheelPickerShowingBuffer
+  );
+  const isWheelPickerQuestion =
+    question.type === "age" || question.type === "weight";
 
   useEffect(() => {
     setSubmitAttempted(false);
@@ -69,7 +78,12 @@ function QuizFlowInner({
             setSubmitAttempted(true);
             onNext();
           }}
-          disabled={question.type === "credentials" ? false : !canProceed}
+          disabled={
+            question.type === "credentials"
+              ? false
+              : !canProceed ||
+                (isWheelPickerQuestion && isWheelPickerShowingBuffer)
+          }
         />
       </View>
     </View>
