@@ -10,6 +10,7 @@ export const english = {
       yourGoal: "Your goal",
       complementaryGoal: "Complementary goal:",
       complementaryGoals: "Complementary goals:",
+      startJourney: "Start my journey",
     },
   },
 } as const;

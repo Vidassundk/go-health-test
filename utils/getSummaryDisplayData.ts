@@ -21,16 +21,27 @@ export function getSummaryDisplayData(
     ? String(answers[nameQuestion.key] ?? "").trim()
     : "";
 
+  // Goal question from quiz
+  const goalQuestion = questions.find((q) => q.key === "goal");
+  // User's selected value (e.g. "more_control")
+  const goalValue = goalQuestion
+    ? (answers[goalQuestion.key] as string | undefined)
+    : undefined;
+  // Resolve to option title for display, fallback if none selected
+  const mainGoal =
+    goalQuestion && goalValue
+      ? getOptionTitle(goalQuestion, goalValue)
+      : "Improve my health";
+
   const programQuestion = questions.find((q) => q.key === "program");
   const programValue = programQuestion
     ? (answers[programQuestion.key] as string | undefined)
     : undefined;
-  const mainGoal =
-    programQuestion && programValue
-      ? getOptionTitle(programQuestion, programValue)
-      : "";
 
   const complementaryGoals: string[] = [];
+  if (programQuestion && programValue) {
+    complementaryGoals.push(getOptionTitle(programQuestion, programValue));
+  }
   const multipleQuestions = questions.filter(
     (q) => q.type === "multiple" && q.key !== "program"
   );
@@ -47,7 +58,7 @@ export function getSummaryDisplayData(
 
   return {
     name: name || "there",
-    mainGoal: mainGoal || "Improve my health",
+    mainGoal,
     complementaryGoals,
   };
 }

@@ -41,8 +41,8 @@ export const GLOW_COLORS = {
 export const PROGRESS_BAR_COLORS = {
   default: COLORS.textAlt,
   summary: {
-    smoking: GLOW_COLORS.summary.smoking.bottom,
-    drinking: GLOW_COLORS.summary.drinking.bottom,
+    smoking: "#1542B4",
+    drinking: "#158095",
   },
 } as const;
 

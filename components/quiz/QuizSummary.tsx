@@ -1,12 +1,15 @@
+import AppButton from "@/components/AppButton";
 import AppText from "@/components/AppText";
-import { COLORS } from "@/constants/colors";
+import { COLORS, PROGRESS_BAR_COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
+import { useGlowContext } from "@/contexts/GlowContext";
 import { useQuizStore } from "@/stores/quizStore";
 import type { QuizQuestion } from "@/types/quiz";
 import {
   getSummaryDisplayData,
   type SummaryDisplayData,
 } from "@/utils/getSummaryDisplayData";
+import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -16,6 +19,8 @@ type Props = {
 
 export function QuizSummary({ questions }: Props) {
   const answers = useQuizStore((s) => s.answers);
+  const { glowVariant, setGlowTarget } = useGlowContext();
+  const router = useRouter();
   const displayData: SummaryDisplayData = useMemo(
     () => getSummaryDisplayData(answers, questions),
     [answers, questions]
@@ -60,6 +65,18 @@ export function QuizSummary({ questions }: Props) {
           )}
         </View>
       </View>
+      <AppButton
+        label={labels.startJourney}
+        fillColor={
+          glowVariant
+            ? PROGRESS_BAR_COLORS.summary[glowVariant]
+            : PROGRESS_BAR_COLORS.summary.smoking
+        }
+        onPress={() => {
+          setGlowTarget(0);
+          router.back();
+        }}
+      />
     </View>
   );
 }
@@ -71,6 +88,7 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   sections: {
+    flex: 1,
     gap: 40,
   },
   header: {

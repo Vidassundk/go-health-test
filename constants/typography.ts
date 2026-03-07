@@ -15,7 +15,20 @@ export const FONTS = {
   },
 } as const;
 
-export const TYPOGRAPHY: Record<string, TextStyle> = {
+export const TYPOGRAPHY_VARIANTS = [
+  "display",
+  "heading",
+  "headingBold",
+  "body",
+  "bodyBold",
+  "bodyCompact",
+  "headingSemiRight",
+  "caption",
+] as const;
+
+export type TypographyVariant = (typeof TYPOGRAPHY_VARIANTS)[number];
+
+export const TYPOGRAPHY: Record<TypographyVariant, TextStyle> = {
   display: {
     fontFamily: FONTS.merriweather.regular,
     fontSize: 28,

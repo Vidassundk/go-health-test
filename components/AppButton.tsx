@@ -10,6 +10,8 @@ import { CROSSFADE_DURATION_MS } from "@/constants/animations";
 
 type AppButtonProps = {
   label: string;
+  /** When provided, uses solid fill instead of gradient (e.g. for summary variant colors) */
+  fillColor?: string;
 } & Omit<React.ComponentPropsWithoutRef<typeof Pressable>, "children">;
 
 const BORDER_RADIUS = 20;
@@ -21,6 +23,7 @@ const PRESS_OVERLAY_OPACITY = 0.12;
 const AppButton = ({
   label,
   disabled,
+  fillColor,
   onPressIn,
   onPressOut,
   ...pressableProps
@@ -89,13 +92,26 @@ const AppButton = ({
                   color={COLORS.optionInnerActive}
                 />
               </Group>
-              <GradientLayer
-                width={layout.width}
-                height={layout.height}
-                borderRadius={BORDER_RADIUS}
-                pressProgress={pressProgress}
-                opacity={enabledProgress}
-              />
+              {fillColor ? (
+                <Group opacity={enabledProgress}>
+                  <RoundedRect
+                    x={0}
+                    y={0}
+                    width={layout.width}
+                    height={layout.height}
+                    r={BORDER_RADIUS}
+                    color={fillColor}
+                  />
+                </Group>
+              ) : (
+                <GradientLayer
+                  width={layout.width}
+                  height={layout.height}
+                  borderRadius={BORDER_RADIUS}
+                  pressProgress={pressProgress}
+                  opacity={enabledProgress}
+                />
+              )}
             </Canvas>
             <Animated.View
               style={[

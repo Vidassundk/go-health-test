@@ -1,9 +1,7 @@
 import React, { forwardRef } from "react";
 import { StyleSheet, Text, TextProps } from "react-native";
 import { COLORS } from "@/constants/colors";
-import { TYPOGRAPHY } from "@/constants/typography";
-
-export type TypographyVariant = keyof typeof TYPOGRAPHY;
+import { TYPOGRAPHY, type TypographyVariant } from "@/constants/typography";
 
 export type AppTextProps = TextProps & {
   variant?: TypographyVariant;
