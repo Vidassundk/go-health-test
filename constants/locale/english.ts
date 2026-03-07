@@ -4,15 +4,12 @@ export const english = {
     subtext: "Be ready to amaze yourself.",
   },
   summary: {
-    smoking: {
-      caption: "Quitting smoking",
-      title: "You're on your way",
-      body: "Thank you for completing the health quiz. Your journey to quit smoking starts here.",
-    },
-    drinking: {
-      caption: "Quitting drinking",
-      title: "You're on your way",
-      body: "Thank you for completing the health quiz. Your journey to quit drinking starts here.",
+    labels: {
+      sectionTitle: "Summary",
+      welcomePrefix: "Welcome to your new journey, ",
+      yourGoal: "Your goal",
+      complementaryGoal: "Complementary goal:",
+      complementaryGoals: "Complementary goals:",
     },
   },
 } as const;

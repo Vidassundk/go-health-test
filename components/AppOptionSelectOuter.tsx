@@ -57,7 +57,6 @@ export default function AppOptionSelectOuter({
         entranceProgress={selectedProgress}
         opacity={selectedProgress}
         error={error}
-        s
       />
     </Canvas>
   );

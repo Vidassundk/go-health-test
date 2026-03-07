@@ -1,7 +1,10 @@
+import { useQuizStore } from "@/stores/quizStore";
 import type { QuizQuestion } from "@/types/quiz";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
-export type QuizAnswers = Record<string, unknown>;
+import type { QuizAnswers } from "@/stores/quizStore";
+
+export type { QuizAnswers } from "@/stores/quizStore";
 
 function isVisible(question: QuizQuestion, answers: QuizAnswers): boolean {
   const condition = question.visibleIf;
@@ -63,8 +66,10 @@ export function useQuizEngine(
   options?: UseQuizEngineOptions
 ) {
   const { onSubmit } = options ?? {};
-  const [answers, setAnswersState] = useState<QuizAnswers>({});
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const answers = useQuizStore((s) => s.answers);
+  const currentIndex = useQuizStore((s) => s.currentIndex);
+  const setAnswer = useQuizStore((s) => s.setAnswer);
+  const setCurrentIndex = useQuizStore((s) => s.setCurrentIndex);
 
   const visibleQuestions = useMemo(() => {
     if (!questions) return [];
@@ -75,10 +80,6 @@ export function useQuizEngine(
   const totalSteps = visibleQuestions.length;
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === totalSteps - 1 && totalSteps > 0;
-
-  const setAnswer = useCallback((key: string, value: unknown) => {
-    setAnswersState((prev) => ({ ...prev, [key]: value }));
-  }, []);
 
   const isCurrentStepValid = useMemo(() => {
     if (!currentQuestion) return true;
@@ -95,17 +96,25 @@ export function useQuizEngine(
     }
 
     setCurrentIndex((i) => Math.min(i + 1, visibleQuestions.length - 1));
-  }, [currentQuestion, isCurrentStepValid, answers, isLast, visibleQuestions.length, onSubmit]);
+  }, [
+    currentQuestion,
+    isCurrentStepValid,
+    answers,
+    isLast,
+    visibleQuestions.length,
+    onSubmit,
+    setCurrentIndex,
+  ]);
 
   const goBack = useCallback(() => {
     setCurrentIndex((i) => Math.max(0, i - 1));
-  }, []);
+  }, [setCurrentIndex]);
 
   useEffect(() => {
     setCurrentIndex((i) =>
       Math.min(Math.max(0, i), Math.max(0, visibleQuestions.length - 1))
     );
-  }, [visibleQuestions.length]);
+  }, [visibleQuestions.length, setCurrentIndex]);
 
   return {
     answers,

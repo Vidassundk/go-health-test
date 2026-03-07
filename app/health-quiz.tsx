@@ -3,7 +3,6 @@ import QuizHeader, { HEADER_HEIGHT } from "@/components/QuizHeader";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { COLORS } from "@/constants/colors";
 import { useGlowContext } from "@/contexts/GlowContext";
-import type { QuizAnswers } from "@/hooks/useQuizEngine";
 import { getSummaryVariant } from "@/utils/getSummaryVariant";
 import { useQuizEngine } from "@/hooks/useQuizEngine";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
@@ -25,9 +24,6 @@ export default function QuizScreen() {
   const { questions, isLoading, isError, error } = useQuizQuestions();
   const { setGlowTarget } = useGlowContext();
   const [showSummary, setShowSummary] = useState(false);
-  const [submittedAnswers, setSubmittedAnswers] = useState<QuizAnswers | null>(
-    null
-  );
   const {
     fadeStyle: sectionFadeStyle,
     transitionTo,
@@ -35,7 +31,6 @@ export default function QuizScreen() {
   } = useSectionFade();
   const engine = useQuizEngine(questions, {
     onSubmit: (answers) => {
-      setSubmittedAnswers(answers);
       setGlowTarget(1, getSummaryVariant(answers));
       transitionTo(() => setShowSummary(true), "back");
     },
@@ -95,9 +90,9 @@ export default function QuizScreen() {
             <View style={styles.bufferingWrapper}>
               <SpinningBuffer size={40} color={COLORS.text} />
             </View>
-          ) : showSummary && submittedAnswers ? (
+          ) : showSummary && questions ? (
             <Animated.View style={[styles.quizContent, sectionFadeStyle]}>
-              <QuizSummary answers={submittedAnswers} />
+              <QuizSummary questions={questions} />
             </Animated.View>
           ) : engine.currentQuestion ? (
             <Animated.View style={[styles.quizContent, sectionFadeStyle]}>

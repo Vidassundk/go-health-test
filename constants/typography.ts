@@ -41,9 +41,7 @@ export const TYPOGRAPHY: Record<string, TextStyle> = {
   body: {
     fontFamily: FONTS.redditSans.regular,
     fontSize: 15,
-    lineHeight: 20,
     letterSpacing: -0.24,
-    textAlign: "center",
   },
 
   bodyBold: {

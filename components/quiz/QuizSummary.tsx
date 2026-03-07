@@ -1,34 +1,64 @@
 import AppText from "@/components/AppText";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
-import type { QuizAnswers } from "@/hooks/useQuizEngine";
-import type { SummaryVariant } from "@/utils/getSummaryVariant";
-import { getSummaryVariant } from "@/utils/getSummaryVariant";
-import React from "react";
+import { useQuizStore } from "@/stores/quizStore";
+import type { QuizQuestion } from "@/types/quiz";
+import {
+  getSummaryDisplayData,
+  type SummaryDisplayData,
+} from "@/utils/getSummaryDisplayData";
+import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
 type Props = {
-  answers: QuizAnswers;
+  questions: QuizQuestion[];
 };
 
-export function QuizSummary({ answers }: Props) {
-  const variant: SummaryVariant = getSummaryVariant(answers);
-  const copy = locale.summary[variant];
+export function QuizSummary({ questions }: Props) {
+  const answers = useQuizStore((s) => s.answers);
+  const displayData: SummaryDisplayData = useMemo(
+    () => getSummaryDisplayData(answers, questions),
+    [answers, questions]
+  );
+  const { name, mainGoal, complementaryGoals } = displayData;
+  const { labels } = locale.summary;
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <AppText variant="caption" color={COLORS.textAlt}>
-          {copy.caption}
-        </AppText>
-        <AppText variant="heading" color={COLORS.text}>
-          {copy.title}
-        </AppText>
-      </View>
-      <View style={styles.body}>
-        <AppText variant="body" color={COLORS.text}>
-          {copy.body}
-        </AppText>
+      <View style={styles.sections}>
+        <View style={styles.header}>
+          <AppText variant="body" color={COLORS.textAlt}>
+            {labels.sectionTitle}
+          </AppText>
+          <AppText variant="heading" color={COLORS.text}>
+            {labels.welcomePrefix}
+            {name}
+          </AppText>
+        </View>
+        <View style={styles.goalsBlock}>
+          <View style={styles.header}>
+            <AppText variant="body" color={COLORS.textAlt}>
+              {labels.yourGoal}
+            </AppText>
+            <AppText variant="heading" color={COLORS.text}>
+              {mainGoal}
+            </AppText>
+          </View>
+          {complementaryGoals.length > 0 && (
+            <View style={styles.header}>
+              <AppText variant="body" color={COLORS.textAlt}>
+                {complementaryGoals.length === 1
+                  ? labels.complementaryGoal
+                  : labels.complementaryGoals}
+              </AppText>
+              {complementaryGoals.map((goal, i) => (
+                <AppText key={i} variant="bodyBold" color={COLORS.text}>
+                  {goal}
+                </AppText>
+              ))}
+            </View>
+          )}
+        </View>
       </View>
     </View>
   );
@@ -40,11 +70,13 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     gap: 24,
   },
+  sections: {
+    gap: 40,
+  },
   header: {
     gap: 10,
   },
-  body: {
-    flex: 1,
-    gap: 12,
+  goalsBlock: {
+    gap: 20,
   },
 });
