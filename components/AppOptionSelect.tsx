@@ -1,5 +1,6 @@
 import AppOptionSelectOuter from "@/components/AppOptionSelectOuter";
 import AppText from "@/components/AppText";
+import { CheckIcon } from "@/components/Icons/CheckIcon";
 import {
   CROSSFADE_DURATION_MS,
   STAGGER_DELAY_MS,
@@ -11,6 +12,7 @@ import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
   interpolate,
+  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
@@ -24,14 +26,15 @@ export type AppOptionSelectProps = {
   opt: QuestionOption;
   selected: boolean;
   onPress: () => void;
+  check?: boolean;
 };
 
 export function AppOptionSelect({
   opt,
   selected,
   onPress,
+  check = false,
 }: AppOptionSelectProps) {
-  const hasLabel = Boolean(opt.title);
   const [layout, setLayout] = useState<{
     width: number;
     height: number;
@@ -65,12 +68,24 @@ export function AppOptionSelect({
     opacity: interpolate(innerSelectedProgress.value, [0, 1], [0, 0.4]),
   }));
 
+  const checkWrapperAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(innerSelectedProgress.value, [0, 1], [0.4, 1]),
+    backgroundColor: interpolateColor(
+      innerSelectedProgress.value,
+      [0, 1],
+      [COLORS.optionInnerActive, COLORS.checkBoxBackground]
+    ),
+  }));
+
+  const checkIconAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(innerSelectedProgress.value, [0, 1], [0, 1]),
+  }));
+
   const innerRadius = BORDER_RADIUS - INSET;
 
   return (
     <View
       style={styles.optionWrapper}
-      pointerEvents={hasLabel ? "auto" : "none"}
       onLayout={(e) => {
         const { width, height } = e.nativeEvent.layout;
         setLayout((prev) =>
@@ -90,11 +105,7 @@ export function AppOptionSelect({
         />
       )}
       <View
-        style={[
-          styles.inner,
-          { margin: INSET, borderRadius: innerRadius },
-          !hasLabel && styles.innerFill,
-        ]}
+        style={[styles.inner, { margin: INSET, borderRadius: innerRadius }]}
       >
         <Animated.View
           style={[
@@ -111,10 +122,19 @@ export function AppOptionSelect({
           onPress={onPress}
           onPressIn={onPressIn}
           onPressOut={onPressOut}
-          style={hasLabel ? styles.pressable : styles.pressableFill}
+          style={styles.pressable}
           android_ripple={null}
         >
-          {hasLabel && <AppText variant="bodyBold">{opt.title}</AppText>}
+          <AppText variant="bodyBold">{opt.title}</AppText>
+          {check && (
+            <Animated.View
+              style={[styles.checkWrapper, checkWrapperAnimatedStyle]}
+            >
+              <Animated.View style={checkIconAnimatedStyle}>
+                <CheckIcon size={10} />
+              </Animated.View>
+            </Animated.View>
+          )}
         </Pressable>
       </View>
     </View>
@@ -134,7 +154,19 @@ const styles = StyleSheet.create({
   },
   pressable: {
     paddingHorizontal: 20,
-    paddingVertical: 26,
+    minHeight: 74,
+    paddingVertical: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  checkWrapper: {
+    marginLeft: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    height: 24,
+    width: 24,
+    borderRadius: 9.6,
   },
   pressableFill: {
     flex: 1,

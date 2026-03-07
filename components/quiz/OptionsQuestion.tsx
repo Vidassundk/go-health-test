@@ -38,6 +38,7 @@ export function OptionsQuestion({ question, value, onChange }: Props) {
           opt={opt}
           selected={isSelected(opt)}
           onPress={() => handlePress(opt)}
+          check={isMultiple}
         />
       ))}
     </View>

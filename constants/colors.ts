@@ -3,6 +3,7 @@ export const COLORS = {
   text: "#FDFCFE",
   textAlt: "#BCB1FF",
   error: "#F44F43",
+  checkBoxBackground: "#34CBB1",
   optionBorderInactive: "#4A4884",
   optionBorderError: "#8B3A38",
   optionInnerActive: "#33325B",
