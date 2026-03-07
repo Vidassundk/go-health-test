@@ -106,6 +106,7 @@ export default function QuizScreen() {
               <QuizFlow
                 question={engine.currentQuestion}
                 isLast={engine.isLast}
+                setAnswer={engine.setAnswer}
                 canProceed={engine.isCurrentStepValid}
                 onNext={() =>
                   engine.isLast

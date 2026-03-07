@@ -1,11 +1,7 @@
 import AppText from "@/components/AppText";
 import { COLORS } from "@/constants/colors";
 import type { QuizQuestion } from "@/types/quiz";
-import {
-  selectAnswer,
-  selectSetAnswer,
-  useQuizStore,
-} from "@/stores/quizStore";
+import { selectAnswer, useQuizStore } from "@/stores/quizStore";
 import {
   selectWheelPickerShowingBuffer,
   useWheelPickerStore,
@@ -19,6 +15,7 @@ type Props = {
   question: QuizQuestion;
   isLast: boolean;
   onNext: () => void;
+  setAnswer: (key: string, value: unknown) => void;
   isTransitioning?: boolean;
   canProceed?: boolean;
 };
@@ -27,12 +24,12 @@ function QuizFlowInner({
   question,
   isLast,
   onNext,
+  setAnswer,
   isTransitioning = false,
   canProceed = true,
 }: Props) {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const value = useQuizStore(selectAnswer(question.key));
-  const setAnswer = useQuizStore(selectSetAnswer);
   const isWheelPickerShowingBuffer = useWheelPickerStore(
     selectWheelPickerShowingBuffer
   );

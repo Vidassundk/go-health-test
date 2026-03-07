@@ -1,7 +1,10 @@
 import IconButton from "@/components/IconButton";
 import { ArrowIcon } from "@/components/Icons/ArrowIcon";
+import { TrashIcon } from "@/components/Icons/TrashIcon";
 import QuizProgressBar from "@/components/QuizProgressBar";
+import { isDebugWipeDataButtonEnabled } from "@/config/featureFlags";
 import { COLORS } from "@/constants/colors";
+import { useQuizStore } from "@/stores/quizStore";
 import React, { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -36,7 +39,19 @@ export default function QuizHeader({
       <View style={styles.progressWrapper}>
         <QuizProgressBar progress={progress} />
       </View>
-      <View style={styles.spacer} />
+      {isDebugWipeDataButtonEnabled() ? (
+        <View style={styles.wipeButton}>
+          <IconButton
+            icon={<TrashIcon size={22} color={COLORS.text} />}
+            onPress={() => useQuizStore.getState().reset()}
+            accessibilityRole="button"
+            accessibilityLabel="Wipe quiz state (debug)"
+          />
+        </View>
+      ) : (
+        // Spacer
+        <View style={styles.wipeButton} />
+      )}
     </View>
   );
 }
@@ -59,7 +74,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  spacer: {
+  wipeButton: {
     width: 22,
+    height: 22,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

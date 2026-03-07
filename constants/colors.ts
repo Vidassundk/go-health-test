@@ -35,3 +35,16 @@ export const GLOW_COLORS = {
     drinking: { top: "#E2B0FF", bottom: "#00F0DD" },
   },
 } as const;
+
+/** Dominating glow colors per summary variant, used for progress bar fill */
+export const PROGRESS_BAR_COLORS = {
+  default: COLORS.textAlt,
+  summary: {
+    smoking: GLOW_COLORS.summary.smoking.bottom,
+    drinking: GLOW_COLORS.summary.drinking.bottom,
+  },
+} as const;
+
+export type ProgressBarColor =
+  | (typeof PROGRESS_BAR_COLORS)["default"]
+  | (typeof PROGRESS_BAR_COLORS)["summary"][keyof (typeof PROGRESS_BAR_COLORS)["summary"]];

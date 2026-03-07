@@ -1,7 +1,14 @@
-import { COLORS } from "@/constants/colors";
+import {
+  COLORS,
+  type ProgressBarColor,
+  PROGRESS_BAR_COLORS,
+} from "@/constants/colors";
+import { useGlowContext } from "@/contexts/GlowContext";
+import type { GlowVariant } from "@/contexts/GlowContext";
 import React, { useCallback, useEffect } from "react";
 import { type LayoutChangeEvent, StyleSheet, View } from "react-native";
 import Animated, {
+  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -18,8 +25,19 @@ type QuizProgressBarProps = {
 };
 
 export default function QuizProgressBar({ progress }: QuizProgressBarProps) {
+  const { glowProgress, glowVariant } = useGlowContext();
   const animatedProgress = useSharedValue(0);
   const trackWidth = useSharedValue(0);
+  const targetColor = useSharedValue<ProgressBarColor>(
+    PROGRESS_BAR_COLORS.default
+  );
+
+  useEffect(() => {
+    targetColor.value =
+      glowVariant != null
+        ? PROGRESS_BAR_COLORS.summary[glowVariant as GlowVariant]
+        : PROGRESS_BAR_COLORS.default;
+  }, [glowVariant, targetColor]);
 
   useEffect(() => {
     animatedProgress.value = withSpring(
@@ -37,8 +55,14 @@ export default function QuizProgressBar({ progress }: QuizProgressBarProps) {
 
   const fillStyle = useAnimatedStyle(() => {
     "worklet";
+    const fillColor = interpolateColor(
+      glowProgress.value,
+      [0, 1],
+      [PROGRESS_BAR_COLORS.default, targetColor.value]
+    );
     return {
       width: animatedProgress.value * trackWidth.value,
+      backgroundColor: fillColor,
     };
   });
 
@@ -60,6 +84,5 @@ const styles = StyleSheet.create({
   fill: {
     height: "100%",
     borderRadius: 5,
-    backgroundColor: COLORS.textAlt,
   },
 });

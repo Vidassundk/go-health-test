@@ -8,6 +8,7 @@ interface QuizState {
   answers: QuizAnswers;
   currentIndex: number;
   setAnswer: (key: string, value: unknown) => void;
+  clearAnswers: (keys: string[]) => void;
   setCurrentIndex: (index: number | ((prev: number) => number)) => void;
   reset: () => void;
 }
@@ -32,6 +33,13 @@ export const useQuizStore = create<QuizState>()(
         set((state) => ({
           answers: { ...state.answers, [key]: value },
         })),
+      // Wipe path-specific answers when switching program (e.g. smoking↔alcohol)
+      clearAnswers: (keys) =>
+        set((state) => {
+          const next = { ...state.answers };
+          for (const k of keys) delete next[k];
+          return { answers: next };
+        }),
       setCurrentIndex: (indexOrUpdater) =>
         set((state) => ({
           currentIndex:

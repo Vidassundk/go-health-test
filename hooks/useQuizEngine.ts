@@ -74,6 +74,20 @@ function getVisibilityKeys(questions: QuizQuestion[] | null): Set<string> {
   );
 }
 
+/** Keys for questions on a given path; used to clear them when switching program */
+function getQuestionKeysForVisibilityValue(
+  questions: QuizQuestion[],
+  visibilityKey: string,
+  value: string
+): string[] {
+  return questions
+    .filter(
+      (q) =>
+        q.visibleIf?.question === visibilityKey && q.visibleIf?.value === value
+    )
+    .map((q) => q.key);
+}
+
 export function useQuizEngine(
   questions: QuizQuestion[] | null,
   options?: UseQuizEngineOptions
@@ -92,8 +106,34 @@ export function useQuizEngine(
   );
 
   const currentIndex = useQuizStore(selectCurrentIndex);
-  const setAnswer = useQuizStore((s) => s.setAnswer);
+  const storeSetAnswer = useQuizStore((s) => s.setAnswer);
+  const clearAnswers = useQuizStore((s) => s.clearAnswers);
   const setCurrentIndex = useQuizStore(selectSetCurrentIndex);
+
+  // When switching program (e.g. smoking↔alcohol), clear answers from the path we're leaving
+  const setAnswer = useCallback(
+    (key: string, value: unknown) => {
+      if (questions && visibilityKeys.has(key)) {
+        const oldValue = useQuizStore.getState().answers[key];
+        const oldStr =
+          oldValue !== undefined && oldValue !== null ? String(oldValue) : null;
+        const newStr =
+          value !== undefined && value !== null ? String(value) : null;
+        if (oldStr !== null && newStr !== null && oldStr !== newStr) {
+          const keysToClear = getQuestionKeysForVisibilityValue(
+            questions,
+            key,
+            oldStr
+          );
+          if (keysToClear.length > 0) {
+            clearAnswers(keysToClear);
+          }
+        }
+      }
+      storeSetAnswer(key, value);
+    },
+    [questions, visibilityKeys, storeSetAnswer, clearAnswers]
+  );
 
   const visibleQuestions = useMemo(
     () =>
