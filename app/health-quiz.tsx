@@ -13,12 +13,12 @@ import { showErrorToast } from "@/utils/toast";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
-  Animated,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
   View,
 } from "react-native";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function QuizScreen() {
@@ -97,34 +97,34 @@ export default function QuizScreen() {
             <View style={styles.bufferingWrapper}>
               <SpinningBuffer size={40} color={COLORS.text} />
             </View>
-          ) : showSummary && questions ? (
-            <Animated.View style={[styles.quizContent, sectionFadeStyle]}>
-              <QuizSummary
-                questions={questions}
-                isTransitioning={isTransitioning}
-                onStartJourney={() => {
-                  setGlowTarget(0);
-                  fadeOutThen(() => router.push("/home"), "back");
-                }}
-              />
-            </Animated.View>
-          ) : engine.currentQuestion ? (
-            <Animated.View style={[styles.quizContent, sectionFadeStyle]}>
-              <QuizFlow
-                question={engine.currentQuestion}
-                isLast={engine.isLast}
-                setAnswer={engine.setAnswer}
-                canProceed={engine.isCurrentStepValid}
-                onNext={() =>
-                  engine.isLast
-                    ? engine.goNext()
-                    : transitionTo(engine.goNext, "back")
-                }
-                isTransitioning={isSectionTransitioning}
-              />
-            </Animated.View>
           ) : (
-            <View />
+            <Animated.View style={[styles.quizContent, sectionFadeStyle]}>
+              {showSummary && questions ? (
+                <QuizSummary
+                  questions={questions}
+                  isTransitioning={isTransitioning}
+                  onStartJourney={() => {
+                    setGlowTarget(0);
+                    fadeOutThen(() => router.push("/home"), "back");
+                  }}
+                />
+              ) : engine.currentQuestion ? (
+                <QuizFlow
+                  question={engine.currentQuestion}
+                  isLast={engine.isLast}
+                  setAnswer={engine.setAnswer}
+                  canProceed={engine.isCurrentStepValid}
+                  onNext={() =>
+                    engine.isLast
+                      ? engine.goNext()
+                      : transitionTo(engine.goNext, "back")
+                  }
+                  isTransitioning={isSectionTransitioning}
+                />
+              ) : (
+                <View />
+              )}
+            </Animated.View>
           )}
         </KeyboardAvoidingView>
       </SafeAreaView>

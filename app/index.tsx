@@ -4,7 +4,8 @@ import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
 import { useScreenFade } from "@/hooks/useScreenFade";
 import { useRouter } from "expo-router";
-import { Animated, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LandingScreen() {
