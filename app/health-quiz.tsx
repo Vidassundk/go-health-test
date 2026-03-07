@@ -2,7 +2,9 @@ import { QuizFlow, QuizSummary } from "@/components/quiz";
 import QuizHeader, { HEADER_HEIGHT } from "@/components/QuizHeader";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { COLORS } from "@/constants/colors";
+import { useGlowContext } from "@/contexts/GlowContext";
 import type { QuizAnswers } from "@/hooks/useQuizEngine";
+import { getSummaryVariant } from "@/utils/getSummaryVariant";
 import { useQuizEngine } from "@/hooks/useQuizEngine";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
 import { useScreenFade } from "@/hooks/useScreenFade";
@@ -21,6 +23,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function QuizScreen() {
   const { questions, isLoading, isError, error } = useQuizQuestions();
+  const { setGlowTarget } = useGlowContext();
   const [showSummary, setShowSummary] = useState(false);
   const [submittedAnswers, setSubmittedAnswers] = useState<QuizAnswers | null>(
     null
@@ -33,6 +36,7 @@ export default function QuizScreen() {
   const engine = useQuizEngine(questions, {
     onSubmit: (answers) => {
       setSubmittedAnswers(answers);
+      setGlowTarget(1, getSummaryVariant(answers));
       transitionTo(() => setShowSummary(true), "back");
     },
   });
@@ -45,8 +49,13 @@ export default function QuizScreen() {
     }
   }, [isError, error]);
 
+  useEffect(() => {
+    return () => setGlowTarget(0);
+  }, [setGlowTarget]);
+
   const handleBackPress = useCallback(() => {
     if (showSummary) {
+      setGlowTarget(0);
       transitionTo(() => setShowSummary(false), "forward");
     } else if (engine.isFirst) {
       fadeOutThen(() => router.back(), "forward");
@@ -55,6 +64,7 @@ export default function QuizScreen() {
     }
   }, [
     showSummary,
+    setGlowTarget,
     engine.isFirst,
     engine.goBack,
     fadeOutThen,
@@ -68,10 +78,10 @@ export default function QuizScreen() {
         <QuizHeader
           onBackPress={handleBackPress}
           progress={
-            showSummary
-              ? 1
-              : engine.totalSteps > 0
-              ? (engine.currentIndex + 1) / engine.totalSteps
+            engine.totalSteps > 0
+              ? showSummary
+                ? (engine.totalSteps + 1) / (engine.totalSteps + 1)
+                : (engine.currentIndex + 1) / (engine.totalSteps + 1)
               : 0
           }
           isBackDisabled={isTransitioning || isSectionTransitioning}

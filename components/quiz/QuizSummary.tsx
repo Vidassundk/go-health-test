@@ -1,6 +1,9 @@
 import AppText from "@/components/AppText";
 import { COLORS } from "@/constants/colors";
+import { locale } from "@/constants/locale";
 import type { QuizAnswers } from "@/hooks/useQuizEngine";
+import type { SummaryVariant } from "@/utils/getSummaryVariant";
+import { getSummaryVariant } from "@/utils/getSummaryVariant";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -9,19 +12,22 @@ type Props = {
 };
 
 export function QuizSummary({ answers }: Props) {
+  const variant: SummaryVariant = getSummaryVariant(answers);
+  const copy = locale.summary[variant];
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <AppText variant="caption" color={COLORS.textAlt}>
-          All done
+          {copy.caption}
         </AppText>
         <AppText variant="heading" color={COLORS.text}>
-          Summary
+          {copy.title}
         </AppText>
       </View>
       <View style={styles.body}>
         <AppText variant="body" color={COLORS.text}>
-          Thank you for completing the health quiz.
+          {copy.body}
         </AppText>
       </View>
     </View>

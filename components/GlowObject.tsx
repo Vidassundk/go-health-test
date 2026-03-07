@@ -2,11 +2,13 @@ import {
   Blur,
   Canvas,
   Group,
+  interpolateColors,
   Paint,
   RoundedRect,
 } from "@shopify/react-native-skia";
 import React, { useEffect } from "react";
 import { View, type StyleProp, type ViewStyle } from "react-native";
+import type { SharedValue } from "react-native-reanimated";
 import {
   useDerivedValue,
   useSharedValue,
@@ -14,7 +16,7 @@ import {
   withTiming,
 } from "react-native-reanimated";
 
-const DRIFT_AMPLITUDE = 8;
+const DRIFT_AMPLITUDE = 10;
 const DRIFT_DURATION_MS = 4000;
 
 export interface GlowObjectProps {
@@ -22,6 +24,10 @@ export interface GlowObjectProps {
   height: number;
   radius?: number;
   color: string;
+  /** Target color when progress is 1 (for Summary screen glow shift) */
+  colorTo?: string;
+  /** 0 = color, 1 = colorTo. When provided with colorTo, animates between them. */
+  colorProgress?: SharedValue<number>;
   fillOpacity?: number;
   layerOpacity?: number;
   blur: number;
@@ -37,6 +43,8 @@ export default function GlowObject({
   height,
   radius = 0,
   color,
+  colorTo,
+  colorProgress,
   fillOpacity = 1,
   layerOpacity = 1,
   blur,
@@ -63,6 +71,14 @@ export default function GlowObject({
     const translateX = Math.sin(t) * DRIFT_AMPLITUDE;
     const translateY = Math.cos(t * 0.7) * DRIFT_AMPLITUDE * 0.8;
     return [{ translateX }, { translateY }];
+  });
+
+  const resolvedColor = useDerivedValue(() => {
+    "worklet";
+    if (colorTo != null && colorProgress != null) {
+      return interpolateColors(colorProgress.value, [0, 1], [color, colorTo]);
+    }
+    return color;
   });
 
   return (
@@ -100,7 +116,7 @@ export default function GlowObject({
               width={width}
               height={height}
               r={radius}
-              color={color}
+              color={resolvedColor}
             />
           </Group>
         </Group>

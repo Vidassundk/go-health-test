@@ -24,3 +24,14 @@ export const ERROR_GRADIENT_COLORS = [
 ] as const;
 
 export const GRADIENT_POSITIONS = [0, 0.5006, 0.7352, 1] as const;
+
+export const GLOW_COLORS = {
+  default: {
+    top: "#E2B0FF",
+    bottom: "#4717E9",
+  },
+  summary: {
+    smoking: { top: "#E2B0FF", bottom: "#0080FF" },
+    drinking: { top: "#E2B0FF", bottom: "#00F0DD" },
+  },
+} as const;

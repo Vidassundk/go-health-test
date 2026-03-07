@@ -1,14 +1,22 @@
 import GlowObject from "@/components/GlowObject";
-import { COLORS } from "@/constants/colors";
+import { COLORS, GLOW_COLORS } from "@/constants/colors";
+import { useGlowContext } from "@/contexts/GlowContext";
 import { StyleSheet, View } from "react-native";
 
 export default function GlowingBackground() {
+  const { glowProgress, glowVariant } = useGlowContext();
+  const summaryColors = glowVariant
+    ? GLOW_COLORS.summary[glowVariant]
+    : GLOW_COLORS.default;
+
   return (
     <View pointerEvents="none" style={styles.container}>
       <GlowObject
         width={195}
         height={48}
-        color="#E2B0FF"
+        color={GLOW_COLORS.default.top}
+        colorTo={summaryColors.top}
+        colorProgress={glowProgress}
         layerOpacity={0.7268}
         blur={50}
         radius={20}
@@ -19,7 +27,9 @@ export default function GlowingBackground() {
       <GlowObject
         width={310}
         height={48}
-        color="#4717E9"
+        color={GLOW_COLORS.default.bottom}
+        colorTo={summaryColors.bottom}
+        colorProgress={glowProgress}
         blur={54}
         radius={20}
         animate
