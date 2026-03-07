@@ -56,7 +56,7 @@ function isStepValid(question: QuizQuestion, value: unknown): boolean {
     case "single":
       return !!(value && (typeof value !== "string" || value.trim()));
     case "multiple":
-      return true;
+      return Array.isArray(value) && value.length > 0;
     default:
       return true;
   }
