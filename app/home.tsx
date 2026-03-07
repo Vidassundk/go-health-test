@@ -3,33 +3,43 @@ import AppText from "@/components/AppText";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
 import { useScreenFade } from "@/hooks/useScreenFade";
+import { useQuizStore } from "@/stores/quizStore";
 import { useRouter } from "expo-router";
 import { Animated, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function LandingScreen() {
+export default function HomeScreen() {
   const router = useRouter();
+  const reset = useQuizStore((s) => s.reset);
   const { fadeStyle, fadeOutThen, isTransitioning } = useScreenFade();
+  const { title, text, startOver } = locale.homeScreen;
+
+  const handleStartOver = () => {
+    fadeOutThen(() => {
+      reset();
+      router.replace("/");
+    }, "back");
+  };
 
   return (
     <Animated.View style={[styles.screen, fadeStyle]}>
       <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
         <View style={styles.contentArea}>
           <View style={styles.appGreetingSection}>
-            <AppText variant="display">{locale.home.greeting}</AppText>
+            <AppText variant="display">{title}</AppText>
             <AppText
               color={COLORS.textAlt}
               style={{ textAlign: "center" }}
               variant="bodyCompact"
             >
-              {locale.home.subtext}
+              {text}
             </AppText>
           </View>
         </View>
         <AppButton
-          label="Next"
+          label={startOver}
           disabled={isTransitioning}
-          onPress={() => fadeOutThen(() => router.push("/health-quiz"), "back")}
+          onPress={handleStartOver}
         />
       </SafeAreaView>
     </Animated.View>

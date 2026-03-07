@@ -99,7 +99,14 @@ export default function QuizScreen() {
             </View>
           ) : showSummary && questions ? (
             <Animated.View style={[styles.quizContent, sectionFadeStyle]}>
-              <QuizSummary questions={questions} />
+              <QuizSummary
+                questions={questions}
+                isTransitioning={isTransitioning}
+                onStartJourney={() => {
+                  setGlowTarget(0);
+                  fadeOutThen(() => router.push("/home"), "back");
+                }}
+              />
             </Animated.View>
           ) : engine.currentQuestion ? (
             <Animated.View style={[styles.quizContent, sectionFadeStyle]}>
