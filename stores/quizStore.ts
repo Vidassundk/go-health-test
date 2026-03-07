@@ -17,6 +17,13 @@ const initialState = {
   currentIndex: 0,
 };
 
+/** Selector helpers for granular subscriptions - use these to avoid re-renders when unrelated answers change */
+export const selectAnswer = (key: string) => (s: QuizState) => s.answers[key];
+export const selectSetAnswer = (s: QuizState) => s.setAnswer;
+export const selectSetCurrentIndex = (s: QuizState) => s.setCurrentIndex;
+export const selectCurrentIndex = (s: QuizState) => s.currentIndex;
+export const selectAnswers = (s: QuizState) => s.answers;
+
 export const useQuizStore = create<QuizState>()(
   persist(
     (set) => ({

@@ -1,6 +1,11 @@
-import { useQuizStore } from "@/stores/quizStore";
+import {
+  useQuizStore,
+  selectCurrentIndex,
+  selectSetCurrentIndex,
+} from "@/stores/quizStore";
 import type { QuizQuestion } from "@/types/quiz";
 import { useCallback, useEffect, useMemo } from "react";
+import { useShallow } from "zustand/react/shallow";
 
 import type { QuizAnswers } from "@/stores/quizStore";
 
@@ -61,37 +66,60 @@ type UseQuizEngineOptions = {
   onSubmit?: (answers: QuizAnswers) => void;
 };
 
+/** Keys from answers that affect question visibility (visibleIf conditions) */
+function getVisibilityKeys(questions: QuizQuestion[] | null): Set<string> {
+  if (!questions) return new Set();
+  return new Set(
+    questions.flatMap((q) => (q.visibleIf ? [q.visibleIf.question] : []))
+  );
+}
+
 export function useQuizEngine(
   questions: QuizQuestion[] | null,
   options?: UseQuizEngineOptions
 ) {
   const { onSubmit } = options ?? {};
-  const answers = useQuizStore((s) => s.answers);
-  const currentIndex = useQuizStore((s) => s.currentIndex);
-  const setAnswer = useQuizStore((s) => s.setAnswer);
-  const setCurrentIndex = useQuizStore((s) => s.setCurrentIndex);
 
-  const visibleQuestions = useMemo(() => {
-    if (!questions) return [];
-    return getVisibleQuestions(questions, answers);
-  }, [questions, answers]);
+  const visibilityKeys = useMemo(() => getVisibilityKeys(questions), [questions]);
+  const visibilitySlice = useQuizStore(
+    useShallow((s) =>
+      visibilityKeys.size > 0
+        ? Object.fromEntries(
+            Object.entries(s.answers).filter(([k]) => visibilityKeys.has(k))
+          )
+        : {}
+    )
+  );
+
+  const currentIndex = useQuizStore(selectCurrentIndex);
+  const setAnswer = useQuizStore((s) => s.setAnswer);
+  const setCurrentIndex = useQuizStore(selectSetCurrentIndex);
+
+  const visibleQuestions = useMemo(
+    () =>
+      questions ? getVisibleQuestions(questions, visibilitySlice) : [],
+    [questions, visibilitySlice]
+  );
 
   const currentQuestion = visibleQuestions[currentIndex] ?? null;
   const totalSteps = visibleQuestions.length;
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === totalSteps - 1 && totalSteps > 0;
 
-  const isCurrentStepValid = useMemo(() => {
-    if (!currentQuestion) return true;
-    const value = answers[currentQuestion.key];
-    return isStepValid(currentQuestion, value);
-  }, [currentQuestion, answers]);
+  const currentValue = useQuizStore((s) =>
+    currentQuestion ? s.answers[currentQuestion.key] : undefined
+  );
+  const isCurrentStepValid = useMemo(
+    () =>
+      currentQuestion ? isStepValid(currentQuestion, currentValue) : true,
+    [currentQuestion, currentValue]
+  );
 
   const goNext = useCallback(() => {
     if (!currentQuestion || !isCurrentStepValid) return;
 
     if (isLast) {
-      onSubmit?.(answers);
+      onSubmit?.(useQuizStore.getState().answers);
       return;
     }
 
@@ -99,7 +127,6 @@ export function useQuizEngine(
   }, [
     currentQuestion,
     isCurrentStepValid,
-    answers,
     isLast,
     visibleQuestions.length,
     onSubmit,
@@ -116,17 +143,30 @@ export function useQuizEngine(
     );
   }, [visibleQuestions.length, setCurrentIndex]);
 
-  return {
-    answers,
-    setAnswer,
-    visibleQuestions,
-    currentQuestion,
-    currentIndex,
-    totalSteps,
-    isFirst,
-    isLast,
-    goNext,
-    goBack,
-    isCurrentStepValid,
-  };
+  return useMemo(
+    () => ({
+      setAnswer,
+      visibleQuestions,
+      currentQuestion,
+      currentIndex,
+      totalSteps,
+      isFirst,
+      isLast,
+      goNext,
+      goBack,
+      isCurrentStepValid,
+    }),
+    [
+      setAnswer,
+      visibleQuestions,
+      currentQuestion,
+      currentIndex,
+      totalSteps,
+      isFirst,
+      isLast,
+      goNext,
+      goBack,
+      isCurrentStepValid,
+    ]
+  );
 }

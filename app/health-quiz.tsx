@@ -98,13 +98,7 @@ export default function QuizScreen() {
             <Animated.View style={[styles.quizContent, sectionFadeStyle]}>
               <QuizFlow
                 question={engine.currentQuestion}
-                value={engine.answers[engine.currentQuestion.key]}
-                setAnswer={engine.setAnswer}
-                isFirst={engine.isFirst}
                 isLast={engine.isLast}
-                currentStep={engine.currentIndex + 1}
-                totalSteps={engine.totalSteps}
-                onBack={() => transitionTo(engine.goBack, "back")}
                 canProceed={engine.isCurrentStepValid}
                 onNext={() =>
                   engine.isLast

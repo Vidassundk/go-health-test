@@ -1,39 +1,40 @@
 import AppText from "@/components/AppText";
 import { COLORS } from "@/constants/colors";
 import type { QuizQuestion } from "@/types/quiz";
-import React, { useEffect, useState } from "react";
+import {
+  selectAnswer,
+  selectSetAnswer,
+  useQuizStore,
+} from "@/stores/quizStore";
+import React, { memo, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import AppButton from "../AppButton";
 import { QuestionRenderer } from "./QuestionRenderer";
 
 type Props = {
   question: QuizQuestion;
-  value: unknown;
-  setAnswer: (key: string, value: unknown) => void;
-  isFirst: boolean;
   isLast: boolean;
-  currentStep: number;
-  totalSteps: number;
-  onBack: () => void;
   onNext: () => void;
   isTransitioning?: boolean;
   canProceed?: boolean;
 };
 
-export function QuizFlow({
+function QuizFlowInner({
   question,
-  value,
-  setAnswer,
   isLast,
   onNext,
   isTransitioning = false,
   canProceed = true,
 }: Props) {
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const value = useQuizStore(selectAnswer(question.key));
+  const setAnswer = useQuizStore(selectSetAnswer);
 
   useEffect(() => {
     setSubmitAttempted(false);
   }, [question.key]);
+
+  const handleChange = (v: unknown) => setAnswer(question.key, v);
 
   return (
     <View
@@ -53,7 +54,7 @@ export function QuizFlow({
         <QuestionRenderer
           question={question}
           value={value}
-          onChange={(v) => setAnswer(question.key, v)}
+          onChange={handleChange}
           isTransitioning={isTransitioning}
           onConfirm={onNext}
           submitAttempted={submitAttempted}
@@ -94,3 +95,5 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
 });
+
+export const QuizFlow = memo(QuizFlowInner);
