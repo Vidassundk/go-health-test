@@ -1,8 +1,6 @@
 import { QuizFlow, QuizSummary } from "@/components/quiz";
 import QuizHeader, { HEADER_HEIGHT } from "@/components/QuizHeader";
-import ScreenWithBottomAction, {
-  type BottomActionConfig,
-} from "@/components/ScreenWithBottomAction";
+import ScreenWithBottomAction from "@/components/ScreenWithBottomAction";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { WheelPickerReadyInit } from "@/components/WheelPickerReadyInit";
 import {
@@ -10,34 +8,28 @@ import {
   TRANSITION_EXIT_MS,
   TRANSITION_INITIAL_DELAY_MS,
 } from "@/constants/animations";
-import { COLORS, PROGRESS_BAR_COLORS } from "@/constants/colors";
-import { locale } from "@/constants/locale";
+import { COLORS } from "@/constants/colors";
 import { useGlowContext } from "@/contexts/GlowContext";
+import { useQuizBottomAction } from "@/hooks/useQuizBottomAction";
 import { useQuizEngine, type QuizAnswers } from "@/hooks/useQuizEngine";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
+import {
+  getSectionKey,
+  type SectionSnapshot,
+  useQuizSectionSnapshot,
+} from "@/hooks/useQuizSectionSnapshot";
 import { useScreenTransition } from "@/hooks/useScreenTransition";
 import { useQuizStore } from "@/stores/quizStore";
 import {
   selectWheelPickerShowingBuffer,
   useWheelPickerStore,
 } from "@/stores/wheelPickerStore";
-import type { QuizQuestion } from "@/types/quiz";
 import { getSummaryVariant } from "@/utils/getSummaryVariant";
 import { showErrorToast } from "@/utils/toast";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
-
-type SectionSnapshot =
-  | { kind: "summary" }
-  | {
-      kind: "question";
-      question: QuizQuestion;
-      isLast: boolean;
-      canProceed: boolean;
-    }
-  | { kind: "empty" };
 
 export default function QuizScreen() {
   const { questions, isLoading, isError, error } = useQuizQuestions();
@@ -71,71 +63,31 @@ export default function QuizScreen() {
   const { isVisible, entering, exiting, fadeOutThen, isTransitioning } =
     useScreenTransition();
 
-  const currentSection = useMemo<SectionSnapshot>(() => {
-    if (showSummary && questions) {
-      return { kind: "summary" };
-    }
-    if (currentQuestion) {
-      return {
-        kind: "question",
-        question: currentQuestion,
-        isLast,
-        canProceed: isCurrentStepValid,
-      };
-    }
-    return { kind: "empty" };
-  }, [showSummary, questions, currentQuestion, isLast, isCurrentStepValid]);
+  const currentSection = useQuizSectionSnapshot({
+    showSummary,
+    questions,
+    currentQuestion,
+    isLast,
+    isCurrentStepValid,
+  });
 
   const startSectionTransition = useCallback((action: () => void) => {
     action();
   }, []);
 
-  const bottomAction = useMemo<BottomActionConfig | null>(() => {
-    if (currentSection.kind === "summary") {
-      return {
-        label: locale.summary.labels.startJourney,
-        disabled: isTransitioning,
-        fillColor: PROGRESS_BAR_COLORS.summary[getSummaryVariant(answers)],
-        onPress: () => {
-          setGlowTarget(0);
-          fadeOutThen(() => router.push("/home"), "forward");
-        },
-      };
-    }
-
-    if (currentSection.kind === "question") {
-      return {
-        label: currentSection.isLast ? locale.common.submit : locale.common.next,
-        onPress: () => {
-          setSubmitAttempted(true);
-          if (currentSection.isLast) {
-            goNext();
-          } else {
-            startSectionTransition(goNext);
-          }
-        },
-        disabled:
-          currentSection.question.type === "credentials"
-            ? false
-            : !currentSection.canProceed ||
-              ((currentSection.question.type === "age" ||
-                currentSection.question.type === "weight") &&
-                isWheelPickerShowingBuffer),
-      };
-    }
-
-    return null;
-  }, [
-    currentSection,
-    isTransitioning,
+  const bottomAction = useQuizBottomAction({
+    section: currentSection,
     answers,
-    setGlowTarget,
-    fadeOutThen,
-    router,
+    isTransitioning,
+    isWheelPickerShowingBuffer,
     goNext,
     startSectionTransition,
-    isWheelPickerShowingBuffer,
-  ]);
+    setSubmitAttempted,
+    onSummaryActionPress: () => {
+      setGlowTarget(0);
+      fadeOutThen(() => router.push("/home"), "forward");
+    },
+  });
 
   const renderSection = useCallback(
     (section: SectionSnapshot) => {
@@ -167,8 +119,7 @@ export default function QuizScreen() {
     [questions, setAnswer, goNext, startSectionTransition, submitAttempted]
   );
 
-  const currentSectionKey =
-    currentSection.kind === "question" ? currentSection.question.key : "empty";
+  const currentSectionKey = getSectionKey(currentSection);
 
   useEffect(() => {
     if (isError && error) {
@@ -251,13 +202,7 @@ export default function QuizScreen() {
                 <View style={styles.quizLayout}>
                   <View style={styles.quizContent}>
                     <Animated.View
-                      key={
-                        currentSection.kind === "summary"
-                          ? "summary"
-                          : currentSection.kind === "question"
-                          ? currentSection.question.key
-                          : "empty"
-                      }
+                      key={currentSection.kind === "summary" ? "summary" : currentSectionKey}
                       entering={FadeInRight.duration(TRANSITION_ENTER_MS).delay(
                         TRANSITION_INITIAL_DELAY_MS
                       )}

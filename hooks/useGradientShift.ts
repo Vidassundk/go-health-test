@@ -3,6 +3,10 @@ import { vec } from "@shopify/react-native-skia";
 import type { SharedValue } from "react-native-reanimated";
 import { useDerivedValue } from "react-native-reanimated";
 
+/**
+ * Computes animated gradient start/end points based on button width,
+ * press state, and optional entrance progress.
+ */
 export function useGradientShift(
   width: number,
   pressProgress: SharedValue<number>,

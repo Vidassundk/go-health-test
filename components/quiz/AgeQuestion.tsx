@@ -1,19 +1,10 @@
 import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { COLORS } from "@/constants/colors";
 import { WHEEL_ITEM_HEIGHT } from "@/constants/wheelPicker";
-import {
-  selectWheelPickerReady,
-  useWheelPickerStore,
-} from "@/stores/wheelPickerStore";
+import { useWheelPickerRenderGate } from "@/hooks/useWheelPickerRenderGate";
 import WheelPicker from "@quidone/react-native-wheel-picker";
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useState,
-} from "react";
-import { InteractionManager, View } from "react-native";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { View } from "react-native";
 import {
   WheelPickerChrome,
   wheelPickerItemTextStyle,
@@ -40,27 +31,7 @@ export function AgeQuestion({
   onChange,
   isTransitioning = false,
 }: Props) {
-  const isReady = useWheelPickerStore(selectWheelPickerReady);
-  const setShowingBuffer = useWheelPickerStore((s) => s.setShowingBuffer);
-  const [canRenderPicker, setCanRenderPicker] = useState(false);
-
-  useEffect(() => {
-    setCanRenderPicker(false);
-    if (!isReady || isTransitioning) {
-      return;
-    }
-    const handle = InteractionManager.runAfterInteractions(() => {
-      requestAnimationFrame(() => setCanRenderPicker(true));
-    });
-    return () => handle.cancel();
-  }, [isReady, isTransitioning]);
-
-  const isShowingBuffer = !isReady || isTransitioning || !canRenderPicker;
-
-  useLayoutEffect(() => {
-    setShowingBuffer(isShowingBuffer);
-    return () => setShowingBuffer(false);
-  }, [isShowingBuffer, setShowingBuffer]);
+  const isShowingBuffer = useWheelPickerRenderGate({ isTransitioning });
 
   const age = useMemo(() => {
     if (value === undefined || value === null) {

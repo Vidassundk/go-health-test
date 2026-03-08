@@ -8,6 +8,11 @@ import { FadeInRight, FadeOutLeft, runOnJS } from "react-native-reanimated";
 
 type TransitionDirection = "forward" | "backward";
 
+/**
+ * Controls one-screen fade transition flow.
+ * `fadeOutThen` hides the screen, waits for exit animation completion,
+ * then runs the provided action (usually navigation).
+ */
 export function useScreenTransition() {
   const [isVisible, setIsVisible] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);

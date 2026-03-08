@@ -7,6 +7,10 @@ import {
 } from "react-native-reanimated";
 import type { GestureResponderEvent } from "react-native";
 
+/**
+ * Provides a shared press progress value (0→1) and ready-to-use press handlers.
+ * Useful for components that animate on press while preserving caller callbacks.
+ */
 export function usePressProgress(callbacks?: {
   onPressIn?: (e: GestureResponderEvent) => void;
   onPressOut?: (e: GestureResponderEvent) => void;

@@ -9,6 +9,10 @@ export const QUIZ_QUESTIONS_QUERY_KEY = ["quiz", "questions"] as const;
 
 const configError = new Error(QUIZ_API_URL_ERROR_MESSAGE);
 
+/**
+ * Fetches quiz questions through React Query and normalizes the response
+ * into a screen-friendly shape, including config-related error fallback.
+ */
 export function useQuizQuestions() {
   const isConfigured = isQuizApiConfigured();
   const query = useQuery({

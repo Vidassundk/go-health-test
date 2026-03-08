@@ -90,6 +90,13 @@ function getQuestionKeysForVisibilityValue(
     .map((q) => q.key);
 }
 
+/**
+ * Central quiz flow controller:
+ * - computes visible steps from answers
+ * - validates current step
+ * - handles forward/backward navigation
+ * - triggers submit with full answer snapshot
+ */
 export function useQuizEngine(
   questions: QuizQuestion[] | null,
   options?: UseQuizEngineOptions

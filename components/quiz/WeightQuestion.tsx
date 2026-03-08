@@ -2,19 +2,10 @@ import AppText from "@/components/AppText";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { COLORS } from "@/constants/colors";
 import { WHEEL_ITEM_HEIGHT } from "@/constants/wheelPicker";
-import {
-  selectWheelPickerReady,
-  useWheelPickerStore,
-} from "@/stores/wheelPickerStore";
+import { useWheelPickerRenderGate } from "@/hooks/useWheelPickerRenderGate";
 import WheelPicker from "@quidone/react-native-wheel-picker";
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useState,
-} from "react";
-import { InteractionManager, StyleSheet, View } from "react-native";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { StyleSheet, View } from "react-native";
 import {
   WheelPickerChrome,
   wheelPickerItemTextStyle,
@@ -47,29 +38,7 @@ export function WeightQuestion({
   onChange,
   isTransitioning = false,
 }: Props) {
-  const isReady = useWheelPickerStore(selectWheelPickerReady);
-  const setShowingBuffer = useWheelPickerStore((s) => s.setShowingBuffer);
-  // Defer WheelPicker mount: show buffer first. Mounting WheelPicker blocks JS 2–3s on Android.
-  const [canRenderPicker, setCanRenderPicker] = useState(false);
-
-  useEffect(() => {
-    setCanRenderPicker(false);
-    if (!isReady || isTransitioning) {
-      return;
-    }
-    const handle = InteractionManager.runAfterInteractions(() => {
-      requestAnimationFrame(() => setCanRenderPicker(true));
-    });
-    return () => handle.cancel();
-  }, [isReady, isTransitioning]);
-
-  // Buffer when: not ready, section transitioning, or picker not yet safe to mount.
-  const isShowingBuffer = !isReady || isTransitioning || !canRenderPicker;
-
-  useLayoutEffect(() => {
-    setShowingBuffer(isShowingBuffer);
-    return () => setShowingBuffer(false);
-  }, [isShowingBuffer, setShowingBuffer]);
+  const isShowingBuffer = useWheelPickerRenderGate({ isTransitioning });
 
   const { whole, decimal } = useMemo(() => {
     if (value === undefined || value === null) {
