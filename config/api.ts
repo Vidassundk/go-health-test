@@ -1,5 +1,6 @@
-export const QUIZ_API_URL_ERROR_MESSAGE =
-  "EXPO_PUBLIC_QUIZ_API_URL is not set. Add it to your .env file.";
+import { locale } from "@/constants/locale";
+
+export const QUIZ_API_URL_ERROR_MESSAGE = locale.apiErrors.quizApiNotConfigured;
 
 export function isQuizApiConfigured(): boolean {
   return !!process.env.EXPO_PUBLIC_QUIZ_API_URL;

@@ -8,6 +8,16 @@ export const english = {
       genericAnswer: "Your answer",
     },
   },
+  apiErrors: {
+    quizApiNotConfigured:
+      "Quiz API is not configured. Add EXPO_PUBLIC_QUIZ_API_URL to your .env file.",
+    quizApiNetwork:
+      "Unable to reach Quiz API. Check your internet connection and try again.",
+    quizApiRequestFailed:
+      "Unable to load quiz questions right now. Please try again in a moment.",
+    quizApiInvalidResponse:
+      "Received an invalid response from Quiz API. Please try again later.",
+  },
   home: {
     greeting: "First & foremost, congratulations on this first step.",
     subtext: "Be ready to amaze yourself.",
