@@ -1,3 +1,4 @@
+import { QUIZ_KEYS } from "@/constants/quiz";
 import type { QuizAnswers } from "@/stores/quizStore";
 import type { QuizQuestion } from "@/types/quiz";
 
@@ -16,13 +17,15 @@ export function getSummaryDisplayData(
   answers: QuizAnswers,
   questions: QuizQuestion[]
 ): SummaryDisplayData {
-  const nameQuestion = questions.find((q) => q.type === "name" || q.key === "name");
+  const nameQuestion = questions.find(
+    (q) => q.type === "name" || q.key === QUIZ_KEYS.name
+  );
   const name = nameQuestion
     ? String(answers[nameQuestion.key] ?? "").trim()
     : "";
 
   // Goal question from quiz
-  const goalQuestion = questions.find((q) => q.key === "goal");
+  const goalQuestion = questions.find((q) => q.key === QUIZ_KEYS.goal);
   // User's selected value (e.g. "more_control")
   const goalValue = goalQuestion
     ? (answers[goalQuestion.key] as string | undefined)
@@ -33,7 +36,7 @@ export function getSummaryDisplayData(
       ? getOptionTitle(goalQuestion, goalValue)
       : "Improve my health";
 
-  const programQuestion = questions.find((q) => q.key === "program");
+  const programQuestion = questions.find((q) => q.key === QUIZ_KEYS.program);
   const programValue = programQuestion
     ? (answers[programQuestion.key] as string | undefined)
     : undefined;
@@ -43,7 +46,7 @@ export function getSummaryDisplayData(
     complementaryGoals.push(getOptionTitle(programQuestion, programValue));
   }
   const multipleQuestions = questions.filter(
-    (q) => q.type === "multiple" && q.key !== "program"
+    (q) => q.type === "multiple" && q.key !== QUIZ_KEYS.program
   );
   for (const q of multipleQuestions) {
     const value = answers[q.key];
