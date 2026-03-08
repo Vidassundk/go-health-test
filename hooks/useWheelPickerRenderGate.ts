@@ -13,25 +13,23 @@ type Params = {
  * Gates heavy wheel-picker rendering behind app readiness + interaction idle state.
  * Returns whether a loading buffer should be shown instead of the picker.
  */
-export function useWheelPickerRenderGate({
-  isTransitioning = false,
-}: Params): boolean {
+export function useWheelPickerRenderGate(_params: Params): boolean {
   const isReady = useWheelPickerStore(selectWheelPickerReady);
   const setShowingBuffer = useWheelPickerStore((s) => s.setShowingBuffer);
   const [canRenderPicker, setCanRenderPicker] = useState(false);
 
   useEffect(() => {
     setCanRenderPicker(false);
-    if (!isReady || isTransitioning) {
+    if (!isReady) {
       return;
     }
     const handle = InteractionManager.runAfterInteractions(() => {
       requestAnimationFrame(() => setCanRenderPicker(true));
     });
     return () => handle.cancel();
-  }, [isReady, isTransitioning]);
+  }, [isReady]);
 
-  const isShowingBuffer = !isReady || isTransitioning || !canRenderPicker;
+  const isShowingBuffer = !isReady || !canRenderPicker;
 
   useLayoutEffect(() => {
     setShowingBuffer(isShowingBuffer);
