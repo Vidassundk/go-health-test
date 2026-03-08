@@ -1,4 +1,4 @@
-import type { BottomActionConfig } from "@/components/ScreenWithBottomAction";
+import type { BottomActionConfig } from "@components";
 import { locale } from "@/constants/locale";
 import type { QuizQuestion } from "@/types/quiz";
 import { useMemo } from "react";

@@ -1,4 +1,4 @@
-import AppOptionSelectOuter from "@/components/AppOptionSelectOuter";
+import AppOptionSelectOuter from "./AppOptionSelectOuter";
 import { COLORS } from "@/constants/colors";
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";

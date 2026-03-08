@@ -1,6 +1,6 @@
-import AppOptionSelectOuter from "@/components/AppOptionSelectOuter";
-import AppText from "@/components/AppText";
-import { CheckIcon } from "@/components/Icons/CheckIcon";
+import AppOptionSelectOuter from "./AppOptionSelectOuter";
+import AppText from "./AppText";
+import { CheckIcon } from "@icons";
 import {
   CROSSFADE_DURATION_MS,
   STAGGER_DELAY_MS,

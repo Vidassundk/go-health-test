@@ -1,7 +1,10 @@
-import { QuizSummary } from "@/components/quiz";
-import QuizHeader, { HEADER_HEIGHT } from "@/components/QuizHeader";
-import ScreenWithBottomAction from "@/components/ScreenWithBottomAction";
-import { SpinningBuffer } from "@/components/SpinningBuffer";
+import {
+  HEADER_HEIGHT,
+  QuizHeader,
+  QuizSummary,
+  ScreenWithBottomAction,
+  SpinningBuffer,
+} from "@components";
 import { COLORS, PROGRESS_BAR_COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
 import { useGlowContext } from "@/contexts/GlowContext";

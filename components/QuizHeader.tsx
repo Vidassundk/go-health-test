@@ -1,7 +1,6 @@
-import IconButton from "@/components/IconButton";
-import { ArrowIcon } from "@/components/Icons/ArrowIcon";
-import { TrashIcon } from "@/components/Icons/TrashIcon";
-import QuizProgressBar from "@/components/QuizProgressBar";
+import IconButton from "./IconButton";
+import { ArrowIcon, TrashIcon } from "@icons";
+import QuizProgressBar from "./QuizProgressBar";
 import { isDebugWipeDataButtonEnabled } from "@/config/featureFlags";
 import { COLORS } from "@/constants/colors";
 import { useQuizStore } from "@/stores/quizStore";

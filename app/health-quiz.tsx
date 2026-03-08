@@ -1,8 +1,11 @@
-import { QuizFlow } from "@/components/quiz";
-import QuizHeader, { HEADER_HEIGHT } from "@/components/QuizHeader";
-import ScreenWithBottomAction from "@/components/ScreenWithBottomAction";
-import { SpinningBuffer } from "@/components/SpinningBuffer";
-import { WheelPickerReadyInit } from "@/components/WheelPickerReadyInit";
+import {
+  HEADER_HEIGHT,
+  QuizFlow,
+  QuizHeader,
+  ScreenWithBottomAction,
+  SpinningBuffer,
+  WheelPickerReadyInit,
+} from "@components";
 import {
   TRANSITION_ENTER_MS,
   TRANSITION_EXIT_MS,

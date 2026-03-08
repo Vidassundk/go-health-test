@@ -1,4 +1,4 @@
-import AppOptionSelectOuter from "@/components/AppOptionSelectOuter";
+import AppOptionSelectOuter from "./AppOptionSelectOuter";
 import { CROSSFADE_DURATION_MS } from "@/constants/animations";
 import { COLORS } from "@/constants/colors";
 import { TYPOGRAPHY } from "@/constants/typography";

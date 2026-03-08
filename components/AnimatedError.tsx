@@ -1,4 +1,4 @@
-import AppText from "@/components/AppText";
+import AppText from "./AppText";
 import {
   ERROR_ANIMATION_DURATION_MS,
   ERROR_EXIT_PHASE1_MS,

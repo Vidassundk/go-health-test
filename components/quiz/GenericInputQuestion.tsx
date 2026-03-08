@@ -1,4 +1,4 @@
-import { AppTextInput } from "@/components/AppTextInput";
+import { AppTextInput } from "../AppTextInput";
 import { locale } from "@/constants/locale";
 import { useFocusOnTransitionEnd } from "@/hooks/useFocusOnTransitionEnd";
 import React, { useRef } from "react";

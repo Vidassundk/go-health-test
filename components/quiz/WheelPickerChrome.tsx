@@ -1,4 +1,4 @@
-import { AppOptionSelectChrome } from "@/components/AppOptionSelectChrome";
+import { AppOptionSelectChrome } from "../AppOptionSelectChrome";
 import { COLORS } from "@/constants/colors";
 import { TYPOGRAPHY } from "@/constants/typography";
 import {

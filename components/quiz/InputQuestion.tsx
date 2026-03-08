@@ -1,5 +1,5 @@
-import { AppTextInput } from "@/components/AppTextInput";
-import AppText from "@/components/AppText";
+import { AppTextInput } from "../AppTextInput";
+import AppText from "../AppText";
 import type { QuizQuestion } from "@/types/quiz";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";

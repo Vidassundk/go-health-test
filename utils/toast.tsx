@@ -1,5 +1,5 @@
-import AppText from "@/components/AppText";
-import { ErrorIcon } from "@/components/Icons/ErrorIcon";
+import { AppText } from "@components";
+import { ErrorIcon } from "@icons";
 import { COLORS } from "@/constants/colors";
 import {
   resolveValue,

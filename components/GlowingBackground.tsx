@@ -1,4 +1,4 @@
-import GlowObject from "@/components/GlowObject";
+import GlowObject from "./GlowObject";
 import { COLORS, GLOW_COLORS } from "@/constants/colors";
 import { useGlowContext } from "@/contexts/GlowContext";
 import { StyleSheet, View } from "react-native";

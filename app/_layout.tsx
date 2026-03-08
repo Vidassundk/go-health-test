@@ -1,4 +1,4 @@
-import GlowingBackground from "@/components/GlowingBackground";
+import { GlowingBackground } from "@components";
 import { GlowProvider } from "@/contexts/GlowContext";
 import { Toasts } from "@backpackapp-io/react-native-toast";
 import {

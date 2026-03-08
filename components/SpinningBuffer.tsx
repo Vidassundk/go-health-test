@@ -6,7 +6,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import { BufferIcon } from "@/components/Icons/BufferingIcon";
+import { BufferIcon } from "@icons";
 
 type SpinningBufferProps = Parameters<typeof BufferIcon>[0];
 

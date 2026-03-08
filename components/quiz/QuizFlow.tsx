@@ -1,4 +1,4 @@
-import AppText from "@/components/AppText";
+import AppText from "../AppText";
 import { COLORS } from "@/constants/colors";
 import { selectAnswer, useQuizStore } from "@/stores/quizStore";
 import type { QuizQuestion } from "@/types/quiz";

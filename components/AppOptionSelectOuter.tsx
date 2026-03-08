@@ -1,4 +1,4 @@
-import GradientLayer from "@/components/GradientLayer";
+import GradientLayer from "./GradientLayer";
 import { OPTION_INACTIVE_OPACITY } from "@/constants/animations";
 import { COLORS } from "@/constants/colors";
 import {

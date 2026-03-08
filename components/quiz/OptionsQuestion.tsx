@@ -1,4 +1,4 @@
-import { AppOptionSelect } from "@/components/AppOptionSelect";
+import { AppOptionSelect } from "../AppOptionSelect";
 import type { QuestionOption, QuizQuestion } from "@/types/quiz";
 import React from "react";
 import { StyleSheet, View } from "react-native";

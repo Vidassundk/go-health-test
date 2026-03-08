@@ -1,5 +1,4 @@
-import AppText from "@/components/AppText";
-import ScreenWithBottomAction from "@/components/ScreenWithBottomAction";
+import { AppText, ScreenWithBottomAction } from "@components";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
 import { useScreenTransition } from "@/hooks/useScreenTransition";

@@ -1,4 +1,4 @@
-import AppButton from "@/components/AppButton";
+import AppButton from "./AppButton";
 import React from "react";
 import {
   KeyboardAvoidingView,
