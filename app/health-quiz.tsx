@@ -12,6 +12,7 @@ import { COLORS } from "@/constants/colors";
 import { useGlowContext } from "@/contexts/GlowContext";
 import { useQuizBottomAction } from "@/hooks/useQuizBottomAction";
 import { useQuizEngine, type QuizAnswers } from "@/hooks/useQuizEngine";
+import { useQuizNavigationFlow } from "@/hooks/useQuizNavigationFlow";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
 import {
   getSectionKey,
@@ -24,7 +25,6 @@ import {
   selectWheelPickerShowingBuffer,
   useWheelPickerStore,
 } from "@/stores/wheelPickerStore";
-import { getSummaryVariant } from "@/utils/getSummaryVariant";
 import { showErrorToast } from "@/utils/toast";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
@@ -75,6 +75,20 @@ export default function QuizScreen() {
     action();
   }, []);
 
+  const navigationFlow = useQuizNavigationFlow({
+    setGlowTarget,
+    startSectionTransition,
+    showSummary,
+    setShowSummary,
+    pendingSubmitAnswers,
+    setPendingSubmitAnswers,
+    isFirst,
+    goBack,
+    navigateToHome: () => fadeOutThen(() => router.push("/home"), "forward"),
+    navigateToIntro: () => fadeOutThen(() => router.replace("/"), "forward"),
+  });
+  const { onSummaryActionPress, onBackPress } = navigationFlow;
+
   const bottomAction = useQuizBottomAction({
     section: currentSection,
     answers,
@@ -83,10 +97,7 @@ export default function QuizScreen() {
     goNext,
     startSectionTransition,
     setSubmitAttempted,
-    onSummaryActionPress: () => {
-      setGlowTarget(0);
-      fadeOutThen(() => router.push("/home"), "forward");
-    },
+    onSummaryActionPress,
   });
 
   const renderSection = useCallback(
@@ -131,39 +142,6 @@ export default function QuizScreen() {
     setSubmitAttempted(false);
   }, [currentSectionKey]);
 
-  useEffect(() => {
-    return () => setGlowTarget(0);
-  }, [setGlowTarget]);
-
-  useEffect(() => {
-    if (!pendingSubmitAnswers) {
-      return;
-    }
-
-    setGlowTarget(1, getSummaryVariant(pendingSubmitAnswers));
-    startSectionTransition(() => setShowSummary(true));
-    setPendingSubmitAnswers(null);
-  }, [pendingSubmitAnswers, setGlowTarget, startSectionTransition]);
-
-  const handleBackPress = useCallback(() => {
-    if (showSummary) {
-      setGlowTarget(0);
-      startSectionTransition(() => setShowSummary(false));
-    } else if (isFirst) {
-      fadeOutThen(() => router.replace("/"), "forward");
-    } else {
-      startSectionTransition(goBack);
-    }
-  }, [
-    showSummary,
-    setGlowTarget,
-    startSectionTransition,
-    isFirst,
-    goBack,
-    fadeOutThen,
-    router,
-  ]);
-
   return (
     <View style={styles.screen}>
       {isVisible ? (
@@ -178,7 +156,7 @@ export default function QuizScreen() {
             <WheelPickerReadyInit />
             <View style={styles.headerWrapper}>
               <QuizHeader
-                onBackPress={handleBackPress}
+                onBackPress={onBackPress}
                 isBackDisabled={isTransitioning}
                 progress={
                   totalSteps > 0
