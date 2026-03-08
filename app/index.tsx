@@ -2,39 +2,44 @@ import AppText from "@/components/AppText";
 import ScreenWithBottomAction from "@/components/ScreenWithBottomAction";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
-import { useScreenFade } from "@/hooks/useScreenFade";
+import { useScreenTransition } from "@/hooks/useScreenTransition";
 import { useRouter } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 
 export default function LandingScreen() {
   const router = useRouter();
-  const { fadeStyle, fadeOutThen, isTransitioning } = useScreenFade();
+  const { isVisible, entering, exiting, fadeOutThen, isTransitioning } =
+    useScreenTransition();
 
   return (
-    <Animated.View style={[styles.screen, fadeStyle]}>
-      <ScreenWithBottomAction
-        action={{
-          label: "Next",
-          disabled: isTransitioning,
-          onPress: () =>
-            fadeOutThen(() => router.replace("/health-quiz"), "forward"),
-        }}
-      >
-        <View style={styles.contentArea}>
-          <View style={styles.appGreetingSection}>
-            <AppText variant="display">{locale.home.greeting}</AppText>
-            <AppText
-              color={COLORS.textAlt}
-              style={{ textAlign: "center" }}
-              variant="bodyCompact"
-            >
-              {locale.home.subtext}
-            </AppText>
-          </View>
-        </View>
-      </ScreenWithBottomAction>
-    </Animated.View>
+    <View style={styles.screen}>
+      {isVisible ? (
+        <Animated.View style={styles.screen} entering={entering} exiting={exiting}>
+          <ScreenWithBottomAction
+            action={{
+              label: "Next",
+              disabled: isTransitioning,
+              onPress: () =>
+                fadeOutThen(() => router.replace("/health-quiz"), "forward"),
+            }}
+          >
+            <View style={styles.contentArea}>
+              <View style={styles.appGreetingSection}>
+                <AppText variant="display">{locale.home.greeting}</AppText>
+                <AppText
+                  color={COLORS.textAlt}
+                  style={{ textAlign: "center" }}
+                  variant="bodyCompact"
+                >
+                  {locale.home.subtext}
+                </AppText>
+              </View>
+            </View>
+          </ScreenWithBottomAction>
+        </Animated.View>
+      ) : null}
+    </View>
   );
 }
 

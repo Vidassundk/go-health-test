@@ -15,7 +15,7 @@ import { locale } from "@/constants/locale";
 import { useGlowContext } from "@/contexts/GlowContext";
 import { useQuizEngine, type QuizAnswers } from "@/hooks/useQuizEngine";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
-import { useScreenFade } from "@/hooks/useScreenFade";
+import { useScreenTransition } from "@/hooks/useScreenTransition";
 import { useQuizStore } from "@/stores/quizStore";
 import {
   selectWheelPickerShowingBuffer,
@@ -68,7 +68,8 @@ export default function QuizScreen() {
     goBack,
   } = engine;
   const router = useRouter();
-  const { fadeStyle, fadeOutThen, isTransitioning } = useScreenFade();
+  const { isVisible, entering, exiting, fadeOutThen, isTransitioning } =
+    useScreenTransition();
 
   const currentSection = useMemo<SectionSnapshot>(() => {
     if (showSummary && questions) {
@@ -214,62 +215,66 @@ export default function QuizScreen() {
   ]);
 
   return (
-    <Animated.View style={[styles.screen, fadeStyle]}>
-      <ScreenWithBottomAction
-        action={bottomAction}
-        contentStyle={styles.contentNoHorizontalPadding}
-        actionPointerEventsDisabled={isTransitioning}
-        actionKeyboardAvoiding
-        footerStyle={styles.fixedFooter}
-      >
-        <WheelPickerReadyInit />
-        <View style={styles.headerWrapper}>
-          <QuizHeader
-            onBackPress={handleBackPress}
-            isBackDisabled={isTransitioning}
-            progress={
-              totalSteps > 0
-                ? showSummary
-                  ? (totalSteps + 1) / (totalSteps + 1)
-                  : (currentIndex + 1) / (totalSteps + 1)
-                : 0
-            }
-          />
-        </View>
-        <KeyboardAvoidingView
-          style={styles.contentArea}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? HEADER_HEIGHT / 2 : 0}
-        >
-          {isLoading ? (
-            <View style={styles.bufferingWrapper}>
-              <SpinningBuffer size={40} color={COLORS.text} />
+    <View style={styles.screen}>
+      {isVisible ? (
+        <Animated.View style={styles.screen} entering={entering} exiting={exiting}>
+          <ScreenWithBottomAction
+            action={bottomAction}
+            contentStyle={styles.contentNoHorizontalPadding}
+            actionPointerEventsDisabled={isTransitioning}
+            actionKeyboardAvoiding
+            footerStyle={styles.fixedFooter}
+          >
+            <WheelPickerReadyInit />
+            <View style={styles.headerWrapper}>
+              <QuizHeader
+                onBackPress={handleBackPress}
+                isBackDisabled={isTransitioning}
+                progress={
+                  totalSteps > 0
+                    ? showSummary
+                      ? (totalSteps + 1) / (totalSteps + 1)
+                      : (currentIndex + 1) / (totalSteps + 1)
+                    : 0
+                }
+              />
             </View>
-          ) : (
-            <View style={styles.quizLayout}>
-              <View style={styles.quizContent}>
-                <Animated.View
-                  key={
-                    currentSection.kind === "summary"
-                      ? "summary"
-                      : currentSection.kind === "question"
-                      ? currentSection.question.key
-                      : "empty"
-                  }
-                  entering={FadeInRight.duration(TRANSITION_ENTER_MS).delay(
-                    TRANSITION_INITIAL_DELAY_MS
-                  )}
-                  exiting={FadeOutLeft.duration(TRANSITION_EXIT_MS)}
-                  style={styles.sectionWrapper}
-                >
-                  {renderSection(currentSection)}
-                </Animated.View>
-              </View>
-            </View>
-          )}
-        </KeyboardAvoidingView>
-      </ScreenWithBottomAction>
-    </Animated.View>
+            <KeyboardAvoidingView
+              style={styles.contentArea}
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              keyboardVerticalOffset={Platform.OS === "ios" ? HEADER_HEIGHT / 2 : 0}
+            >
+              {isLoading ? (
+                <View style={styles.bufferingWrapper}>
+                  <SpinningBuffer size={40} color={COLORS.text} />
+                </View>
+              ) : (
+                <View style={styles.quizLayout}>
+                  <View style={styles.quizContent}>
+                    <Animated.View
+                      key={
+                        currentSection.kind === "summary"
+                          ? "summary"
+                          : currentSection.kind === "question"
+                          ? currentSection.question.key
+                          : "empty"
+                      }
+                      entering={FadeInRight.duration(TRANSITION_ENTER_MS).delay(
+                        TRANSITION_INITIAL_DELAY_MS
+                      )}
+                      exiting={FadeOutLeft.duration(TRANSITION_EXIT_MS)}
+                      style={styles.sectionWrapper}
+                    >
+                      {renderSection(currentSection)}
+                    </Animated.View>
+                  </View>
+                </View>
+              )}
+            </KeyboardAvoidingView>
+          </ScreenWithBottomAction>
+        </Animated.View>
+      ) : null}
+    </View>
   );
 }
 
