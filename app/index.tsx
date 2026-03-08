@@ -2,14 +2,28 @@ import { AppText, ScreenWithBottomAction } from "@components";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
 import { useScreenTransition } from "@/hooks/useScreenTransition";
+import { useQuizStore } from "@/stores/quizStore";
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 
 export default function IntroScreen() {
   const router = useRouter();
+  const hasHydrated = useQuizStore((s) => s.hasHydrated);
+  const hasStartedJourney = useQuizStore((s) => s.hasStartedJourney);
   const { isVisible, entering, exiting, fadeOutThen, isTransitioning } =
     useScreenTransition();
+
+  useEffect(() => {
+    if (hasHydrated && hasStartedJourney) {
+      router.replace("/home");
+    }
+  }, [hasHydrated, hasStartedJourney, router]);
+
+  if (!hasHydrated || hasStartedJourney) {
+    return null;
+  }
 
   return (
     <View style={styles.screen}>

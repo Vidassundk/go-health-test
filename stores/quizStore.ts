@@ -7,15 +7,21 @@ export type QuizAnswers = Record<string, unknown>;
 interface QuizState {
   answers: QuizAnswers;
   currentIndex: number;
+  hasStartedJourney: boolean;
+  hasHydrated: boolean;
   setAnswer: (key: string, value: unknown) => void;
   clearAnswers: (keys: string[]) => void;
   setCurrentIndex: (index: number | ((prev: number) => number)) => void;
+  setHasStartedJourney: (started: boolean) => void;
+  setHasHydrated: (hydrated: boolean) => void;
   reset: () => void;
 }
 
 const initialState = {
   answers: {} as QuizAnswers,
   currentIndex: 0,
+  hasStartedJourney: false,
+  hasHydrated: false,
 };
 
 /** Selector helpers for granular subscriptions - use these to avoid re-renders when unrelated answers change */
@@ -45,14 +51,20 @@ export const useQuizStore = create<QuizState>()(
               ? indexOrUpdater(state.currentIndex)
               : indexOrUpdater,
         })),
-      reset: () => set(initialState),
+      setHasStartedJourney: (started) => set({ hasStartedJourney: started }),
+      setHasHydrated: (hydrated) => set({ hasHydrated: hydrated }),
+      reset: () => set((state) => ({ ...initialState, hasHydrated: state.hasHydrated })),
     }),
     {
       name: "quiz-storage",
       storage: createJSONStorage(() => AsyncStorage),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
       partialize: (state) => ({
         answers: state.answers,
         currentIndex: state.currentIndex,
+        hasStartedJourney: state.hasStartedJourney,
       }),
     }
   )

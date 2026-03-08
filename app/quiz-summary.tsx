@@ -21,6 +21,7 @@ import Animated from "react-native-reanimated";
 export default function QuizSummaryScreen() {
   const { questions, isLoading, isError, error } = useQuizQuestions();
   const answers = useQuizStore((s) => s.answers);
+  const setHasStartedJourney = useQuizStore((s) => s.setHasStartedJourney);
   const { setGlowTarget } = useGlowContext();
   const router = useRouter();
   const { isVisible, entering, exiting, fadeOutThen, isTransitioning } =
@@ -44,9 +45,10 @@ export default function QuizSummaryScreen() {
   }, [setGlowTarget, fadeOutThen, router]);
 
   const handleStartJourney = useCallback(() => {
+    setHasStartedJourney(true);
     setGlowTarget(0);
     fadeOutThen(() => router.replace("/home"), "forward");
-  }, [setGlowTarget, fadeOutThen, router]);
+  }, [setHasStartedJourney, setGlowTarget, fadeOutThen, router]);
 
   return (
     <View style={styles.screen}>
