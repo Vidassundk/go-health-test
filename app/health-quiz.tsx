@@ -1,4 +1,6 @@
-import AppButton from "@/components/AppButton";
+import ScreenWithBottomAction, {
+  type BottomActionConfig,
+} from "@/components/ScreenWithBottomAction";
 import { QuizFlow, QuizSummary } from "@/components/quiz";
 import QuizHeader, { HEADER_HEIGHT } from "@/components/QuizHeader";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
@@ -26,7 +28,6 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 type SectionSnapshot =
   | { kind: "summary" }
@@ -55,6 +56,17 @@ export default function QuizScreen() {
       setPendingSubmitAnswers(answers);
     },
   });
+  const {
+    currentQuestion,
+    isLast,
+    isCurrentStepValid,
+    isFirst,
+    totalSteps,
+    currentIndex,
+    setAnswer,
+    goNext,
+    goBack,
+  } = engine;
   const router = useRouter();
   const { fadeStyle, fadeOutThen, isTransitioning } = useScreenFade();
 
@@ -62,26 +74,67 @@ export default function QuizScreen() {
     if (showSummary && questions) {
       return { kind: "summary" };
     }
-    if (engine.currentQuestion) {
+    if (currentQuestion) {
       return {
         kind: "question",
-        question: engine.currentQuestion,
-        isLast: engine.isLast,
-        canProceed: engine.isCurrentStepValid,
+        question: currentQuestion,
+        isLast,
+        canProceed: isCurrentStepValid,
       };
     }
     return { kind: "empty" };
-  }, [
-    showSummary,
-    questions,
-    engine.currentQuestion,
-    engine.isLast,
-    engine.isCurrentStepValid,
-  ]);
+  }, [showSummary, questions, currentQuestion, isLast, isCurrentStepValid]);
 
   const startSectionTransition = useCallback((action: () => void) => {
     action();
   }, []);
+
+  const bottomAction = useMemo<BottomActionConfig | null>(() => {
+    if (currentSection.kind === "summary") {
+      return {
+        label: locale.summary.labels.startJourney,
+        disabled: isTransitioning,
+        fillColor: PROGRESS_BAR_COLORS.summary[getSummaryVariant(answers)],
+        onPress: () => {
+          setGlowTarget(0);
+          fadeOutThen(() => router.push("/home"), "forward");
+        },
+      };
+    }
+
+    if (currentSection.kind === "question") {
+      return {
+        label: currentSection.isLast ? "Submit" : "Next",
+        onPress: () => {
+          setSubmitAttempted(true);
+          if (currentSection.isLast) {
+            goNext();
+          } else {
+            startSectionTransition(goNext);
+          }
+        },
+        disabled:
+          currentSection.question.type === "credentials"
+            ? false
+            : !currentSection.canProceed ||
+              ((currentSection.question.type === "age" ||
+                currentSection.question.type === "weight") &&
+                isWheelPickerShowingBuffer),
+      };
+    }
+
+    return null;
+  }, [
+    currentSection,
+    isTransitioning,
+    answers,
+    setGlowTarget,
+    fadeOutThen,
+    router,
+    goNext,
+    startSectionTransition,
+    isWheelPickerShowingBuffer,
+  ]);
 
   const renderSection = useCallback(
     (section: SectionSnapshot) => {
@@ -97,12 +150,12 @@ export default function QuizScreen() {
           <QuizFlow
             question={section.question}
             isLast={section.isLast}
-            setAnswer={engine.setAnswer}
+            setAnswer={setAnswer}
             canProceed={section.canProceed}
             onNext={() =>
               section.isLast
-                ? engine.goNext()
-                : startSectionTransition(engine.goNext)
+                ? goNext()
+                : startSectionTransition(goNext)
             }
             isTransitioning={false}
             submitAttempted={submitAttempted}
@@ -115,16 +168,15 @@ export default function QuizScreen() {
     },
     [
       questions,
-      setGlowTarget,
-      fadeOutThen,
-      router,
-      engine.setAnswer,
-      engine.goNext,
+      setAnswer,
+      goNext,
       startSectionTransition,
-      isTransitioning,
       submitAttempted,
     ]
   );
+
+  const currentSectionKey =
+    currentSection.kind === "question" ? currentSection.question.key : "empty";
 
   useEffect(() => {
     if (isError && error) {
@@ -134,9 +186,7 @@ export default function QuizScreen() {
 
   useEffect(() => {
     setSubmitAttempted(false);
-  }, [
-    currentSection.kind === "question" ? currentSection.question.key : "empty",
-  ]);
+  }, [currentSectionKey]);
 
   useEffect(() => {
     return () => setGlowTarget(0);
@@ -156,33 +206,38 @@ export default function QuizScreen() {
     if (showSummary) {
       setGlowTarget(0);
       startSectionTransition(() => setShowSummary(false));
-    } else if (engine.isFirst) {
+    } else if (isFirst) {
       fadeOutThen(() => router.replace("/"), "forward");
     } else {
-      startSectionTransition(engine.goBack);
+      startSectionTransition(goBack);
     }
   }, [
     showSummary,
     setGlowTarget,
     startSectionTransition,
-    engine.isFirst,
-    engine.goBack,
+    isFirst,
+    goBack,
     fadeOutThen,
     router,
   ]);
 
   return (
     <Animated.View style={[styles.screen, fadeStyle]}>
-      <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+      <ScreenWithBottomAction
+        action={bottomAction}
+        actionPointerEventsDisabled={isTransitioning}
+        actionKeyboardAvoiding
+        footerStyle={styles.fixedFooter}
+      >
         <WheelPickerReadyInit />
         <QuizHeader
           onBackPress={handleBackPress}
           isBackDisabled={isTransitioning}
           progress={
-            engine.totalSteps > 0
+            totalSteps > 0
               ? showSummary
-                ? (engine.totalSteps + 1) / (engine.totalSteps + 1)
-                : (engine.currentIndex + 1) / (engine.totalSteps + 1)
+                ? (totalSteps + 1) / (totalSteps + 1)
+                : (currentIndex + 1) / (totalSteps + 1)
               : 0
           }
         />
@@ -215,62 +270,16 @@ export default function QuizScreen() {
                   {renderSection(currentSection)}
                 </Animated.View>
               </View>
-              <View
-                style={styles.fixedFooter}
-                pointerEvents={isTransitioning ? "none" : "auto"}
-              >
-                {currentSection.kind === "summary" && (
-                  <AppButton
-                    label={locale.summary.labels.startJourney}
-                    disabled={isTransitioning}
-                    fillColor={
-                      PROGRESS_BAR_COLORS.summary[
-                        getSummaryVariant(answers)
-                      ]
-                    }
-                    onPress={() => {
-                      setGlowTarget(0);
-                      fadeOutThen(() => router.push("/home"), "forward");
-                    }}
-                  />
-                )}
-                {currentSection.kind === "question" && (
-                  <AppButton
-                    label={
-                      currentSection.isLast ? "Submit" : "Next"
-                    }
-                    onPress={() => {
-                      setSubmitAttempted(true);
-                      if (currentSection.isLast) {
-                        engine.goNext();
-                      } else {
-                        startSectionTransition(engine.goNext);
-                      }
-                    }}
-                    disabled={
-                      currentSection.question.type === "credentials"
-                        ? false
-                        : !currentSection.canProceed ||
-                          ((currentSection.question.type === "age" ||
-                            currentSection.question.type === "weight") &&
-                            isWheelPickerShowingBuffer)
-                    }
-                  />
-                )}
-              </View>
             </View>
           )}
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </ScreenWithBottomAction>
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
-  },
-  container: {
     flex: 1,
   },
   contentArea: {

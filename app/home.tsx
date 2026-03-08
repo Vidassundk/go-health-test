@@ -1,5 +1,5 @@
-import AppButton from "@/components/AppButton";
 import AppText from "@/components/AppText";
+import ScreenWithBottomAction from "@/components/ScreenWithBottomAction";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
 import { useScreenFade } from "@/hooks/useScreenFade";
@@ -7,7 +7,6 @@ import { useQuizStore } from "@/stores/quizStore";
 import { useRouter } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -24,7 +23,13 @@ export default function HomeScreen() {
 
   return (
     <Animated.View style={[styles.screen, fadeStyle]}>
-      <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+      <ScreenWithBottomAction
+        action={{
+          label: startOver,
+          disabled: isTransitioning,
+          onPress: handleStartOver,
+        }}
+      >
         <View style={styles.contentArea}>
           <View style={styles.appGreetingSection}>
             <AppText variant="display">{title}</AppText>
@@ -37,21 +42,13 @@ export default function HomeScreen() {
             </AppText>
           </View>
         </View>
-        <AppButton
-          label={startOver}
-          disabled={isTransitioning}
-          onPress={handleStartOver}
-        />
-      </SafeAreaView>
+      </ScreenWithBottomAction>
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
-  },
-  container: {
     flex: 1,
   },
   contentArea: {
