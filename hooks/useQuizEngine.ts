@@ -4,6 +4,10 @@ import {
   selectSetCurrentIndex,
 } from "@/stores/quizStore";
 import type { QuizQuestion } from "@/types/quiz";
+import {
+  getEmailValidationError,
+  getPasswordValidationError,
+} from "@/utils/validation";
 import { useCallback, useEffect, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 
@@ -48,9 +52,7 @@ function isStepValid(question: QuizQuestion, value: unknown): boolean {
     case "credentials": {
       const v = value as { email?: string; password?: string };
       return (
-        !!v?.email?.trim() &&
-        !!v?.password &&
-        String(v.password).length >= 6
+        !getEmailValidationError(v?.email) && !getPasswordValidationError(v?.password)
       );
     }
     case "single":

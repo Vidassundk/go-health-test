@@ -1,7 +1,11 @@
 import { AnimatedError } from "@/components/AnimatedError";
 import { AppTextInput } from "@/components/AppTextInput";
 import type { QuizQuestion } from "@/types/quiz";
-import React, { useEffect, useRef } from "react";
+import {
+  getEmailValidationError,
+  getPasswordValidationError,
+} from "@/utils/validation";
+import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 
 type CredentialsValue = { email: string; password: string };
@@ -29,6 +33,10 @@ export function CredentialsQuestion({
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
   const prevTransitioningRef = useRef(true);
+  const [touched, setTouched] = useState({
+    email: false,
+    password: false,
+  });
 
   useEffect(() => {
     if (prevTransitioningRef.current && !isTransitioning) {
@@ -39,45 +47,52 @@ export function CredentialsQuestion({
     }
   }, [isTransitioning]);
 
-  const emailError =
-    submitAttempted && !email.trim() ? "Email is required" : null;
-  const passwordError =
-    submitAttempted && (!password || password.length < 6)
-      ? "Password must be at least 6 characters"
-      : null;
+  const emailError = getEmailValidationError(email);
+  const passwordError = getPasswordValidationError(password);
+  const showEmailError = submitAttempted || touched.email;
+  const showPasswordError = submitAttempted || touched.password;
 
   return (
     <View style={styles.container}>
       <AppTextInput
         ref={emailRef}
-        error={Boolean(emailError)}
+        error={showEmailError && Boolean(emailError)}
         value={email}
-        onChangeText={(email) => onChange({ ...value, email, password })}
+        onChangeText={(nextEmail) =>
+          onChange({ ...value, email: nextEmail, password })
+        }
         placeholder="Email"
         keyboardType="email-address"
         autoCapitalize="none"
+        autoCorrect={false}
         textContentType="emailAddress"
         autoComplete="email"
         returnKeyType="next"
+        onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
         onSubmitEditing={() => passwordRef.current?.focus()}
       />
-      <AnimatedError error={emailError} />
+      <AnimatedError error={showEmailError ? emailError : null} />
       <AppTextInput
         ref={passwordRef}
-        error={Boolean(passwordError)}
+        error={showPasswordError && Boolean(passwordError)}
         value={password}
-        onChangeText={(password) => onChange({ ...value, email, password })}
-        placeholder="Password (min 6 characters)"
+        onChangeText={(nextPassword) =>
+          onChange({ ...value, email, password: nextPassword })
+        }
+        placeholder="Password"
         secureTextEntry
+        autoCapitalize="none"
+        autoCorrect={false}
         textContentType="password"
         autoComplete="password"
         returnKeyType="go"
+        onBlur={() => setTouched((prev) => ({ ...prev, password: true }))}
         onSubmitEditing={() => {
           onSubmitAttempt?.();
           onConfirm?.();
         }}
       />
-      <AnimatedError error={passwordError} />
+      <AnimatedError error={showPasswordError ? passwordError : null} />
     </View>
   );
 }
