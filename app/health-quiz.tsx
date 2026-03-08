@@ -1,4 +1,4 @@
-import { QuizFlow, QuizSummary } from "@/components/quiz";
+import { QuizFlow } from "@/components/quiz";
 import QuizHeader, { HEADER_HEIGHT } from "@/components/QuizHeader";
 import ScreenWithBottomAction from "@/components/ScreenWithBottomAction";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
@@ -11,20 +11,14 @@ import {
 import { COLORS } from "@/constants/colors";
 import { useGlowContext } from "@/contexts/GlowContext";
 import { useQuizBottomAction } from "@/hooks/useQuizBottomAction";
-import { useQuizEngine, type QuizAnswers } from "@/hooks/useQuizEngine";
-import { useQuizNavigationFlow } from "@/hooks/useQuizNavigationFlow";
+import { useQuizEngine } from "@/hooks/useQuizEngine";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
-import {
-  getSectionKey,
-  type SectionSnapshot,
-  useQuizSectionSnapshot,
-} from "@/hooks/useQuizSectionSnapshot";
 import { useScreenTransition } from "@/hooks/useScreenTransition";
-import { useQuizStore } from "@/stores/quizStore";
 import {
   selectWheelPickerShowingBuffer,
   useWheelPickerStore,
 } from "@/stores/wheelPickerStore";
+import { getSummaryVariant } from "@/utils/getSummaryVariant";
 import { showErrorToast } from "@/utils/toast";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
@@ -34,18 +28,15 @@ import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 export default function QuizScreen() {
   const { questions, isLoading, isError, error } = useQuizQuestions();
   const { setGlowTarget } = useGlowContext();
-  const [showSummary, setShowSummary] = useState(false);
-  const [pendingSubmitAnswers, setPendingSubmitAnswers] =
-    useState<QuizAnswers | null>(null);
   const [submitAttempted, setSubmitAttempted] = useState(false);
-  const answers = useQuizStore((s) => s.answers);
   const isWheelPickerShowingBuffer = useWheelPickerStore(
     selectWheelPickerShowingBuffer
   );
   // Reanimated layout animation test – entering/exiting
   const engine = useQuizEngine(questions, {
     onSubmit: (answers) => {
-      setPendingSubmitAnswers(answers);
+      setGlowTarget(1, getSummaryVariant(answers));
+      fadeOutThen(() => router.push("/quiz-summary"), "forward");
     },
   });
   const {
@@ -63,74 +54,25 @@ export default function QuizScreen() {
   const { isVisible, entering, exiting, fadeOutThen, isTransitioning } =
     useScreenTransition();
 
-  const currentSection = useQuizSectionSnapshot({
-    showSummary,
-    questions,
-    currentQuestion,
-    isLast,
-    isCurrentStepValid,
-  });
-
   const startSectionTransition = useCallback((action: () => void) => {
     action();
   }, []);
 
-  const navigationFlow = useQuizNavigationFlow({
-    setGlowTarget,
-    startSectionTransition,
-    showSummary,
-    setShowSummary,
-    pendingSubmitAnswers,
-    setPendingSubmitAnswers,
-    isFirst,
-    goBack,
-    navigateToHome: () => fadeOutThen(() => router.push("/home"), "forward"),
-    navigateToIntro: () => fadeOutThen(() => router.replace("/"), "forward"),
-  });
-  const { onSummaryActionPress, onBackPress } = navigationFlow;
-
   const bottomAction = useQuizBottomAction({
-    section: currentSection,
-    answers,
-    isTransitioning,
+    currentQuestion,
+    isLast,
+    isCurrentStepValid,
     isWheelPickerShowingBuffer,
     goNext,
     startSectionTransition,
     setSubmitAttempted,
-    onSummaryActionPress,
   });
 
-  const renderSection = useCallback(
-    (section: SectionSnapshot) => {
-      if (section.kind === "summary") {
-        if (!questions) {
-          return <View />;
-        }
-        return <QuizSummary questions={questions} />;
-      }
+  const currentSectionKey = currentQuestion?.key ?? "empty";
 
-      if (section.kind === "question") {
-        return (
-          <QuizFlow
-            question={section.question}
-            isLast={section.isLast}
-            setAnswer={setAnswer}
-            onNext={() =>
-              section.isLast ? goNext() : startSectionTransition(goNext)
-            }
-            isTransitioning={false}
-            submitAttempted={submitAttempted}
-            onSubmitAttempt={() => setSubmitAttempted(true)}
-          />
-        );
-      }
-
-      return <View />;
-    },
-    [questions, setAnswer, goNext, startSectionTransition, submitAttempted]
-  );
-
-  const currentSectionKey = getSectionKey(currentSection);
+  const handleSectionSubmitAttempt = useCallback(() => {
+    setSubmitAttempted(true);
+  }, []);
 
   useEffect(() => {
     if (isError && error) {
@@ -141,6 +83,18 @@ export default function QuizScreen() {
   useEffect(() => {
     setSubmitAttempted(false);
   }, [currentSectionKey]);
+
+  useEffect(() => {
+    return () => setGlowTarget(0);
+  }, [setGlowTarget]);
+
+  const onBackPress = useCallback(() => {
+    if (isFirst) {
+      fadeOutThen(() => router.replace("/"), "forward");
+      return;
+    }
+    startSectionTransition(goBack);
+  }, [isFirst, fadeOutThen, router, startSectionTransition, goBack]);
 
   return (
     <View style={styles.screen}>
@@ -160,9 +114,7 @@ export default function QuizScreen() {
                 isBackDisabled={isTransitioning}
                 progress={
                   totalSteps > 0
-                    ? showSummary
-                      ? (totalSteps + 1) / (totalSteps + 1)
-                      : (currentIndex + 1) / (totalSteps + 1)
+                    ? (currentIndex + 1) / totalSteps
                     : 0
                 }
               />
@@ -180,14 +132,28 @@ export default function QuizScreen() {
                 <View style={styles.quizLayout}>
                   <View style={styles.quizContent}>
                     <Animated.View
-                      key={currentSection.kind === "summary" ? "summary" : currentSectionKey}
+                      key={currentSectionKey}
                       entering={FadeInRight.duration(TRANSITION_ENTER_MS).delay(
                         TRANSITION_INITIAL_DELAY_MS
                       )}
                       exiting={FadeOutLeft.duration(TRANSITION_EXIT_MS)}
                       style={styles.sectionWrapper}
                     >
-                      {renderSection(currentSection)}
+                      {currentQuestion ? (
+                        <QuizFlow
+                          question={currentQuestion}
+                          isLast={isLast}
+                          setAnswer={setAnswer}
+                          onNext={() =>
+                            isLast ? goNext() : startSectionTransition(goNext)
+                          }
+                          isTransitioning={false}
+                          submitAttempted={submitAttempted}
+                          onSubmitAttempt={handleSectionSubmitAttempt}
+                        />
+                      ) : (
+                        <View />
+                      )}
                     </Animated.View>
                   </View>
                 </View>

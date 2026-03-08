@@ -1,76 +1,60 @@
 import type { BottomActionConfig } from "@/components/ScreenWithBottomAction";
-import { PROGRESS_BAR_COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
-import type { QuizAnswers } from "@/hooks/useQuizEngine";
-import type { SectionSnapshot } from "@/hooks/useQuizSectionSnapshot";
-import { getSummaryVariant } from "@/utils/getSummaryVariant";
+import type { QuizQuestion } from "@/types/quiz";
 import { useMemo } from "react";
 
 type Params = {
-  section: SectionSnapshot;
-  answers: QuizAnswers;
-  isTransitioning: boolean;
+  currentQuestion: QuizQuestion | null;
+  isLast: boolean;
+  isCurrentStepValid: boolean;
   isWheelPickerShowingBuffer: boolean;
   goNext: () => void;
   startSectionTransition: (action: () => void) => void;
   setSubmitAttempted: (attempted: boolean) => void;
-  onSummaryActionPress: () => void;
 };
 
 /**
  * Builds the bottom CTA configuration for the quiz screen.
- * Encapsulates label, disabled rules, fill color, and press behavior.
+ * Encapsulates label, disabled rules, and press behavior.
  */
 export function useQuizBottomAction({
-  section,
-  answers,
-  isTransitioning,
+  currentQuestion,
+  isLast,
+  isCurrentStepValid,
   isWheelPickerShowingBuffer,
   goNext,
   startSectionTransition,
   setSubmitAttempted,
-  onSummaryActionPress,
 }: Params): BottomActionConfig | null {
   return useMemo<BottomActionConfig | null>(() => {
-    if (section.kind === "summary") {
-      return {
-        label: locale.summary.labels.startJourney,
-        disabled: isTransitioning,
-        fillColor: PROGRESS_BAR_COLORS.summary[getSummaryVariant(answers)],
-        onPress: onSummaryActionPress,
-      };
+    if (!currentQuestion) {
+      return null;
     }
 
-    if (section.kind === "question") {
-      return {
-        label: section.isLast ? locale.common.submit : locale.common.next,
-        onPress: () => {
-          setSubmitAttempted(true);
-          if (section.isLast) {
-            goNext();
-          } else {
-            startSectionTransition(goNext);
-          }
-        },
-        disabled:
-          section.question.type === "credentials"
-            ? false
-            : !section.canProceed ||
-              ((section.question.type === "age" ||
-                section.question.type === "weight") &&
-                isWheelPickerShowingBuffer),
-      };
-    }
-
-    return null;
+    return {
+      label: isLast ? locale.common.submit : locale.common.next,
+      onPress: () => {
+        setSubmitAttempted(true);
+        if (isLast) {
+          goNext();
+        } else {
+          startSectionTransition(goNext);
+        }
+      },
+      disabled:
+        currentQuestion.type === "credentials"
+          ? false
+          : !isCurrentStepValid ||
+            ((currentQuestion.type === "age" || currentQuestion.type === "weight") &&
+              isWheelPickerShowingBuffer),
+    };
   }, [
-    section,
-    answers,
-    isTransitioning,
+    currentQuestion,
+    isLast,
+    isCurrentStepValid,
     isWheelPickerShowingBuffer,
     goNext,
     startSectionTransition,
     setSubmitAttempted,
-    onSummaryActionPress,
   ]);
 }
