@@ -21,6 +21,7 @@ type Props = {
   children: React.ReactNode;
   action: BottomActionConfig | null;
   edges?: Edge[];
+  horizontalPadding?: number;
   safeAreaStyle?: StyleProp<ViewStyle>;
   contentStyle?: StyleProp<ViewStyle>;
   footerStyle?: StyleProp<ViewStyle>;
@@ -33,6 +34,7 @@ export default function ScreenWithBottomAction({
   children,
   action,
   edges = ["top", "bottom"],
+  horizontalPadding = 20,
   safeAreaStyle,
   contentStyle,
   footerStyle,
@@ -43,7 +45,7 @@ export default function ScreenWithBottomAction({
   const footer =
     action === null ? null : (
       <View
-        style={footerStyle}
+        style={[styles.footer, { paddingHorizontal: horizontalPadding }, footerStyle]}
         pointerEvents={actionPointerEventsDisabled ? "none" : "auto"}
       >
         <AppButton
@@ -57,7 +59,9 @@ export default function ScreenWithBottomAction({
 
   return (
     <SafeAreaView style={[styles.container, safeAreaStyle]} edges={edges}>
-      <View style={[styles.content, contentStyle]}>{children}</View>
+      <View style={[styles.content, { paddingHorizontal: horizontalPadding }, contentStyle]}>
+        {children}
+      </View>
       {actionKeyboardAvoiding ? (
         <KeyboardAvoidingView
           style={styles.footerAvoider}
@@ -79,6 +83,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  footer: {
+    alignItems: "stretch",
   },
   footerAvoider: {
     alignItems: "stretch",

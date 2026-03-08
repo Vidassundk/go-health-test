@@ -52,16 +52,15 @@ export default function RootLayout() {
           <GlowProvider>
             <GlowingBackground />
             <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: {
-                backgroundColor: "transparent",
-                paddingHorizontal: 20,
-                paddingBottom: 20,
-              },
-              animation: "none",
-            }}
-          >
+              screenOptions={{
+                headerShown: false,
+                contentStyle: {
+                  backgroundColor: "transparent",
+                  paddingBottom: 20,
+                },
+                animation: "none",
+              }}
+            >
               <Stack.Screen name="index" />
               <Stack.Screen name="home" />
               <Stack.Screen name="health-quiz" />

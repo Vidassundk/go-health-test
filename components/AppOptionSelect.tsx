@@ -64,10 +64,6 @@ export function AppOptionSelect({
     );
   }, [selected, outerSelectedProgress, innerSelectedProgress]);
 
-  const overlayAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(innerSelectedProgress.value, [0, 1], [0, 0.4]),
-  }));
-
   const checkWrapperAnimatedStyle = useAnimatedStyle(() => ({
     opacity: interpolate(innerSelectedProgress.value, [0, 1], [0.4, 1]),
     backgroundColor: interpolateColor(
@@ -101,23 +97,13 @@ export function AppOptionSelect({
           height={layout.height}
           borderRadius={BORDER_RADIUS}
           selectedProgress={outerSelectedProgress}
+          innerProgress={innerSelectedProgress}
           pressProgress={pressProgress}
         />
       )}
       <View
         style={[styles.inner, { margin: INSET, borderRadius: innerRadius }]}
       >
-        <Animated.View
-          style={[
-            styles.overlay,
-            {
-              borderRadius: innerRadius,
-              backgroundColor: COLORS.optionInnerActive,
-            },
-            overlayAnimatedStyle,
-          ]}
-          pointerEvents="none"
-        />
         <Pressable
           onPress={onPress}
           onPressIn={onPressIn}
@@ -146,11 +132,8 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   inner: {
-    backgroundColor: COLORS.background,
+    backgroundColor: "transparent",
     overflow: "hidden",
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
   },
   pressable: {
     paddingHorizontal: 20,

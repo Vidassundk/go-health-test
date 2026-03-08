@@ -1,8 +1,8 @@
+import { QuizFlow, QuizSummary } from "@/components/quiz";
+import QuizHeader, { HEADER_HEIGHT } from "@/components/QuizHeader";
 import ScreenWithBottomAction, {
   type BottomActionConfig,
 } from "@/components/ScreenWithBottomAction";
-import { QuizFlow, QuizSummary } from "@/components/quiz";
-import QuizHeader, { HEADER_HEIGHT } from "@/components/QuizHeader";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { WheelPickerReadyInit } from "@/components/WheelPickerReadyInit";
 import {
@@ -153,9 +153,7 @@ export default function QuizScreen() {
             setAnswer={setAnswer}
             canProceed={section.canProceed}
             onNext={() =>
-              section.isLast
-                ? goNext()
-                : startSectionTransition(goNext)
+              section.isLast ? goNext() : startSectionTransition(goNext)
             }
             isTransitioning={false}
             submitAttempted={submitAttempted}
@@ -166,13 +164,7 @@ export default function QuizScreen() {
 
       return <View />;
     },
-    [
-      questions,
-      setAnswer,
-      goNext,
-      startSectionTransition,
-      submitAttempted,
-    ]
+    [questions, setAnswer, goNext, startSectionTransition, submitAttempted]
   );
 
   const currentSectionKey =
@@ -225,22 +217,25 @@ export default function QuizScreen() {
     <Animated.View style={[styles.screen, fadeStyle]}>
       <ScreenWithBottomAction
         action={bottomAction}
+        contentStyle={styles.contentNoHorizontalPadding}
         actionPointerEventsDisabled={isTransitioning}
         actionKeyboardAvoiding
         footerStyle={styles.fixedFooter}
       >
         <WheelPickerReadyInit />
-        <QuizHeader
-          onBackPress={handleBackPress}
-          isBackDisabled={isTransitioning}
-          progress={
-            totalSteps > 0
-              ? showSummary
-                ? (totalSteps + 1) / (totalSteps + 1)
-                : (currentIndex + 1) / (totalSteps + 1)
-              : 0
-          }
-        />
+        <View style={styles.headerWrapper}>
+          <QuizHeader
+            onBackPress={handleBackPress}
+            isBackDisabled={isTransitioning}
+            progress={
+              totalSteps > 0
+                ? showSummary
+                  ? (totalSteps + 1) / (totalSteps + 1)
+                  : (currentIndex + 1) / (totalSteps + 1)
+                : 0
+            }
+          />
+        </View>
         <KeyboardAvoidingView
           style={styles.contentArea}
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -287,6 +282,12 @@ const styles = StyleSheet.create({
     marginTop: -HEADER_HEIGHT,
     paddingTop: HEADER_HEIGHT,
     alignItems: "stretch",
+  },
+  contentNoHorizontalPadding: {
+    paddingHorizontal: 0,
+  },
+  headerWrapper: {
+    paddingHorizontal: 20,
   },
   quizLayout: {
     flex: 1,
