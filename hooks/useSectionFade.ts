@@ -1,6 +1,10 @@
+/**
+ * Section fade transitions for quiz flow (e.g. Credentials → Weight).
+ * Performance fix: we keep isTransitioning true until fade-in completes so
+ * WeightQuestion mounts with buffer (not WheelPicker), avoiding 2–3s JS block on Android.
+ */
 import { FADE_TRANSITION, type TransitionDirection } from "@/utils/fadeTransition";
 import { useCallback, useRef, useState } from "react";
-import { InteractionManager } from "react-native";
 import Animated, {
   cancelAnimation,
   Easing,
@@ -35,12 +39,18 @@ export function useSectionFade() {
     transform: [{ translateX: translateX.value }],
   }));
 
+  // Called only when fade-in completes. Keeps isTransitioning true until then so
+  // WeightQuestion shows buffer on first mount (WheelPicker would block 2–3s on Android).
+  const finalizeTransition = useCallback(() => {
+    isTransitioningRef.current = false;
+    setIsTransitioning(false);
+  }, []);
+
   const resetToIdle = useCallback(() => {
     opacity.value = 1;
     translateX.value = 0;
-    isTransitioningRef.current = false;
-    setIsTransitioning(false);
-  }, [opacity, translateX]);
+    finalizeTransition();
+  }, [opacity, translateX, finalizeTransition]);
 
   const runFadeIn = useCallback(() => {
     opacity.value = 0;
@@ -53,17 +63,20 @@ export function useSectionFade() {
     translateX.value = withTiming(0, {
       duration: FADE_TRANSITION.inDuration,
       easing: Easing.out(Easing.cubic),
+    }, (finished) => {
+      // Only clear isTransitioning after fade-in; children use it to show buffer vs WheelPicker.
+      if (finished) {
+        runOnJS(finalizeTransition)();
+      }
     });
-  }, [opacity, translateX]);
+  }, [opacity, translateX, finalizeTransition]);
 
   const handleFadeOutComplete = useCallback(() => {
-    isTransitioningRef.current = false;
-    setIsTransitioning(false);
     const action = pendingActionRef.current;
     pendingActionRef.current = null;
     action?.();
-    // Defer fade-in until after React commits the new content. Double rAF
-    // ensures we're past the commit so we don't briefly fade in the previous section.
+    // Double rAF: wait for React to commit the new section before fading in.
+    // On Android, InteractionManager.runAfterInteractions can block 2–3s, so we use rAF instead.
     requestAnimationFrame(() => {
       requestAnimationFrame(runFadeIn);
     });

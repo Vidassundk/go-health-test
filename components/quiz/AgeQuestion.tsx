@@ -7,8 +7,14 @@ import {
 } from "@/stores/wheelPickerStore";
 import type { QuizQuestion } from "@/types/quiz";
 import WheelPicker from "@quidone/react-native-wheel-picker";
-import React, { useCallback, useEffect, useLayoutEffect, useMemo } from "react";
-import { View } from "react-native";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
+import { InteractionManager, View } from "react-native";
 import {
   WheelPickerChrome,
   wheelPickerItemTextStyle,
@@ -38,8 +44,20 @@ export function AgeQuestion({
 }: Props) {
   const isReady = useWheelPickerStore(selectWheelPickerReady);
   const setShowingBuffer = useWheelPickerStore((s) => s.setShowingBuffer);
+  const [canRenderPicker, setCanRenderPicker] = useState(false);
 
-  const isShowingBuffer = !isReady || isTransitioning;
+  useEffect(() => {
+    setCanRenderPicker(false);
+    if (!isReady || isTransitioning) {
+      return;
+    }
+    const handle = InteractionManager.runAfterInteractions(() => {
+      requestAnimationFrame(() => setCanRenderPicker(true));
+    });
+    return () => handle.cancel();
+  }, [isReady, isTransitioning]);
+
+  const isShowingBuffer = !isReady || isTransitioning || !canRenderPicker;
 
   useLayoutEffect(() => {
     setShowingBuffer(isShowingBuffer);
@@ -92,7 +110,6 @@ export function AgeQuestion({
             data={ageData}
             value={age}
             onValueChanged={({ item: { value: v } }) => handleChange(v)}
-            onValueChanging={({ item: { value: v } }) => handleChange(v)}
             itemHeight={WHEEL_ITEM_HEIGHT}
             visibleItemCount={5}
             enableScrollByTapOnItem

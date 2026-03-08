@@ -8,8 +8,14 @@ import {
 } from "@/stores/wheelPickerStore";
 import type { QuizQuestion } from "@/types/quiz";
 import WheelPicker from "@quidone/react-native-wheel-picker";
-import React, { useCallback, useEffect, useLayoutEffect, useMemo } from "react";
-import { StyleSheet, View } from "react-native";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
+import { InteractionManager, StyleSheet, View } from "react-native";
 import {
   WheelPickerChrome,
   wheelPickerItemTextStyle,
@@ -45,8 +51,22 @@ export function WeightQuestion({
 }: Props) {
   const isReady = useWheelPickerStore(selectWheelPickerReady);
   const setShowingBuffer = useWheelPickerStore((s) => s.setShowingBuffer);
+  // Defer WheelPicker mount: show buffer first. Mounting WheelPicker blocks JS 2–3s on Android.
+  const [canRenderPicker, setCanRenderPicker] = useState(false);
 
-  const isShowingBuffer = !isReady || isTransitioning;
+  useEffect(() => {
+    setCanRenderPicker(false);
+    if (!isReady || isTransitioning) {
+      return;
+    }
+    const handle = InteractionManager.runAfterInteractions(() => {
+      requestAnimationFrame(() => setCanRenderPicker(true));
+    });
+    return () => handle.cancel();
+  }, [isReady, isTransitioning]);
+
+  // Buffer when: not ready, section transitioning, or picker not yet safe to mount.
+  const isShowingBuffer = !isReady || isTransitioning || !canRenderPicker;
 
   useLayoutEffect(() => {
     setShowingBuffer(isShowingBuffer);
@@ -128,7 +148,6 @@ export function WeightQuestion({
               data={wholeLbData}
               value={whole}
               onValueChanged={({ item: { value: v } }) => handleWholeChange(v)}
-              onValueChanging={({ item: { value: v } }) => handleWholeChange(v)}
               itemHeight={WHEEL_ITEM_HEIGHT}
               visibleItemCount={5}
               enableScrollByTapOnItem
@@ -146,9 +165,6 @@ export function WeightQuestion({
               data={decimalData}
               value={decimal}
               onValueChanged={({ item: { value: v } }) =>
-                handleDecimalChange(v)
-              }
-              onValueChanging={({ item: { value: v } }) =>
                 handleDecimalChange(v)
               }
               itemHeight={WHEEL_ITEM_HEIGHT}
