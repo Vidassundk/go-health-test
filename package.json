@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "test": "vitest run"
   },
   "dependencies": {
     "@backpackapp-io/react-native-toast": "^0.15.1",
@@ -40,11 +41,14 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
+    "@types/node": "^25.3.5",
     "@types/react": "~19.1.0",
     "dotenv": "~16.4.5",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.0.18"
   },
   "private": true
 }
