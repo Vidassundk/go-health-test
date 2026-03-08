@@ -1,3 +1,4 @@
+import AppButton from "@/components/AppButton";
 import { QuizFlow, QuizSummary } from "@/components/quiz";
 import QuizHeader, { HEADER_HEIGHT } from "@/components/QuizHeader";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
@@ -7,11 +8,17 @@ import {
   TRANSITION_EXIT_MS,
   TRANSITION_INITIAL_DELAY_MS,
 } from "@/constants/animations";
-import { COLORS } from "@/constants/colors";
+import { COLORS, PROGRESS_BAR_COLORS } from "@/constants/colors";
+import { locale } from "@/constants/locale";
 import { useGlowContext } from "@/contexts/GlowContext";
 import { useQuizEngine, type QuizAnswers } from "@/hooks/useQuizEngine";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
 import { useScreenFade } from "@/hooks/useScreenFade";
+import { useQuizStore } from "@/stores/quizStore";
+import {
+  selectWheelPickerShowingBuffer,
+  useWheelPickerStore,
+} from "@/stores/wheelPickerStore";
 import type { QuizQuestion } from "@/types/quiz";
 import { getSummaryVariant } from "@/utils/getSummaryVariant";
 import { showErrorToast } from "@/utils/toast";
@@ -37,6 +44,11 @@ export default function QuizScreen() {
   const [showSummary, setShowSummary] = useState(false);
   const [pendingSubmitAnswers, setPendingSubmitAnswers] =
     useState<QuizAnswers | null>(null);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const answers = useQuizStore((s) => s.answers);
+  const isWheelPickerShowingBuffer = useWheelPickerStore(
+    selectWheelPickerShowingBuffer
+  );
   // Reanimated layout animation test – entering/exiting
   const engine = useQuizEngine(questions, {
     onSubmit: (answers) => {
@@ -77,16 +89,7 @@ export default function QuizScreen() {
         if (!questions) {
           return <View />;
         }
-        return (
-          <QuizSummary
-            questions={questions}
-            isTransitioning={isTransitioning}
-            onStartJourney={() => {
-              setGlowTarget(0);
-              fadeOutThen(() => router.push("/home"), "forward");
-            }}
-          />
-        );
+        return <QuizSummary questions={questions} />;
       }
 
       if (section.kind === "question") {
@@ -102,6 +105,8 @@ export default function QuizScreen() {
                 : startSectionTransition(engine.goNext)
             }
             isTransitioning={false}
+            submitAttempted={submitAttempted}
+            onSubmitAttempt={() => setSubmitAttempted(true)}
           />
         );
       }
@@ -117,6 +122,7 @@ export default function QuizScreen() {
       engine.goNext,
       startSectionTransition,
       isTransitioning,
+      submitAttempted,
     ]
   );
 
@@ -125,6 +131,12 @@ export default function QuizScreen() {
       showErrorToast(error.message);
     }
   }, [isError, error]);
+
+  useEffect(() => {
+    setSubmitAttempted(false);
+  }, [
+    currentSection.kind === "question" ? currentSection.question.key : "empty",
+  ]);
 
   useEffect(() => {
     return () => setGlowTarget(0);
@@ -184,23 +196,68 @@ export default function QuizScreen() {
               <SpinningBuffer size={40} color={COLORS.text} />
             </View>
           ) : (
-            <View style={styles.quizContent}>
-              <Animated.View
-                key={
-                  currentSection.kind === "summary"
-                    ? "summary"
-                    : currentSection.kind === "question"
-                    ? currentSection.question.key
-                    : "empty"
-                }
-                entering={FadeInRight.duration(TRANSITION_ENTER_MS).delay(
-                  TRANSITION_INITIAL_DELAY_MS
-                )}
-                exiting={FadeOutLeft.duration(TRANSITION_EXIT_MS)}
-                style={styles.sectionWrapper}
+            <View style={styles.quizLayout}>
+              <View style={styles.quizContent}>
+                <Animated.View
+                  key={
+                    currentSection.kind === "summary"
+                      ? "summary"
+                      : currentSection.kind === "question"
+                      ? currentSection.question.key
+                      : "empty"
+                  }
+                  entering={FadeInRight.duration(TRANSITION_ENTER_MS).delay(
+                    TRANSITION_INITIAL_DELAY_MS
+                  )}
+                  exiting={FadeOutLeft.duration(TRANSITION_EXIT_MS)}
+                  style={styles.sectionWrapper}
+                >
+                  {renderSection(currentSection)}
+                </Animated.View>
+              </View>
+              <View
+                style={styles.fixedFooter}
+                pointerEvents={isTransitioning ? "none" : "auto"}
               >
-                {renderSection(currentSection)}
-              </Animated.View>
+                {currentSection.kind === "summary" && (
+                  <AppButton
+                    label={locale.summary.labels.startJourney}
+                    disabled={isTransitioning}
+                    fillColor={
+                      PROGRESS_BAR_COLORS.summary[
+                        getSummaryVariant(answers)
+                      ]
+                    }
+                    onPress={() => {
+                      setGlowTarget(0);
+                      fadeOutThen(() => router.push("/home"), "forward");
+                    }}
+                  />
+                )}
+                {currentSection.kind === "question" && (
+                  <AppButton
+                    label={
+                      currentSection.isLast ? "Submit" : "Next"
+                    }
+                    onPress={() => {
+                      setSubmitAttempted(true);
+                      if (currentSection.isLast) {
+                        engine.goNext();
+                      } else {
+                        startSectionTransition(engine.goNext);
+                      }
+                    }}
+                    disabled={
+                      currentSection.question.type === "credentials"
+                        ? false
+                        : !currentSection.canProceed ||
+                          ((currentSection.question.type === "age" ||
+                            currentSection.question.type === "weight") &&
+                            isWheelPickerShowingBuffer)
+                    }
+                  />
+                )}
+              </View>
             </View>
           )}
         </KeyboardAvoidingView>
@@ -222,6 +279,10 @@ const styles = StyleSheet.create({
     paddingTop: HEADER_HEIGHT,
     alignItems: "stretch",
   },
+  quizLayout: {
+    flex: 1,
+    minHeight: 0,
+  },
   quizContent: {
     flex: 1,
     position: "relative",
@@ -229,6 +290,10 @@ const styles = StyleSheet.create({
   },
   sectionWrapper: {
     flex: 1,
+  },
+  fixedFooter: {
+    backgroundColor: COLORS.background,
+    paddingTop: 8,
   },
   bufferingWrapper: {
     alignItems: "center",

@@ -1,14 +1,9 @@
 import AppText from "@/components/AppText";
 import { COLORS } from "@/constants/colors";
 import { selectAnswer, useQuizStore } from "@/stores/quizStore";
-import {
-  selectWheelPickerShowingBuffer,
-  useWheelPickerStore,
-} from "@/stores/wheelPickerStore";
 import type { QuizQuestion } from "@/types/quiz";
-import React, { memo, useEffect, useState } from "react";
+import React, { memo } from "react";
 import { StyleSheet, View } from "react-native";
-import AppButton from "../AppButton";
 import { QuestionRenderer } from "./QuestionRenderer";
 
 type Props = {
@@ -18,27 +13,20 @@ type Props = {
   setAnswer: (key: string, value: unknown) => void;
   isTransitioning?: boolean;
   canProceed?: boolean;
+  submitAttempted?: boolean;
+  onSubmitAttempt?: () => void;
 };
 
 function QuizFlowInner({
   question,
-  isLast,
   onNext,
   setAnswer,
   isTransitioning = false,
   canProceed = true,
+  submitAttempted = false,
+  onSubmitAttempt,
 }: Props) {
-  const [submitAttempted, setSubmitAttempted] = useState(false);
   const value = useQuizStore(selectAnswer(question.key));
-  const isWheelPickerShowingBuffer = useWheelPickerStore(
-    selectWheelPickerShowingBuffer
-  );
-  const isWheelPickerQuestion =
-    question.type === "age" || question.type === "weight";
-
-  useEffect(() => {
-    setSubmitAttempted(false);
-  }, [question.key]);
 
   const handleChange = (v: unknown) => setAnswer(question.key, v);
 
@@ -64,23 +52,7 @@ function QuizFlowInner({
           isTransitioning={isTransitioning}
           onConfirm={onNext}
           submitAttempted={submitAttempted}
-          onSubmitAttempt={() => setSubmitAttempted(true)}
-        />
-      </View>
-      <View style={styles.footer}>
-        <AppButton
-          // key={question.key}
-          label={isLast ? "Submit" : "Next"}
-          onPress={() => {
-            setSubmitAttempted(true);
-            onNext();
-          }}
-          disabled={
-            question.type === "credentials"
-              ? false
-              : !canProceed ||
-                (isWheelPickerQuestion && isWheelPickerShowingBuffer)
-          }
+          onSubmitAttempt={onSubmitAttempt}
         />
       </View>
     </View>
@@ -100,10 +72,6 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 12,
     justifyContent: "flex-start",
-  },
-  footer: {
-    backgroundColor: COLORS.background,
-    paddingTop: 8,
   },
 });
 

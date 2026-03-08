@@ -1,34 +1,21 @@
-import AppButton from "@/components/AppButton";
 import AppText from "@/components/AppText";
-import { COLORS, PROGRESS_BAR_COLORS } from "@/constants/colors";
+import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
-import { useGlowContext } from "@/contexts/GlowContext";
 import { useQuizStore } from "@/stores/quizStore";
-import { useRouter } from "expo-router";
 import type { QuizQuestion } from "@/types/quiz";
 import {
   getSummaryDisplayData,
   type SummaryDisplayData,
 } from "@/utils/getSummaryDisplayData";
-import { getSummaryVariant } from "@/utils/getSummaryVariant";
 import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
 type Props = {
   questions: QuizQuestion[];
-  onStartJourney?: () => void;
-  isTransitioning?: boolean;
 };
 
-export function QuizSummary({
-  questions,
-  onStartJourney,
-  isTransitioning = false,
-}: Props) {
+export function QuizSummary({ questions }: Props) {
   const answers = useQuizStore((s) => s.answers);
-  const router = useRouter();
-  const { setGlowTarget } = useGlowContext();
-  const summaryVariant = useMemo(() => getSummaryVariant(answers), [answers]);
   const displayData: SummaryDisplayData = useMemo(
     () => getSummaryDisplayData(answers, questions),
     [answers, questions]
@@ -73,19 +60,6 @@ export function QuizSummary({
           )}
         </View>
       </View>
-      <AppButton
-        label={labels.startJourney}
-        disabled={isTransitioning}
-        fillColor={PROGRESS_BAR_COLORS.summary[summaryVariant]}
-        onPress={() => {
-          if (onStartJourney) {
-            onStartJourney();
-          } else {
-            setGlowTarget(0);
-            router.push("/home");
-          }
-        }}
-      />
     </View>
   );
 }
