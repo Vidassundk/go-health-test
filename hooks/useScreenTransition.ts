@@ -3,9 +3,10 @@ import {
   TRANSITION_EXIT_MS,
   TRANSITION_INITIAL_DELAY_MS,
 } from "@/constants/animations";
-import type { TransitionDirection } from "@/utils/fadeTransition";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { FadeInRight, FadeOutLeft, runOnJS } from "react-native-reanimated";
+
+type TransitionDirection = "forward" | "backward";
 
 export function useScreenTransition() {
   const [isVisible, setIsVisible] = useState(true);
