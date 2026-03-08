@@ -151,11 +151,4 @@ const styles = StyleSheet.create({
     width: 24,
     borderRadius: 9.6,
   },
-  pressableFill: {
-    flex: 1,
-    minHeight: 1,
-  },
-  innerFill: {
-    flex: 1,
-  },
 });

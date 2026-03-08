@@ -7,7 +7,7 @@ import { useRouter } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 
-export default function LandingScreen() {
+export default function IntroScreen() {
   const router = useRouter();
   const { isVisible, entering, exiting, fadeOutThen, isTransitioning } =
     useScreenTransition();
@@ -18,7 +18,7 @@ export default function LandingScreen() {
         <Animated.View style={styles.screen} entering={entering} exiting={exiting}>
           <ScreenWithBottomAction
             action={{
-              label: "Next",
+              label: locale.common.next,
               disabled: isTransitioning,
               onPress: () =>
                 fadeOutThen(() => router.replace("/health-quiz"), "forward"),

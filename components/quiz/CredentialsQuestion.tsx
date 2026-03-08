@@ -1,6 +1,6 @@
 import { AnimatedError } from "@/components/AnimatedError";
 import { AppTextInput } from "@/components/AppTextInput";
-import type { QuizQuestion } from "@/types/quiz";
+import { locale } from "@/constants/locale";
 import {
   getEmailValidationError,
   getPasswordValidationError,
@@ -11,7 +11,6 @@ import { StyleSheet, TextInput, View } from "react-native";
 type CredentialsValue = { email: string; password: string };
 
 type Props = {
-  question: QuizQuestion;
   value: CredentialsValue | undefined;
   onChange: (value: CredentialsValue) => void;
   isTransitioning?: boolean;
@@ -61,7 +60,7 @@ export function CredentialsQuestion({
         onChangeText={(nextEmail) =>
           onChange({ ...value, email: nextEmail, password })
         }
-        placeholder="Email"
+        placeholder={locale.common.placeholders.email}
         keyboardType="email-address"
         autoCapitalize="none"
         autoCorrect={false}
@@ -79,7 +78,7 @@ export function CredentialsQuestion({
         onChangeText={(nextPassword) =>
           onChange({ ...value, email, password: nextPassword })
         }
-        placeholder="Password"
+        placeholder={locale.common.placeholders.password}
         secureTextEntry
         autoCapitalize="none"
         autoCorrect={false}

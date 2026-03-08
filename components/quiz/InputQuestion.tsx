@@ -2,6 +2,7 @@ import { AppTextInput } from "@/components/AppTextInput";
 import AppText from "@/components/AppText";
 import type { QuizQuestion } from "@/types/quiz";
 import { COLORS } from "@/constants/colors";
+import { locale } from "@/constants/locale";
 import React, { useEffect, useRef } from "react";
 import {
   KeyboardTypeOptions,
@@ -28,7 +29,7 @@ function getInputConfig(question: QuizQuestion): {
     default:
       return {
         keyboardType: "default",
-        placeholder: "Your answer",
+        placeholder: locale.common.placeholders.genericAnswer,
         suffix: undefined,
       };
   }

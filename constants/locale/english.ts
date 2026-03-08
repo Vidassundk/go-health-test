@@ -1,4 +1,13 @@
 export const english = {
+  common: {
+    next: "Next",
+    submit: "Submit",
+    placeholders: {
+      email: "Email",
+      password: "Password",
+      genericAnswer: "Your answer",
+    },
+  },
   home: {
     greeting: "First & foremost, congratulations on this first step.",
     subtext: "Be ready to amaze yourself.",

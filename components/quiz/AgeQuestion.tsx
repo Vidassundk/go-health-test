@@ -5,7 +5,6 @@ import {
   selectWheelPickerReady,
   useWheelPickerStore,
 } from "@/stores/wheelPickerStore";
-import type { QuizQuestion } from "@/types/quiz";
 import WheelPicker from "@quidone/react-native-wheel-picker";
 import React, {
   useCallback,
@@ -31,7 +30,6 @@ const ageData = Array.from({ length: AGE_MAX - AGE_MIN + 1 }, (_, i) => ({
 }));
 
 type Props = {
-  question: QuizQuestion;
   value: string | number | undefined;
   onChange: (value: number) => void;
   isTransitioning?: boolean;

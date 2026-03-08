@@ -1,10 +1,9 @@
 import { AppTextInput } from "@/components/AppTextInput";
-import type { QuizQuestion } from "@/types/quiz";
+import { locale } from "@/constants/locale";
 import React, { useEffect, useRef } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 
 type Props = {
-  question: QuizQuestion;
   value: string | undefined;
   onChange: (value: string) => void;
   isTransitioning?: boolean;
@@ -35,7 +34,7 @@ export function GenericInputQuestion({
         ref={inputRef}
         value={value ?? ""}
         onChangeText={onChange}
-        placeholder="Your answer"
+        placeholder={locale.common.placeholders.genericAnswer}
         keyboardType="default"
         autoComplete="off"
         returnKeyType="go"

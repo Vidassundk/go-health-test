@@ -41,7 +41,6 @@ export function QuestionRenderer({
   if (question.type === "credentials") {
     return (
       <CredentialsQuestion
-        question={question}
         value={value as { email: string; password: string } | undefined}
         onChange={onChange as (v: { email: string; password: string }) => void}
         isTransitioning={isTransitioning}
@@ -55,7 +54,6 @@ export function QuestionRenderer({
   if (question.type === "weight") {
     return (
       <WeightQuestion
-        question={question}
         value={value as string | number | undefined}
         onChange={onChange as (v: number) => void}
         isTransitioning={isTransitioning}
@@ -66,7 +64,6 @@ export function QuestionRenderer({
   if (question.type === "age") {
     return (
       <AgeQuestion
-        question={question}
         value={value as string | number | undefined}
         onChange={onChange as (v: number) => void}
         isTransitioning={isTransitioning}
@@ -88,7 +85,6 @@ export function QuestionRenderer({
 
   return (
     <GenericInputQuestion
-      question={question}
       value={value as string | undefined}
       onChange={onChange as (v: string) => void}
       isTransitioning={isTransitioning}

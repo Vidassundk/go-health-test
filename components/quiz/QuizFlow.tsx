@@ -12,7 +12,6 @@ type Props = {
   onNext: () => void;
   setAnswer: (key: string, value: unknown) => void;
   isTransitioning?: boolean;
-  canProceed?: boolean;
   submitAttempted?: boolean;
   onSubmitAttempt?: () => void;
 };
@@ -22,7 +21,6 @@ function QuizFlowInner({
   onNext,
   setAnswer,
   isTransitioning = false,
-  canProceed = true,
   submitAttempted = false,
   onSubmitAttempt,
 }: Props) {

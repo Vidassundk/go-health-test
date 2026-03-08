@@ -105,7 +105,7 @@ export default function QuizScreen() {
 
     if (currentSection.kind === "question") {
       return {
-        label: currentSection.isLast ? "Submit" : "Next",
+        label: currentSection.isLast ? locale.common.submit : locale.common.next,
         onPress: () => {
           setSubmitAttempted(true);
           if (currentSection.isLast) {
@@ -152,7 +152,6 @@ export default function QuizScreen() {
             question={section.question}
             isLast={section.isLast}
             setAnswer={setAnswer}
-            canProceed={section.canProceed}
             onNext={() =>
               section.isLast ? goNext() : startSectionTransition(goNext)
             }
