@@ -4,8 +4,8 @@
  * WeightQuestion mounts with buffer (not WheelPicker), avoiding 2–3s JS block on Android.
  */
 import { FADE_TRANSITION, type TransitionDirection } from "@/utils/fadeTransition";
-import { useCallback, useRef, useState } from "react";
-import Animated, {
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
   cancelAnimation,
   Easing,
   runOnJS,
@@ -27,60 +27,78 @@ function getTranslateTarget(direction: TransitionDirection): number {
 }
 
 export function useSectionFade() {
-  const opacity = useSharedValue(1);
-  const translateX = useSharedValue(0);
+  const incomingOpacity = useSharedValue(1);
+  const incomingTranslateX = useSharedValue(0);
+  const outgoingOpacity = useSharedValue(0);
+  const outgoingTranslateX = useSharedValue(0);
+  const actionRafRef = useRef<number | null>(null);
   const isTransitioningRef = useRef(false);
-  const pendingActionRef = useRef<(() => void) | null>(null);
-  const lastDirectionRef = useRef<TransitionDirection | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  const fadeStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateX: translateX.value }],
+  const incomingStyle = useAnimatedStyle(() => ({
+    opacity: incomingOpacity.value,
+    transform: [{ translateX: incomingTranslateX.value }],
   }));
 
-  // Called only when fade-in completes. Keeps isTransitioning true until then so
-  // WeightQuestion shows buffer on first mount (WheelPicker would block 2–3s on Android).
-  const finalizeTransition = useCallback(() => {
+  const outgoingStyle = useAnimatedStyle(() => ({
+    opacity: outgoingOpacity.value,
+    transform: [{ translateX: outgoingTranslateX.value }],
+  }));
+
+  const finishTransition = useCallback(() => {
     isTransitioningRef.current = false;
     setIsTransitioning(false);
   }, []);
 
-  const resetToIdle = useCallback(() => {
-    opacity.value = 1;
-    translateX.value = 0;
-    finalizeTransition();
-  }, [opacity, translateX, finalizeTransition]);
+  const cancelQueuedAction = useCallback(() => {
+    if (actionRafRef.current !== null) {
+      cancelAnimationFrame(actionRafRef.current);
+      actionRafRef.current = null;
+    }
+  }, []);
 
-  const runFadeIn = useCallback(() => {
-    opacity.value = 0;
-    translateX.value = getEnterOffset(lastDirectionRef.current);
-
-    opacity.value = withTiming(1, {
+  const startIncomingAnimation = useCallback(() => {
+    incomingOpacity.value = withTiming(1, {
       duration: FADE_TRANSITION.inDuration,
       easing: Easing.out(Easing.cubic),
     });
-    translateX.value = withTiming(0, {
-      duration: FADE_TRANSITION.inDuration,
-      easing: Easing.out(Easing.cubic),
-    }, (finished) => {
-      // Only clear isTransitioning after fade-in; children use it to show buffer vs WheelPicker.
-      if (finished) {
-        runOnJS(finalizeTransition)();
+    incomingTranslateX.value = withTiming(
+      0,
+      {
+        duration: FADE_TRANSITION.inDuration,
+        easing: Easing.out(Easing.cubic),
+      },
+      (finished) => {
+        if (finished) {
+          outgoingOpacity.value = 0;
+          outgoingTranslateX.value = 0;
+          runOnJS(finishTransition)();
+        }
       }
-    });
-  }, [opacity, translateX, finalizeTransition]);
+    );
+  }, [
+    finishTransition,
+    incomingOpacity,
+    incomingTranslateX,
+    outgoingOpacity,
+    outgoingTranslateX,
+  ]);
 
-  const handleFadeOutComplete = useCallback(() => {
-    const action = pendingActionRef.current;
-    pendingActionRef.current = null;
-    action?.();
-    // Double rAF: wait for React to commit the new section before fading in.
-    // On Android, InteractionManager.runAfterInteractions can block 2–3s, so we use rAF instead.
-    requestAnimationFrame(() => {
-      requestAnimationFrame(runFadeIn);
-    });
-  }, [runFadeIn]);
+  const resetToIdle = useCallback(() => {
+    cancelQueuedAction();
+    incomingOpacity.value = 1;
+    incomingTranslateX.value = 0;
+    outgoingOpacity.value = 0;
+    outgoingTranslateX.value = 0;
+    finishTransition();
+  }, [
+    cancelQueuedAction,
+    finishTransition,
+    incomingOpacity,
+    incomingTranslateX,
+    outgoingOpacity,
+    outgoingTranslateX,
+  ]);
 
   const transitionTo = useCallback(
     (action: () => void, direction: TransitionDirection = "forward") => {
@@ -88,31 +106,56 @@ export function useSectionFade() {
         return;
       }
 
-      lastDirectionRef.current = direction;
+      cancelQueuedAction();
       isTransitioningRef.current = true;
       setIsTransitioning(true);
-      pendingActionRef.current = action;
 
+      const enterOffset = getEnterOffset(direction);
       const translateTarget = getTranslateTarget(direction);
 
-      opacity.value = withTiming(0, {
-        duration: FADE_TRANSITION.outOpacityDuration,
-        easing: Easing.in(Easing.cubic),
+      outgoingOpacity.value = 1;
+      outgoingTranslateX.value = 0;
+      incomingOpacity.value = 0;
+      incomingTranslateX.value = enterOffset;
+
+      // Let initial visual state apply first (incoming hidden, outgoing visible),
+      // then swap section content to avoid a one-frame "new content flash".
+      actionRafRef.current = requestAnimationFrame(() => {
+        actionRafRef.current = null;
+        try {
+          action();
+        } catch (error) {
+          resetToIdle();
+          throw error;
+        }
       });
-      translateX.value = withTiming(
-        translateTarget,
+
+      outgoingOpacity.value = withTiming(
+        0,
         {
-          duration: FADE_TRANSITION.outDuration,
-          easing: Easing.inOut(Easing.cubic),
+          duration: FADE_TRANSITION.outOpacityDuration,
+          easing: Easing.in(Easing.cubic),
         },
         (finished) => {
           if (finished) {
-            runOnJS(handleFadeOutComplete)();
+            runOnJS(startIncomingAnimation)();
           }
         }
       );
+      outgoingTranslateX.value = withTiming(translateTarget, {
+        duration: FADE_TRANSITION.outDuration,
+        easing: Easing.inOut(Easing.cubic),
+      });
     },
-    [opacity, translateX, handleFadeOutComplete]
+    [
+      cancelQueuedAction,
+      incomingOpacity,
+      incomingTranslateX,
+      outgoingOpacity,
+      outgoingTranslateX,
+      resetToIdle,
+      startIncomingAnimation,
+    ]
   );
 
   const interruptAndRun = useCallback(
@@ -121,18 +164,45 @@ export function useSectionFade() {
         action();
         return;
       }
-      cancelAnimation(opacity);
-      cancelAnimation(translateX);
+      cancelAnimation(incomingOpacity);
+      cancelAnimation(incomingTranslateX);
+      cancelAnimation(outgoingOpacity);
+      cancelAnimation(outgoingTranslateX);
       resetToIdle();
       action();
     },
-    [opacity, translateX, resetToIdle]
+    [
+      incomingOpacity,
+      incomingTranslateX,
+      outgoingOpacity,
+      outgoingTranslateX,
+      resetToIdle,
+    ]
   );
+
+  useEffect(() => {
+    return () => {
+      cancelQueuedAction();
+      cancelAnimation(incomingOpacity);
+      cancelAnimation(incomingTranslateX);
+      cancelAnimation(outgoingOpacity);
+      cancelAnimation(outgoingTranslateX);
+      isTransitioningRef.current = false;
+    };
+  }, [
+    cancelQueuedAction,
+    incomingOpacity,
+    incomingTranslateX,
+    outgoingOpacity,
+    outgoingTranslateX,
+  ]);
 
   return {
     transitionTo,
     interruptAndRun,
     isTransitioning,
-    fadeStyle,
+    fadeStyle: incomingStyle,
+    incomingStyle,
+    outgoingStyle,
   };
 }
