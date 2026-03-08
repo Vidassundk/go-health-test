@@ -1,3 +1,8 @@
+/** Global transition durations – screens and sections use these for uniform fade/slide animations */
+export const TRANSITION_ENTER_MS = 300;
+export const TRANSITION_EXIT_MS = 200;
+export const TRANSITION_INITIAL_DELAY_MS = 200;
+
 export const PRESS_DURATION_MS = 80;
 export const GRADIENT_SHIFT_AMOUNT = 80;
 export const RELEASE_SPRING = { damping: 20, stiffness: 200 };

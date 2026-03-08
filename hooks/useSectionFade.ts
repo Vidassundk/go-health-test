@@ -58,10 +58,7 @@ export function useSectionFade() {
   }, []);
 
   const startIncomingAnimation = useCallback(() => {
-    incomingOpacity.value = withTiming(1, {
-      duration: FADE_TRANSITION.inDuration,
-      easing: Easing.out(Easing.cubic),
-    });
+    incomingOpacity.value = 1;
     incomingTranslateX.value = withTiming(
       0,
       {
@@ -118,30 +115,19 @@ export function useSectionFade() {
       incomingOpacity.value = 0;
       incomingTranslateX.value = enterOffset;
 
-      // Let initial visual state apply first (incoming hidden, outgoing visible),
-      // then swap section content to avoid a one-frame "new content flash".
+      // rAF: swap content, instant opacity flip (0/1), then animate incoming translate.
       actionRafRef.current = requestAnimationFrame(() => {
         actionRafRef.current = null;
         try {
           action();
+          outgoingOpacity.value = 0;
+          incomingOpacity.value = 1;
+          startIncomingAnimation();
         } catch (error) {
           resetToIdle();
           throw error;
         }
       });
-
-      outgoingOpacity.value = withTiming(
-        0,
-        {
-          duration: FADE_TRANSITION.outOpacityDuration,
-          easing: Easing.in(Easing.cubic),
-        },
-        (finished) => {
-          if (finished) {
-            runOnJS(startIncomingAnimation)();
-          }
-        }
-      );
       outgoingTranslateX.value = withTiming(translateTarget, {
         duration: FADE_TRANSITION.outDuration,
         easing: Easing.inOut(Easing.cubic),

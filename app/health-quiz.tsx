@@ -2,20 +2,23 @@ import { QuizFlow, QuizSummary } from "@/components/quiz";
 import QuizHeader, { HEADER_HEIGHT } from "@/components/QuizHeader";
 import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { WheelPickerReadyInit } from "@/components/WheelPickerReadyInit";
+import {
+  TRANSITION_ENTER_MS,
+  TRANSITION_EXIT_MS,
+  TRANSITION_INITIAL_DELAY_MS,
+} from "@/constants/animations";
 import { COLORS } from "@/constants/colors";
 import { useGlowContext } from "@/contexts/GlowContext";
 import { useQuizEngine, type QuizAnswers } from "@/hooks/useQuizEngine";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
 import { useScreenFade } from "@/hooks/useScreenFade";
-import { useSectionFade } from "@/hooks/useSectionFade";
 import type { QuizQuestion } from "@/types/quiz";
-import { type TransitionDirection } from "@/utils/fadeTransition";
 import { getSummaryVariant } from "@/utils/getSummaryVariant";
 import { showErrorToast } from "@/utils/toast";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
-import Animated from "react-native-reanimated";
+import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type SectionSnapshot =
@@ -34,15 +37,7 @@ export default function QuizScreen() {
   const [showSummary, setShowSummary] = useState(false);
   const [pendingSubmitAnswers, setPendingSubmitAnswers] =
     useState<QuizAnswers | null>(null);
-  const [outgoingSection, setOutgoingSection] =
-    useState<SectionSnapshot | null>(null);
-  const {
-    incomingStyle: sectionIncomingStyle,
-    outgoingStyle: sectionOutgoingStyle,
-    transitionTo,
-    interruptAndRun,
-    isTransitioning: isSectionTransitioning,
-  } = useSectionFade();
+  // Reanimated layout animation test – entering/exiting
   const engine = useQuizEngine(questions, {
     onSubmit: (answers) => {
       setPendingSubmitAnswers(answers);
@@ -72,16 +67,12 @@ export default function QuizScreen() {
     engine.isCurrentStepValid,
   ]);
 
-  const startSectionTransition = useCallback(
-    (action: () => void, direction: TransitionDirection) => {
-      setOutgoingSection(currentSection);
-      transitionTo(action, direction);
-    },
-    [currentSection, transitionTo]
-  );
+  const startSectionTransition = useCallback((action: () => void) => {
+    action();
+  }, []);
 
   const renderSection = useCallback(
-    (section: SectionSnapshot, layerTransitioning: boolean) => {
+    (section: SectionSnapshot) => {
       if (section.kind === "summary") {
         if (!questions) {
           return <View />;
@@ -89,10 +80,10 @@ export default function QuizScreen() {
         return (
           <QuizSummary
             questions={questions}
-            isTransitioning={isTransitioning || layerTransitioning}
+            isTransitioning={isTransitioning}
             onStartJourney={() => {
               setGlowTarget(0);
-              fadeOutThen(() => router.push("/home"), "back");
+              fadeOutThen(() => router.push("/home"), "forward");
             }}
           />
         );
@@ -108,9 +99,9 @@ export default function QuizScreen() {
             onNext={() =>
               section.isLast
                 ? engine.goNext()
-                : startSectionTransition(engine.goNext, "back")
+                : startSectionTransition(engine.goNext)
             }
-            isTransitioning={layerTransitioning}
+            isTransitioning={false}
           />
         );
       }
@@ -119,13 +110,13 @@ export default function QuizScreen() {
     },
     [
       questions,
-      isTransitioning,
       setGlowTarget,
       fadeOutThen,
       router,
       engine.setAnswer,
       engine.goNext,
       startSectionTransition,
+      isTransitioning,
     ]
   );
 
@@ -145,26 +136,18 @@ export default function QuizScreen() {
     }
 
     setGlowTarget(1, getSummaryVariant(pendingSubmitAnswers));
-    startSectionTransition(() => setShowSummary(true), "back");
+    startSectionTransition(() => setShowSummary(true));
     setPendingSubmitAnswers(null);
   }, [pendingSubmitAnswers, setGlowTarget, startSectionTransition]);
-
-  useEffect(() => {
-    if (!isSectionTransitioning) {
-      setOutgoingSection(null);
-    }
-  }, [isSectionTransitioning]);
 
   const handleBackPress = useCallback(() => {
     if (showSummary) {
       setGlowTarget(0);
-      startSectionTransition(() => setShowSummary(false), "forward");
+      startSectionTransition(() => setShowSummary(false));
     } else if (engine.isFirst) {
-      fadeOutThen(() => router.back(), "forward");
-    } else if (isSectionTransitioning) {
-      interruptAndRun(engine.goBack);
+      fadeOutThen(() => router.replace("/"), "forward");
     } else {
-      startSectionTransition(engine.goBack, "forward");
+      startSectionTransition(engine.goBack);
     }
   }, [
     showSummary,
@@ -174,8 +157,6 @@ export default function QuizScreen() {
     engine.goBack,
     fadeOutThen,
     router,
-    interruptAndRun,
-    isSectionTransitioning,
   ]);
 
   return (
@@ -184,6 +165,7 @@ export default function QuizScreen() {
         <WheelPickerReadyInit />
         <QuizHeader
           onBackPress={handleBackPress}
+          isBackDisabled={isTransitioning}
           progress={
             engine.totalSteps > 0
               ? showSummary
@@ -191,7 +173,6 @@ export default function QuizScreen() {
                 : (engine.currentIndex + 1) / (engine.totalSteps + 1)
               : 0
           }
-          isBackDisabled={isTransitioning}
         />
         <KeyboardAvoidingView
           style={styles.contentArea}
@@ -205,26 +186,21 @@ export default function QuizScreen() {
           ) : (
             <View style={styles.quizContent}>
               <Animated.View
-                style={[
-                  styles.sectionLayer,
-                  styles.sectionLayerIncoming,
-                  sectionIncomingStyle,
-                ]}
+                key={
+                  currentSection.kind === "summary"
+                    ? "summary"
+                    : currentSection.kind === "question"
+                    ? currentSection.question.key
+                    : "empty"
+                }
+                entering={FadeInRight.duration(TRANSITION_ENTER_MS).delay(
+                  TRANSITION_INITIAL_DELAY_MS
+                )}
+                exiting={FadeOutLeft.duration(TRANSITION_EXIT_MS)}
+                style={styles.sectionWrapper}
               >
-                {renderSection(currentSection, isSectionTransitioning)}
+                {renderSection(currentSection)}
               </Animated.View>
-              {outgoingSection && (
-                <Animated.View
-                  pointerEvents="none"
-                  style={[
-                    styles.sectionLayer,
-                    styles.sectionLayerOutgoing,
-                    sectionOutgoingStyle,
-                  ]}
-                >
-                  {renderSection(outgoingSection, true)}
-                </Animated.View>
-              )}
             </View>
           )}
         </KeyboardAvoidingView>
@@ -251,14 +227,8 @@ const styles = StyleSheet.create({
     position: "relative",
     overflow: "hidden",
   },
-  sectionLayer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  sectionLayerIncoming: {
-    zIndex: 1,
-  },
-  sectionLayerOutgoing: {
-    zIndex: 2,
+  sectionWrapper: {
+    flex: 1,
   },
   bufferingWrapper: {
     alignItems: "center",

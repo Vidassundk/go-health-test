@@ -1,11 +1,11 @@
 import AppText from "@/components/AppText";
 import { COLORS } from "@/constants/colors";
-import type { QuizQuestion } from "@/types/quiz";
 import { selectAnswer, useQuizStore } from "@/stores/quizStore";
 import {
   selectWheelPickerShowingBuffer,
   useWheelPickerStore,
 } from "@/stores/wheelPickerStore";
+import type { QuizQuestion } from "@/types/quiz";
 import React, { memo, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import AppButton from "../AppButton";
@@ -69,7 +69,7 @@ function QuizFlowInner({
       </View>
       <View style={styles.footer}>
         <AppButton
-          key={question.key}
+          // key={question.key}
           label={isLast ? "Submit" : "Next"}
           onPress={() => {
             setSubmitAttempted(true);

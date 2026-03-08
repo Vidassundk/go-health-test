@@ -30,7 +30,9 @@ export default function LandingScreen() {
         <AppButton
           label="Next"
           disabled={isTransitioning}
-          onPress={() => fadeOutThen(() => router.push("/health-quiz"), "back")}
+          onPress={() =>
+            fadeOutThen(() => router.replace("/health-quiz"), "forward")
+          }
         />
       </SafeAreaView>
     </Animated.View>

@@ -1,3 +1,7 @@
+import {
+  TRANSITION_ENTER_MS,
+  TRANSITION_EXIT_MS,
+} from "@/constants/animations";
 import { FADE_TRANSITION, type TransitionDirection } from "@/utils/fadeTransition";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useRef, useState } from "react";
@@ -42,11 +46,11 @@ export function useScreenFade() {
     translateX.value = getEnterOffset(lastTransitionDirection);
 
     opacity.value = withTiming(1, {
-      duration: FADE_TRANSITION.inDuration,
+      duration: TRANSITION_ENTER_MS,
       easing: Easing.out(Easing.cubic),
     });
     translateX.value = withTiming(0, {
-      duration: FADE_TRANSITION.inDuration,
+      duration: TRANSITION_ENTER_MS,
       easing: Easing.out(Easing.cubic),
     });
   }, [opacity, translateX]);
@@ -85,13 +89,13 @@ export function useScreenFade() {
       const translateTarget = getTranslateTarget(direction);
 
       opacity.value = withTiming(0, {
-        duration: FADE_TRANSITION.outOpacityDuration,
+        duration: Math.round(TRANSITION_EXIT_MS * 0.72),
         easing: Easing.in(Easing.cubic),
       });
       translateX.value = withTiming(
         translateTarget,
         {
-          duration: FADE_TRANSITION.outDuration,
+          duration: TRANSITION_EXIT_MS,
           easing: Easing.inOut(Easing.cubic),
         },
         (finished) => {

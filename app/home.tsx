@@ -19,7 +19,7 @@ export default function HomeScreen() {
     fadeOutThen(() => {
       reset();
       router.replace("/");
-    }, "back");
+    }, "forward");
   };
 
   return (
