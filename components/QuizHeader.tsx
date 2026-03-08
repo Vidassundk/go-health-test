@@ -13,12 +13,14 @@ type QuizHeaderProps = {
   onBackPress: () => void;
   progress: number;
   isBackDisabled?: boolean;
+  hideBackButton?: boolean;
 };
 
 export default function QuizHeader({
   onBackPress,
   progress,
   isBackDisabled = false,
+  hideBackButton = false,
 }: QuizHeaderProps) {
   const handleBackPress = useCallback(() => {
     if (isBackDisabled) return;
@@ -28,12 +30,16 @@ export default function QuizHeader({
   return (
     <View style={styles.container}>
       <View style={styles.backButton}>
-        <IconButton
-          icon={<ArrowIcon size={22} color={COLORS.text} />}
-          onPress={handleBackPress}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-        />
+        {hideBackButton ? (
+          <View style={styles.backButton} />
+        ) : (
+          <IconButton
+            icon={<ArrowIcon size={22} color={COLORS.text} />}
+            onPress={handleBackPress}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          />
+        )}
       </View>
       <View style={styles.progressWrapper}>
         <QuizProgressBar progress={progress} />

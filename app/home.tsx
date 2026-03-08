@@ -1,20 +1,28 @@
 import { AppText, ScreenWithBottomAction } from "@components";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
+import { useGlowContext } from "@/contexts/GlowContext";
 import { useScreenTransition } from "@/hooks/useScreenTransition";
 import { useQuizStore } from "@/stores/quizStore";
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 
 export default function HomeScreen() {
   const router = useRouter();
   const reset = useQuizStore((s) => s.reset);
+  const { setHomeBackgroundEnabled } = useGlowContext();
   const { isVisible, entering, exiting, fadeOutThen, isTransitioning } =
     useScreenTransition();
   const { title, text, startOver } = locale.homeScreen;
 
+  useEffect(() => {
+    setHomeBackgroundEnabled(true);
+  }, [setHomeBackgroundEnabled]);
+
   const handleStartOver = () => {
+    setHomeBackgroundEnabled(false);
     fadeOutThen(() => {
       reset();
       router.replace("/");

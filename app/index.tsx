@@ -1,6 +1,7 @@
 import { AppText, ScreenWithBottomAction } from "@components";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
+import { isDebugSkipQuizToSummaryEnabled } from "@/config/featureFlags";
 import { useScreenTransition } from "@/hooks/useScreenTransition";
 import { useQuizStore } from "@/stores/quizStore";
 import { useRouter } from "expo-router";
@@ -14,6 +15,7 @@ export default function IntroScreen() {
   const hasStartedJourney = useQuizStore((s) => s.hasStartedJourney);
   const { isVisible, entering, exiting, fadeOutThen, isTransitioning } =
     useScreenTransition();
+  const shouldSkipQuizToSummary = isDebugSkipQuizToSummaryEnabled();
 
   useEffect(() => {
     if (hasHydrated && hasStartedJourney) {
@@ -34,7 +36,13 @@ export default function IntroScreen() {
               label: locale.common.next,
               disabled: isTransitioning,
               onPress: () =>
-                fadeOutThen(() => router.replace("/health-quiz"), "forward"),
+                fadeOutThen(
+                  () =>
+                    router.replace(
+                      shouldSkipQuizToSummary ? "/quiz-summary" : "/health-quiz"
+                    ),
+                  "forward"
+                ),
             }}
           >
             <View style={styles.contentArea}>

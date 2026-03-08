@@ -7,6 +7,7 @@ import {
 } from "@components";
 import { COLORS, PROGRESS_BAR_COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
+import { isDebugSkipQuizToSummaryEnabled } from "@/config/featureFlags";
 import { useGlowContext } from "@/contexts/GlowContext";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
 import { useScreenTransition } from "@/hooks/useScreenTransition";
@@ -26,6 +27,7 @@ export default function QuizSummaryScreen() {
   const router = useRouter();
   const { isVisible, entering, exiting, fadeOutThen, isTransitioning } =
     useScreenTransition();
+  const shouldHideBackArrow = isDebugSkipQuizToSummaryEnabled();
 
   const variant = getSummaryVariant(answers);
 
@@ -69,6 +71,7 @@ export default function QuizSummaryScreen() {
             <View style={styles.headerWrapper}>
               <QuizHeader
                 onBackPress={handleBackPress}
+                hideBackButton={shouldHideBackArrow}
                 isBackDisabled={isTransitioning}
                 progress={1}
               />

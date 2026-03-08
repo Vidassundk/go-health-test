@@ -14,6 +14,8 @@ type GlowContextValue = {
   glowProgress: SharedValue<number>;
   glowVariant: GlowVariant | null;
   setGlowTarget: (target: number, variant?: GlowVariant) => void;
+  isHomeBackgroundEnabled: boolean;
+  setHomeBackgroundEnabled: (enabled: boolean) => void;
 };
 
 const GlowContext = createContext<GlowContextValue | null>(null);
@@ -21,6 +23,7 @@ const GlowContext = createContext<GlowContextValue | null>(null);
 export function GlowProvider({ children }: { children: React.ReactNode }) {
   const glowProgress = useSharedValue(0);
   const [glowVariant, setGlowVariant] = React.useState<GlowVariant | null>(null);
+  const [isHomeBackgroundEnabled, setHomeBackgroundEnabled] = React.useState(true);
 
   const setGlowTarget = useCallback(
     (target: number, variant?: GlowVariant) => {
@@ -41,7 +44,15 @@ export function GlowProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <GlowContext.Provider value={{ glowProgress, glowVariant, setGlowTarget }}>
+    <GlowContext.Provider
+      value={{
+        glowProgress,
+        glowVariant,
+        setGlowTarget,
+        isHomeBackgroundEnabled,
+        setHomeBackgroundEnabled,
+      }}
+    >
       {children}
     </GlowContext.Provider>
   );
