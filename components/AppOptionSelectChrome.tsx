@@ -1,8 +1,8 @@
-import AppOptionSelectOuter from "./AppOptionSelectOuter";
 import { COLORS } from "@/constants/colors";
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
+import AppOptionSelectOuter from "./AppOptionSelectOuter";
 
 const BORDER_RADIUS = 20;
 const INSET = 1;
@@ -25,36 +25,34 @@ export function AppOptionSelectChrome({ height, style }: Props) {
       onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
     >
       {width !== null && (
-        <>
-          <AppOptionSelectOuter
-            width={width}
-            height={height}
-            borderRadius={BORDER_RADIUS}
-            selectedProgress={selectedProgress}
-            pressProgress={pressProgress}
-          />
-          <View
-            style={[
-              styles.inner,
-              {
-                margin: INSET,
-                borderRadius: BORDER_RADIUS - INSET,
-              },
-            ]}
-          >
-            <View
-              style={[
-                styles.overlay,
-                {
-                  borderRadius: BORDER_RADIUS - INSET,
-                  backgroundColor: COLORS.optionInnerActive,
-                  opacity: INNER_OVERLAY_OPACITY,
-                },
-              ]}
-            />
-          </View>
-        </>
+        <AppOptionSelectOuter
+          width={width}
+          height={height}
+          borderRadius={BORDER_RADIUS}
+          selectedProgress={selectedProgress}
+          pressProgress={pressProgress}
+        />
       )}
+      <View
+        style={[
+          styles.inner,
+          {
+            margin: INSET,
+            borderRadius: BORDER_RADIUS - INSET,
+          },
+        ]}
+      >
+        <View
+          style={[
+            styles.overlay,
+            {
+              borderRadius: BORDER_RADIUS - INSET,
+              backgroundColor: COLORS.optionInnerActive,
+              opacity: INNER_OVERLAY_OPACITY,
+            },
+          ]}
+        />
+      </View>
     </View>
   );
 }
