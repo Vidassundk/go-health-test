@@ -15,6 +15,40 @@ import type { QuizAnswers } from "@/stores/quizStore";
 
 export type { QuizAnswers } from "@/stores/quizStore";
 
+/**
+ * Keep only answers that control visibility (visibleIf.question keys).
+ * This lets the visibility computation ignore unrelated answer changes.
+ */
+function pickAnswersByKeys(
+  answers: QuizAnswers,
+  keys: Set<string>
+): Partial<QuizAnswers> {
+  if (keys.size === 0) {
+    return {};
+  }
+  return Object.fromEntries(
+    Object.entries(answers).filter(([key]) => keys.has(key))
+  );
+}
+
+/** Normalize unknown store values into comparable string form. */
+function toComparableAnswerValue(value: unknown): string | null {
+  if (value === undefined || value === null) {
+    return null;
+  }
+  return String(value);
+}
+
+/**
+ * We only treat this as a branch change when both values exist and differ.
+ * (null/undefined -> something does not clear previous branch answers)
+ */
+function didAnswerValueChange(previous: unknown, next: unknown): boolean {
+  const previousValue = toComparableAnswerValue(previous);
+  const nextValue = toComparableAnswerValue(next);
+  return previousValue !== null && nextValue !== null && previousValue !== nextValue;
+}
+
 function isVisible(question: QuizQuestion, answers: QuizAnswers): boolean {
   const condition = question.visibleIf;
   if (!condition) return true;
@@ -76,8 +110,8 @@ function getVisibilityKeys(questions: QuizQuestion[] | null): Set<string> {
   );
 }
 
-/** Keys for questions on a given path; used to clear them when switching program */
-function getQuestionKeysForVisibilityValue(
+/** Keys controlled by a visibility condition branch; cleared when branch selection changes */
+function getDependentQuestionKeysForVisibilityValue(
   questions: QuizQuestion[],
   visibilityKey: string,
   value: string
@@ -105,13 +139,7 @@ export function useQuizEngine(
 
   const visibilityKeys = useMemo(() => getVisibilityKeys(questions), [questions]);
   const visibilitySlice = useQuizStore(
-    useShallow((s) =>
-      visibilityKeys.size > 0
-        ? Object.fromEntries(
-            Object.entries(s.answers).filter(([k]) => visibilityKeys.has(k))
-          )
-        : {}
-    )
+    useShallow((s) => pickAnswersByKeys(s.answers, visibilityKeys))
   );
 
   const currentIndex = useQuizStore(selectCurrentIndex);
@@ -119,20 +147,19 @@ export function useQuizEngine(
   const clearAnswers = useQuizStore((s) => s.clearAnswers);
   const setCurrentIndex = useQuizStore(selectSetCurrentIndex);
 
-  // When switching program (e.g. smoking↔alcohol), clear answers from the path we're leaving
+  // When a visibility-controller answer changes, clear answers from the branch being left.
   const setAnswer = useCallback(
     (key: string, value: unknown) => {
       if (questions && visibilityKeys.has(key)) {
-        const oldValue = useQuizStore.getState().answers[key];
-        const oldStr =
-          oldValue !== undefined && oldValue !== null ? String(oldValue) : null;
-        const newStr =
-          value !== undefined && value !== null ? String(value) : null;
-        if (oldStr !== null && newStr !== null && oldStr !== newStr) {
-          const keysToClear = getQuestionKeysForVisibilityValue(
+        const previousValue = useQuizStore.getState().answers[key];
+        if (didAnswerValueChange(previousValue, value)) {
+          // Example:
+          // program: quit_smoking -> quit_alcohol
+          // clear answers that belonged to the old branch (quit_smoking).
+          const keysToClear = getDependentQuestionKeysForVisibilityValue(
             questions,
             key,
-            oldStr
+            String(previousValue)
           );
           if (keysToClear.length > 0) {
             clearAnswers(keysToClear);
