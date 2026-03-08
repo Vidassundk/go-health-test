@@ -1,6 +1,7 @@
 import { AppTextInput } from "@/components/AppTextInput";
 import { locale } from "@/constants/locale";
-import React, { useEffect, useRef } from "react";
+import { useFocusOnTransitionEnd } from "@/hooks/useFocusOnTransitionEnd";
+import React, { useRef } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 
 type Props = {
@@ -17,16 +18,7 @@ export function GenericInputQuestion({
   onConfirm,
 }: Props) {
   const inputRef = useRef<TextInput>(null);
-  const prevTransitioningRef = useRef(true);
-
-  useEffect(() => {
-    if (prevTransitioningRef.current && !isTransitioning) {
-      prevTransitioningRef.current = false;
-      inputRef.current?.focus();
-    } else if (isTransitioning) {
-      prevTransitioningRef.current = true;
-    }
-  }, [isTransitioning]);
+  useFocusOnTransitionEnd(inputRef, isTransitioning);
 
   return (
     <View style={styles.container}>

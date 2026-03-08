@@ -3,6 +3,7 @@ import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { COLORS } from "@/constants/colors";
 import { WHEEL_ITEM_HEIGHT } from "@/constants/wheelPicker";
 import { useWheelPickerRenderGate } from "@/hooks/useWheelPickerRenderGate";
+import { isValueUnset, resolveWeightValue } from "@/utils/wheelValues";
 import WheelPicker from "@quidone/react-native-wheel-picker";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
@@ -41,21 +42,17 @@ export function WeightQuestion({
   const isShowingBuffer = useWheelPickerRenderGate({ isTransitioning });
 
   const { whole, decimal } = useMemo(() => {
-    if (value === undefined || value === null) {
-      return { whole: WHOLE_MIN, decimal: 0 };
-    }
-    const n = typeof value === "number" ? value : parseFloat(String(value));
-    if (isNaN(n)) return { whole: WHOLE_MIN, decimal: 0 };
-    const w = Math.floor(n);
-    const d = Math.round((n - w) * 10);
-    return {
-      whole: Math.max(WHOLE_MIN, Math.min(WHOLE_MAX, w)),
-      decimal: Math.max(0, Math.min(9, d)),
-    };
+    return resolveWeightValue(
+      value,
+      WHOLE_MIN,
+      WHOLE_MAX,
+      DECIMAL_MIN,
+      DECIMAL_MAX
+    );
   }, [value]);
 
   useEffect(() => {
-    if (value === undefined || value === null) {
+    if (isValueUnset(value)) {
       onChange(WHOLE_MIN);
     }
   }, [value, onChange]);

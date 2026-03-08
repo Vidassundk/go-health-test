@@ -2,6 +2,7 @@ import { SpinningBuffer } from "@/components/SpinningBuffer";
 import { COLORS } from "@/constants/colors";
 import { WHEEL_ITEM_HEIGHT } from "@/constants/wheelPicker";
 import { useWheelPickerRenderGate } from "@/hooks/useWheelPickerRenderGate";
+import { isValueUnset, resolveAgeValue } from "@/utils/wheelValues";
 import WheelPicker from "@quidone/react-native-wheel-picker";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { View } from "react-native";
@@ -34,16 +35,11 @@ export function AgeQuestion({
   const isShowingBuffer = useWheelPickerRenderGate({ isTransitioning });
 
   const age = useMemo(() => {
-    if (value === undefined || value === null) {
-      return AGE_DEFAULT;
-    }
-    const n = typeof value === "number" ? value : parseInt(String(value), 10);
-    if (isNaN(n)) return AGE_DEFAULT;
-    return Math.max(AGE_MIN, Math.min(AGE_MAX, n));
+    return resolveAgeValue(value, AGE_MIN, AGE_MAX, AGE_DEFAULT);
   }, [value]);
 
   useEffect(() => {
-    if (value === undefined || value === null) {
+    if (isValueUnset(value)) {
       onChange(AGE_DEFAULT);
     }
   }, [value, onChange]);

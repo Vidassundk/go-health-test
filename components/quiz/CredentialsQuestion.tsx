@@ -1,11 +1,12 @@
 import { AnimatedError } from "@/components/AnimatedError";
 import { AppTextInput } from "@/components/AppTextInput";
 import { locale } from "@/constants/locale";
+import { useFocusOnTransitionEnd } from "@/hooks/useFocusOnTransitionEnd";
 import {
   getEmailValidationError,
   getPasswordValidationError,
 } from "@/utils/validation";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 
 type CredentialsValue = { email: string; password: string };
@@ -31,20 +32,11 @@ export function CredentialsQuestion({
   const password = value?.password ?? "";
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
-  const prevTransitioningRef = useRef(true);
   const [touched, setTouched] = useState({
     email: false,
     password: false,
   });
-
-  useEffect(() => {
-    if (prevTransitioningRef.current && !isTransitioning) {
-      prevTransitioningRef.current = false;
-      emailRef.current?.focus();
-    } else if (isTransitioning) {
-      prevTransitioningRef.current = true;
-    }
-  }, [isTransitioning]);
+  useFocusOnTransitionEnd(emailRef, isTransitioning);
 
   const emailError = getEmailValidationError(email);
   const passwordError = getPasswordValidationError(password);

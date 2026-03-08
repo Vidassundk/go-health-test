@@ -3,7 +3,8 @@ import AppText from "@/components/AppText";
 import type { QuizQuestion } from "@/types/quiz";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
-import React, { useEffect, useRef } from "react";
+import { useFocusOnTransitionEnd } from "@/hooks/useFocusOnTransitionEnd";
+import React, { useRef } from "react";
 import {
   KeyboardTypeOptions,
   StyleSheet,
@@ -46,16 +47,7 @@ export function InputQuestion({
   const stringValue =
     value !== undefined && value !== null ? String(value) : "";
   const inputRef = useRef<TextInput>(null);
-  const prevTransitioningRef = useRef(true);
-
-  useEffect(() => {
-    if (prevTransitioningRef.current && !isTransitioning) {
-      prevTransitioningRef.current = false;
-      inputRef.current?.focus();
-    } else if (isTransitioning) {
-      prevTransitioningRef.current = true;
-    }
-  }, [isTransitioning]);
+  useFocusOnTransitionEnd(inputRef, isTransitioning);
 
   return (
     <View style={styles.container}>
