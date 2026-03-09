@@ -8,6 +8,10 @@ export const english = {
       genericAnswer: "Your answer",
     },
   },
+  fontErrors: {
+    loadFailed:
+      "Failed to load app fonts. Some text may not display correctly.",
+  },
   apiErrors: {
     quizApiNotConfigured:
       "Quiz API is not configured. Add EXPO_PUBLIC_QUIZ_API_URL to your .env file.",

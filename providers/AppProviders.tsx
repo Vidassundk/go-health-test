@@ -1,0 +1,34 @@
+import { GlowingBackground } from "@components";
+import { GlowProvider } from "@/contexts/GlowContext";
+import { Toasts } from "@backpackapp-io/react-native-toast";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { StatusBar } from "expo-status-bar";
+import type { ReactNode } from "react";
+import "react-native-reanimated";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
+const queryClient = new QueryClient();
+
+export const STACK_SCREEN_OPTIONS = {
+  headerShown: false,
+  contentStyle: {
+    backgroundColor: "transparent",
+    paddingBottom: 20,
+  },
+  animation: "none" as const,
+};
+
+export function AppProviders({ children }: { children: ReactNode }) {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <SafeAreaProvider>
+        <GlowProvider>
+          <StatusBar style="light" />
+          <GlowingBackground />
+          {children}
+        </GlowProvider>
+      </SafeAreaProvider>
+      <Toasts />
+    </QueryClientProvider>
+  );
+}
