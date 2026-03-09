@@ -1,7 +1,7 @@
 import { SpinningBuffer } from "../SpinningBuffer";
 import { COLORS } from "@/constants/colors";
 import { WHEEL_ITEM_HEIGHT } from "@/constants/wheelPicker";
-import { useWheelPickerRenderGate } from "@/hooks/useWheelPickerRenderGate";
+import { useWheelPickerRenderGate } from "@/hooks";
 import { isValueUnset, resolveAgeValue } from "@/utils/wheelValues";
 import WheelPicker from "@quidone/react-native-wheel-picker";
 import React, { useCallback, useEffect, useMemo } from "react";

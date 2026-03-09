@@ -2,7 +2,7 @@ import { AppText, ScreenWithBottomAction } from "@components";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
 import { isDebugSkipQuizToSummaryEnabled } from "@/config/featureFlags";
-import { useScreenTransition } from "@/hooks/useScreenTransition";
+import { useScreenTransition } from "@/hooks";
 import { useQuizStore } from "@/stores";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";

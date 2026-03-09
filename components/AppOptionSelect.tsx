@@ -6,7 +6,7 @@ import {
   STAGGER_DELAY_MS,
 } from "@/constants/animations";
 import { COLORS } from "@/constants/colors";
-import { usePressProgress } from "@/hooks/usePressProgress";
+import { usePressProgress } from "@/hooks";
 import type { QuestionOption } from "@/types/quiz";
 import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";

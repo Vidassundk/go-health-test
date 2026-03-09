@@ -1,6 +1,6 @@
 import { AppTextInput } from "../AppTextInput";
 import { locale } from "@/constants/locale";
-import { useFocusOnTransitionEnd } from "@/hooks/useFocusOnTransitionEnd";
+import { useFocusOnTransitionEnd } from "@/hooks";
 import React, { useRef } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 

@@ -1,5 +1,5 @@
 import { AppProviders, STACK_SCREEN_OPTIONS } from "@/providers";
-import { useFontsReady } from "@/hooks/useFontsReady";
+import { useFontsReady } from "@/hooks";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 

@@ -7,7 +7,7 @@ import { Group, LinearGradient, RoundedRect } from "@shopify/react-native-skia";
 import React from "react";
 import type { SharedValue } from "react-native-reanimated";
 import { useSharedValue } from "react-native-reanimated";
-import { useGradientShift } from "@/hooks/useGradientShift";
+import { useGradientShift } from "@/hooks";
 
 type GradientLayerProps = {
   width: number;

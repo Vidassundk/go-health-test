@@ -4,7 +4,7 @@ import Animated, { useAnimatedStyle , useDerivedValue, useSharedValue, withTimin
 import { Canvas, Group, RoundedRect } from "@shopify/react-native-skia";
 import AppText from "./AppText";
 import GradientLayer from "./GradientLayer";
-import { usePressProgress } from "@/hooks/usePressProgress";
+import { usePressProgress } from "@/hooks";
 import { COLORS } from "@/constants/colors";
 import { CROSSFADE_DURATION_MS } from "@/constants/animations";
 

@@ -1,7 +1,7 @@
 import { AnimatedError } from "../AnimatedError";
 import { AppTextInput } from "../AppTextInput";
 import { locale } from "@/constants/locale";
-import { useFocusOnTransitionEnd } from "@/hooks/useFocusOnTransitionEnd";
+import { useFocusOnTransitionEnd } from "@/hooks";
 import {
   getEmailValidationError,
   getPasswordValidationError,
