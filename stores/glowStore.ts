@@ -1,8 +1,4 @@
-import {
-  runOnJS,
-  type SharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import { runOnJS, type SharedValue, withTiming } from "react-native-reanimated";
 import { create } from "zustand";
 
 const GLOW_ANIMATION_DURATION_MS = 600;
@@ -30,8 +26,7 @@ export const useGlowStore = create<GlowState>((set, get) => ({
   isHomeBackgroundEnabled: true,
   setGlowVariant: (variant) => set({ glowVariant: variant }),
   setHomeBackgroundEnabled: (enabled) => set({ isHomeBackgroundEnabled: enabled }),
-  initialize: (glowProgress, setGlowTarget) =>
-    set({ glowProgress, setGlowTarget }),
+  initialize: (glowProgress, setGlowTarget) => set({ glowProgress, setGlowTarget }),
 }));
 
 export function useGlow() {

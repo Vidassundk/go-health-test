@@ -23,8 +23,7 @@ export default function QuizSummaryScreen() {
   const setHasStartedJourney = useQuizStore((s) => s.setHasStartedJourney);
   const { setGlowTarget } = useGlow();
   const router = useRouter();
-  const { isVisible, entering, exiting, fadeOutThen, isTransitioning } =
-    useScreenTransition();
+  const { isVisible, entering, exiting, fadeOutThen, isTransitioning } = useScreenTransition();
   const shouldHideBackArrow = isDebugSkipQuizToSummaryEnabled();
 
   const variant = getSummaryVariant(answers);

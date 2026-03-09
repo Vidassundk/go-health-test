@@ -1,11 +1,7 @@
 import { AppText } from "@components";
 import { ErrorIcon } from "@icons";
 import { COLORS } from "@/constants/colors";
-import {
-  resolveValue,
-  toast,
-  type Toast,
-} from "@backpackapp-io/react-native-toast";
+import { resolveValue, toast, type Toast } from "@backpackapp-io/react-native-toast";
 import { Dimensions, View } from "react-native";
 
 const SCREEN_PADDING = 32;
@@ -31,11 +27,7 @@ export function showErrorToast(message: string) {
             }}
           >
             <ErrorIcon size={16} color="#fff" />
-            <AppText
-              variant="caption"
-              color="#fff"
-              style={{ flex: 1, textAlign: "left" }}
-            >
+            <AppText variant="caption" color="#fff" style={{ flex: 1, textAlign: "left" }}>
               {text}
             </AppText>
           </View>

@@ -27,12 +27,7 @@ export type AppOptionSelectProps = {
   check?: boolean;
 };
 
-export function AppOptionSelect({
-  opt,
-  selected,
-  onPress,
-  check = false,
-}: AppOptionSelectProps) {
+export function AppOptionSelect({ opt, selected, onPress, check = false }: AppOptionSelectProps) {
   const [layout, setLayout] = useState<{
     width: number;
     height: number;
@@ -83,9 +78,7 @@ export function AppOptionSelect({
       onLayout={(e) => {
         const { width, height } = e.nativeEvent.layout;
         setLayout((prev) =>
-          prev?.width === width && prev?.height === height
-            ? prev
-            : { width, height }
+          prev?.width === width && prev?.height === height ? prev : { width, height }
         );
       }}
     >
@@ -99,9 +92,7 @@ export function AppOptionSelect({
           pressProgress={pressProgress}
         />
       )}
-      <View
-        style={[styles.inner, { margin: INSET, borderRadius: innerRadius }]}
-      >
+      <View style={[styles.inner, { margin: INSET, borderRadius: innerRadius }]}>
         <Pressable
           onPress={onPress}
           onPressIn={onPressIn}
@@ -111,9 +102,7 @@ export function AppOptionSelect({
         >
           <AppText variant="bodyBold">{opt.title}</AppText>
           {check && (
-            <Animated.View
-              style={[styles.checkWrapper, checkWrapperAnimatedStyle]}
-            >
+            <Animated.View style={[styles.checkWrapper, checkWrapperAnimatedStyle]}>
               <Animated.View style={checkIconAnimatedStyle}>
                 <CheckIcon size={10} />
               </Animated.View>

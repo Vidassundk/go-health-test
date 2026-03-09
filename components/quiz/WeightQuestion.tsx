@@ -18,15 +18,15 @@ const WHOLE_MAX = 600;
 const DECIMAL_MIN = 0;
 const DECIMAL_MAX = 9;
 
-const wholeLbData = Array.from(
-  { length: WHOLE_MAX - WHOLE_MIN + 1 },
-  (_, i) => ({ value: WHOLE_MIN + i, label: String(WHOLE_MIN + i) })
-);
+const wholeLbData = Array.from({ length: WHOLE_MAX - WHOLE_MIN + 1 }, (_, i) => ({
+  value: WHOLE_MIN + i,
+  label: String(WHOLE_MIN + i),
+}));
 
-const decimalData = Array.from(
-  { length: DECIMAL_MAX - DECIMAL_MIN + 1 },
-  (_, i) => ({ value: i, label: String(i) })
-);
+const decimalData = Array.from({ length: DECIMAL_MAX - DECIMAL_MIN + 1 }, (_, i) => ({
+  value: i,
+  label: String(i),
+}));
 
 type Props = {
   value: string | number | undefined;
@@ -34,21 +34,11 @@ type Props = {
   isTransitioning?: boolean;
 };
 
-export function WeightQuestion({
-  value,
-  onChange,
-  isTransitioning = false,
-}: Props) {
+export function WeightQuestion({ value, onChange, isTransitioning = false }: Props) {
   const isShowingBuffer = useWheelPickerRenderGate({ isTransitioning });
 
   const { whole, decimal } = useMemo(() => {
-    return resolveWeightValue(
-      value,
-      WHOLE_MIN,
-      WHOLE_MAX,
-      DECIMAL_MIN,
-      DECIMAL_MAX
-    );
+    return resolveWeightValue(value, WHOLE_MIN, WHOLE_MAX, DECIMAL_MIN, DECIMAL_MAX);
   }, [value]);
 
   useEffect(() => {
@@ -73,9 +63,7 @@ export function WeightQuestion({
 
   if (isShowingBuffer) {
     return (
-      <View
-        style={[wheelPickerStyles.container, wheelPickerStyles.placeholder]}
-      >
+      <View style={[wheelPickerStyles.container, wheelPickerStyles.placeholder]}>
         <SpinningBuffer size={40} color={COLORS.text} />
       </View>
     );
@@ -102,12 +90,7 @@ export function WeightQuestion({
       <WheelPickerChrome labelOverlay={labelOverlay} />
       <View style={wheelPickerStyles.pickerRowWrapper}>
         <View style={styles.pickerRow}>
-          <View
-            style={[
-              wheelPickerStyles.pickerWrapper,
-              { height: WHEEL_ITEM_HEIGHT * 5 },
-            ]}
-          >
+          <View style={[wheelPickerStyles.pickerWrapper, { height: WHEEL_ITEM_HEIGHT * 5 }]}>
             <WheelPicker
               data={wholeLbData}
               value={whole}
@@ -119,18 +102,11 @@ export function WeightQuestion({
               overlayItemStyle={wheelPickerStyles.overlayItem}
             />
           </View>
-          <View
-            style={[
-              wheelPickerStyles.pickerWrapper,
-              { height: WHEEL_ITEM_HEIGHT * 5 },
-            ]}
-          >
+          <View style={[wheelPickerStyles.pickerWrapper, { height: WHEEL_ITEM_HEIGHT * 5 }]}>
             <WheelPicker
               data={decimalData}
               value={decimal}
-              onValueChanged={({ item: { value: v } }) =>
-                handleDecimalChange(v)
-              }
+              onValueChanged={({ item: { value: v } }) => handleDecimalChange(v)}
               itemHeight={WHEEL_ITEM_HEIGHT}
               visibleItemCount={5}
               enableScrollByTapOnItem

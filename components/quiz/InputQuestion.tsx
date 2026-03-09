@@ -5,12 +5,7 @@ import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
 import { useFocusOnTransitionEnd } from "@/hooks";
 import React, { useRef } from "react";
-import {
-  KeyboardTypeOptions,
-  StyleSheet,
-  TextInput,
-  View,
-} from "react-native";
+import { KeyboardTypeOptions, StyleSheet, TextInput, View } from "react-native";
 
 type Props = {
   question: QuizQuestion;
@@ -44,8 +39,7 @@ export function InputQuestion({
   onConfirm,
 }: Props) {
   const config = getInputConfig(question);
-  const stringValue =
-    value !== undefined && value !== null ? String(value) : "";
+  const stringValue = value !== undefined && value !== null ? String(value) : "";
   const inputRef = useRef<TextInput>(null);
   useFocusOnTransitionEnd(inputRef, isTransitioning);
 

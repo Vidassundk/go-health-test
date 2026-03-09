@@ -1,7 +1,4 @@
-import {
-  Merriweather_400Regular,
-  Merriweather_700Bold,
-} from "@expo-google-fonts/merriweather";
+import { Merriweather_400Regular, Merriweather_700Bold } from "@expo-google-fonts/merriweather";
 import { Poppins_400Regular } from "@expo-google-fonts/poppins";
 import {
   RedditSans_400Regular,
@@ -32,9 +29,7 @@ export function useFontsReady(): boolean {
       SplashScreen.hideAsync();
       if (fontError) {
         showErrorToast(
-          fontError instanceof Error
-            ? fontError.message
-            : locale.fontErrors.loadFailed
+          fontError instanceof Error ? fontError.message : locale.fontErrors.loadFailed
         );
       }
     }

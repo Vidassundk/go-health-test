@@ -29,10 +29,7 @@ function QuizFlowInner({
   const handleChange = (v: unknown) => setAnswer(question.key, v);
 
   return (
-    <View
-      style={styles.container}
-      pointerEvents={isTransitioning ? "none" : undefined}
-    >
+    <View style={styles.container} pointerEvents={isTransitioning ? "none" : undefined}>
       <View style={styles.header}>
         <AppText variant="caption" color={COLORS.textAlt}>
           {question.subtitle}

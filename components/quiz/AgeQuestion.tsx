@@ -27,11 +27,7 @@ type Props = {
   isTransitioning?: boolean;
 };
 
-export function AgeQuestion({
-  value,
-  onChange,
-  isTransitioning = false,
-}: Props) {
+export function AgeQuestion({ value, onChange, isTransitioning = false }: Props) {
   const isShowingBuffer = useWheelPickerRenderGate({ isTransitioning });
 
   const age = useMemo(() => {
@@ -53,9 +49,7 @@ export function AgeQuestion({
 
   if (isShowingBuffer) {
     return (
-      <View
-        style={[wheelPickerStyles.container, wheelPickerStyles.placeholder]}
-      >
+      <View style={[wheelPickerStyles.container, wheelPickerStyles.placeholder]}>
         <SpinningBuffer size={40} color={COLORS.text} />
       </View>
     );
@@ -65,12 +59,7 @@ export function AgeQuestion({
     <View style={wheelPickerStyles.container}>
       <WheelPickerChrome />
       <View style={wheelPickerStyles.pickerRowWrapper}>
-        <View
-          style={[
-            wheelPickerStyles.pickerWrapper,
-            { height: WHEEL_ITEM_HEIGHT * 5 },
-          ]}
-        >
+        <View style={[wheelPickerStyles.pickerWrapper, { height: WHEEL_ITEM_HEIGHT * 5 }]}>
           <WheelPicker
             data={ageData}
             value={age}

@@ -22,9 +22,7 @@ export function getEmailValidationError(email: string | undefined | null): strin
   return null;
 }
 
-export function getPasswordValidationError(
-  password: string | undefined | null
-): string | null {
+export function getPasswordValidationError(password: string | undefined | null): string | null {
   const value = String(password ?? "");
 
   if (!value) {

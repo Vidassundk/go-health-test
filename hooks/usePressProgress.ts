@@ -1,10 +1,6 @@
 import { useCallback, useRef } from "react";
 import type { GestureResponderEvent } from "react-native";
-import {
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from "react-native-reanimated";
+import { useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 
 const PRESS_DURATION_MS = 80;
 const RELEASE_SPRING = { damping: 20, stiffness: 200 };

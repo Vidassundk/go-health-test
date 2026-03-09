@@ -6,11 +6,7 @@ type ErrorIconProps = React.ComponentProps<typeof Svg> & {
   color?: string;
 };
 
-export function ErrorIcon({
-  size = 16,
-  color = "#fff",
-  ...props
-}: ErrorIconProps) {
+export function ErrorIcon({ size = 16, color = "#fff", ...props }: ErrorIconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 16 16" fill="none" {...props}>
       <Path

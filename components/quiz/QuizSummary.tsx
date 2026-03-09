@@ -3,10 +3,7 @@ import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
 import { useQuizStore } from "@/stores";
 import type { QuizQuestion } from "@/types/quiz";
-import {
-  getSummaryDisplayData,
-  type SummaryDisplayData,
-} from "@/utils/getSummaryDisplayData";
+import { getSummaryDisplayData, type SummaryDisplayData } from "@/utils/getSummaryDisplayData";
 import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 

@@ -12,8 +12,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const reset = useQuizStore((s) => s.reset);
   const { setHomeBackgroundEnabled } = useGlow();
-  const { isVisible, entering, exiting, fadeOutThen, isTransitioning } =
-    useScreenTransition();
+  const { isVisible, entering, exiting, fadeOutThen, isTransitioning } = useScreenTransition();
   const { title, text, startOver } = locale.homeScreen;
 
   useEffect(() => {

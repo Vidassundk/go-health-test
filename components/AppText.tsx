@@ -15,11 +15,7 @@ const AppText = forwardRef<Text, AppTextProps>(
     return (
       <Text
         ref={ref}
-        style={[
-          { color: color ?? COLORS.text },
-          variantStyle,
-          StyleSheet.flatten(style),
-        ]}
+        style={[{ color: color ?? COLORS.text }, variantStyle, StyleSheet.flatten(style)]}
         {...props}
       />
     );

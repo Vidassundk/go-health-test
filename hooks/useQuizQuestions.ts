@@ -1,8 +1,5 @@
 import { fetchQuizQuestions } from "@/api/quiz";
-import {
-  isQuizApiConfigured,
-  QUIZ_API_URL_ERROR_MESSAGE,
-} from "@/config/api";
+import { isQuizApiConfigured, QUIZ_API_URL_ERROR_MESSAGE } from "@/config/api";
 import { useQuery } from "@tanstack/react-query";
 
 export const QUIZ_QUESTIONS_QUERY_KEY = ["quiz", "questions"] as const;

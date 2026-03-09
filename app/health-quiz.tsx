@@ -1,4 +1,14 @@
 import {
+  TRANSITION_ENTER_MS,
+  TRANSITION_EXIT_MS,
+  TRANSITION_INITIAL_DELAY_MS,
+} from "@/constants/animations";
+import { COLORS } from "@/constants/colors";
+import { useQuizBottomAction, useQuizEngine, useQuizQuestions, useScreenTransition } from "@/hooks";
+import { selectWheelPickerShowingBuffer, useGlow, useWheelPickerStore } from "@/stores";
+import { getSummaryVariant } from "@/utils/getSummaryVariant";
+import { showErrorToast } from "@/utils/toast";
+import {
   HEADER_HEIGHT,
   QuizFlow,
   QuizHeader,
@@ -6,25 +16,6 @@ import {
   SpinningBuffer,
   WheelPickerReadyInit,
 } from "@components";
-import {
-  TRANSITION_ENTER_MS,
-  TRANSITION_EXIT_MS,
-  TRANSITION_INITIAL_DELAY_MS,
-} from "@/constants/animations";
-import { COLORS } from "@/constants/colors";
-import { useGlow } from "@/stores";
-import {
-  useQuizBottomAction,
-  useQuizEngine,
-  useQuizQuestions,
-  useScreenTransition,
-} from "@/hooks";
-import {
-  selectWheelPickerShowingBuffer,
-  useWheelPickerStore,
-} from "@/stores";
-import { getSummaryVariant } from "@/utils/getSummaryVariant";
-import { showErrorToast } from "@/utils/toast";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
@@ -34,10 +25,8 @@ export default function QuizScreen() {
   const { questions, isLoading, isError, error } = useQuizQuestions();
   const { setGlowTarget } = useGlow();
   const [submitAttempted, setSubmitAttempted] = useState(false);
-  const isWheelPickerShowingBuffer = useWheelPickerStore(
-    selectWheelPickerShowingBuffer
-  );
-  // Reanimated layout animation test – entering/exiting
+  const isWheelPickerShowingBuffer = useWheelPickerStore(selectWheelPickerShowingBuffer);
+
   const engine = useQuizEngine(questions, {
     onSubmit: (answers) => {
       setGlowTarget(1, getSummaryVariant(answers));
@@ -56,8 +45,7 @@ export default function QuizScreen() {
     goBack,
   } = engine;
   const router = useRouter();
-  const { isVisible, entering, exiting, fadeOutThen, isTransitioning } =
-    useScreenTransition();
+  const { isVisible, entering, exiting, fadeOutThen, isTransitioning } = useScreenTransition();
 
   const startSectionTransition = useCallback((action: () => void) => {
     action();
@@ -117,11 +105,7 @@ export default function QuizScreen() {
               <QuizHeader
                 onBackPress={onBackPress}
                 isBackDisabled={isTransitioning}
-                progress={
-                  totalSteps > 0
-                    ? (currentIndex + 1) / totalSteps
-                    : 0
-                }
+                progress={totalSteps > 0 ? (currentIndex + 1) / totalSteps : 0}
               />
             </View>
             <KeyboardAvoidingView
@@ -149,9 +133,7 @@ export default function QuizScreen() {
                           question={currentQuestion}
                           isLast={isLast}
                           setAnswer={setAnswer}
-                          onNext={() =>
-                            isLast ? goNext() : startSectionTransition(goNext)
-                          }
+                          onNext={() => (isLast ? goNext() : startSectionTransition(goNext))}
                           isTransitioning={false}
                           submitAttempted={submitAttempted}
                           onSubmitAttempt={handleSectionSubmitAttempt}

@@ -35,12 +35,7 @@ export default function GradientLayer({
 
   const content = (
     <RoundedRect x={0} y={0} width={width} height={height} r={borderRadius}>
-      <LinearGradient
-        start={start}
-        end={end}
-        colors={colors}
-        positions={[...GRADIENT_POSITIONS]}
-      />
+      <LinearGradient start={start} end={end} colors={colors} positions={[...GRADIENT_POSITIONS]} />
     </RoundedRect>
   );
 

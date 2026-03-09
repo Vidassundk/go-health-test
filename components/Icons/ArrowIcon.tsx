@@ -6,11 +6,7 @@ type ArrowIconProps = React.ComponentProps<typeof Svg> & {
   color?: string;
 };
 
-export function ArrowIcon({
-  size = 24,
-  color = "#FDFCFE",
-  ...props
-}: ArrowIconProps) {
+export function ArrowIcon({ size = 24, color = "#FDFCFE", ...props }: ArrowIconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
       <Path

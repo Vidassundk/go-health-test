@@ -27,10 +27,7 @@ export function useScreenTransition() {
   }, []);
 
   const entering = useMemo(
-    () =>
-      FadeInRight.duration(TRANSITION_ENTER_MS).delay(
-        TRANSITION_INITIAL_DELAY_MS
-      ),
+    () => FadeInRight.duration(TRANSITION_ENTER_MS).delay(TRANSITION_INITIAL_DELAY_MS),
     []
   );
   const exiting = useMemo(
@@ -44,10 +41,7 @@ export function useScreenTransition() {
     [handleFadeOutComplete]
   );
 
-  const fadeOutThen = (
-    action: () => void,
-    _direction: TransitionDirection = "forward"
-  ) => {
+  const fadeOutThen = (action: () => void, _direction: TransitionDirection = "forward") => {
     if (isTransitioningRef.current) {
       return;
     }

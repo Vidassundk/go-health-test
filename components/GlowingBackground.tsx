@@ -5,13 +5,10 @@ import { StyleSheet, View } from "react-native";
 import GlowObject from "./GlowObject";
 
 export default function GlowingBackground() {
-  const { glowProgress, glowVariant, isHomeBackgroundEnabled } =
-    useGlow();
+  const { glowProgress, glowVariant, isHomeBackgroundEnabled } = useGlow();
   const pathname = usePathname();
   const isHomeScreen = pathname === "/home" && isHomeBackgroundEnabled;
-  const summaryColors = glowVariant
-    ? GLOW_COLORS.summary[glowVariant]
-    : GLOW_COLORS.default;
+  const summaryColors = glowVariant ? GLOW_COLORS.summary[glowVariant] : GLOW_COLORS.default;
 
   return (
     <View pointerEvents="none" style={styles.container}>

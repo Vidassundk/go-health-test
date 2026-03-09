@@ -2,10 +2,7 @@ import { AnimatedError } from "../AnimatedError";
 import { AppTextInput } from "../AppTextInput";
 import { locale } from "@/constants/locale";
 import { useFocusOnTransitionEnd } from "@/hooks";
-import {
-  getEmailValidationError,
-  getPasswordValidationError,
-} from "@/utils/validation";
+import { getEmailValidationError, getPasswordValidationError } from "@/utils/validation";
 import React, { useRef, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 
@@ -49,9 +46,7 @@ export function CredentialsQuestion({
         ref={emailRef}
         error={showEmailError && Boolean(emailError)}
         value={email}
-        onChangeText={(nextEmail) =>
-          onChange({ ...value, email: nextEmail, password })
-        }
+        onChangeText={(nextEmail) => onChange({ ...value, email: nextEmail, password })}
         placeholder={locale.common.placeholders.email}
         keyboardType="email-address"
         autoCapitalize="none"
@@ -67,9 +62,7 @@ export function CredentialsQuestion({
         ref={passwordRef}
         error={showPasswordError && Boolean(passwordError)}
         value={password}
-        onChangeText={(nextPassword) =>
-          onChange({ ...value, email, password: nextPassword })
-        }
+        onChangeText={(nextPassword) => onChange({ ...value, email, password: nextPassword })}
         placeholder={locale.common.placeholders.password}
         secureTextEntry
         autoCapitalize="none"

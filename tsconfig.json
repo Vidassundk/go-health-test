@@ -3,27 +3,12 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@components": [
-        "./components/index.ts"
-      ],
-      "@components/*": [
-        "./components/*"
-      ],
-      "@icons": [
-        "./components/Icons/index.ts"
-      ],
-      "@icons/*": [
-        "./components/Icons/*"
-      ],
-      "@/*": [
-        "./*"
-      ]
+      "@components": ["./components/index.ts"],
+      "@components/*": ["./components/*"],
+      "@icons": ["./components/Icons/index.ts"],
+      "@icons/*": ["./components/Icons/*"],
+      "@/*": ["./*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
 }

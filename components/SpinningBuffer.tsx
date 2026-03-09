@@ -10,11 +10,7 @@ import { BufferIcon } from "@icons";
 
 type SpinningBufferProps = Parameters<typeof BufferIcon>[0];
 
-export function SpinningBuffer({
-  size = 86,
-  color = "#fff",
-  ...props
-}: SpinningBufferProps) {
+export function SpinningBuffer({ size = 86, color = "#fff", ...props }: SpinningBufferProps) {
   const rotation = useSharedValue(0);
 
   useEffect(() => {

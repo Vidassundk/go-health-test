@@ -1,10 +1,5 @@
 import { COLORS } from "@/constants/colors";
-import {
-  Canvas,
-  Group,
-  interpolateColors,
-  RoundedRect,
-} from "@shopify/react-native-skia";
+import { Canvas, Group, interpolateColors, RoundedRect } from "@shopify/react-native-skia";
 import React from "react";
 import type { SharedValue } from "react-native-reanimated";
 import { useDerivedValue, useSharedValue } from "react-native-reanimated";
@@ -37,18 +32,11 @@ export default function AppOptionSelectOuter({
 
   const solidOpacity = useDerivedValue(() => {
     "worklet";
-    return (
-      OPTION_INACTIVE_OPACITY +
-      (1 - OPTION_INACTIVE_OPACITY) * selectedProgress.value
-    );
+    return OPTION_INACTIVE_OPACITY + (1 - OPTION_INACTIVE_OPACITY) * selectedProgress.value;
   });
   const innerFillColor = useDerivedValue(() => {
     "worklet";
-    return interpolateColors(
-      innerSelectionProgress.value,
-      [0, 1],
-      [COLORS.background, "#191435"]
-    );
+    return interpolateColors(innerSelectionProgress.value, [0, 1], [COLORS.background, "#191435"]);
   });
   const innerInset = 1;
   const innerRadius = Math.max(borderRadius - innerInset, 0);
@@ -56,10 +44,7 @@ export default function AppOptionSelectOuter({
   const innerHeight = Math.max(height - innerInset * 2, 0);
 
   return (
-    <Canvas
-      style={{ position: "absolute", width, height }}
-      pointerEvents="none"
-    >
+    <Canvas style={{ position: "absolute", width, height }} pointerEvents="none">
       <Group opacity={solidOpacity}>
         <RoundedRect
           x={0}

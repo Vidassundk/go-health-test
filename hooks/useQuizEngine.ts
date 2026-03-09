@@ -1,13 +1,6 @@
-import {
-  useQuizStore,
-  selectCurrentIndex,
-  selectSetCurrentIndex,
-} from "@/stores";
+import { useQuizStore, selectCurrentIndex, selectSetCurrentIndex } from "@/stores";
 import type { QuizQuestion } from "@/types/quiz";
-import {
-  getEmailValidationError,
-  getPasswordValidationError,
-} from "@/utils/validation";
+import { getEmailValidationError, getPasswordValidationError } from "@/utils/validation";
 import { useCallback, useEffect, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 
@@ -19,16 +12,11 @@ export type { QuizAnswers } from "@/stores";
  * Keep only answers that control visibility (visibleIf.question keys).
  * This lets the visibility computation ignore unrelated answer changes.
  */
-function pickAnswersByKeys(
-  answers: QuizAnswers,
-  keys: Set<string>
-): Partial<QuizAnswers> {
+function pickAnswersByKeys(answers: QuizAnswers, keys: Set<string>): Partial<QuizAnswers> {
   if (keys.size === 0) {
     return {};
   }
-  return Object.fromEntries(
-    Object.entries(answers).filter(([key]) => keys.has(key))
-  );
+  return Object.fromEntries(Object.entries(answers).filter(([key]) => keys.has(key)));
 }
 
 /** Normalize unknown store values into comparable string form. */
@@ -62,10 +50,7 @@ function isVisible(question: QuizQuestion, answers: QuizAnswers): boolean {
   return String(answer) === condition.value;
 }
 
-function getVisibleQuestions(
-  questions: QuizQuestion[],
-  answers: QuizAnswers
-): QuizQuestion[] {
+function getVisibleQuestions(questions: QuizQuestion[], answers: QuizAnswers): QuizQuestion[] {
   return questions.filter((q) => isVisible(q, answers));
 }
 
@@ -85,9 +70,7 @@ function isStepValid(question: QuizQuestion, value: unknown): boolean {
     }
     case "credentials": {
       const v = value as { email?: string; password?: string };
-      return (
-        !getEmailValidationError(v?.email) && !getPasswordValidationError(v?.password)
-      );
+      return !getEmailValidationError(v?.email) && !getPasswordValidationError(v?.password);
     }
     case "single":
       return !!(value && (typeof value !== "string" || value.trim()));
@@ -105,9 +88,7 @@ type UseQuizEngineOptions = {
 /** Keys from answers that affect question visibility (visibleIf conditions) */
 function getVisibilityKeys(questions: QuizQuestion[] | null): Set<string> {
   if (!questions) return new Set();
-  return new Set(
-    questions.flatMap((q) => (q.visibleIf ? [q.visibleIf.question] : []))
-  );
+  return new Set(questions.flatMap((q) => (q.visibleIf ? [q.visibleIf.question] : [])));
 }
 
 /** Keys controlled by a visibility condition branch; cleared when branch selection changes */
@@ -117,10 +98,7 @@ function getDependentQuestionKeysForVisibilityValue(
   value: string
 ): string[] {
   return questions
-    .filter(
-      (q) =>
-        q.visibleIf?.question === visibilityKey && q.visibleIf?.value === value
-    )
+    .filter((q) => q.visibleIf?.question === visibilityKey && q.visibleIf?.value === value)
     .map((q) => q.key);
 }
 
@@ -131,10 +109,7 @@ function getDependentQuestionKeysForVisibilityValue(
  * - handles forward/backward navigation
  * - triggers submit with full answer snapshot
  */
-export function useQuizEngine(
-  questions: QuizQuestion[] | null,
-  options?: UseQuizEngineOptions
-) {
+export function useQuizEngine(questions: QuizQuestion[] | null, options?: UseQuizEngineOptions) {
   const { onSubmit } = options ?? {};
 
   const visibilityKeys = useMemo(() => getVisibilityKeys(questions), [questions]);
@@ -172,8 +147,7 @@ export function useQuizEngine(
   );
 
   const visibleQuestions = useMemo(
-    () =>
-      questions ? getVisibleQuestions(questions, visibilitySlice) : [],
+    () => (questions ? getVisibleQuestions(questions, visibilitySlice) : []),
     [questions, visibilitySlice]
   );
 
@@ -186,8 +160,7 @@ export function useQuizEngine(
     currentQuestion ? s.answers[currentQuestion.key] : undefined
   );
   const isCurrentStepValid = useMemo(
-    () =>
-      currentQuestion ? isStepValid(currentQuestion, currentValue) : true,
+    () => (currentQuestion ? isStepValid(currentQuestion, currentValue) : true),
     [currentQuestion, currentValue]
   );
 
@@ -214,9 +187,7 @@ export function useQuizEngine(
   }, [setCurrentIndex]);
 
   useEffect(() => {
-    setCurrentIndex((i) =>
-      Math.min(Math.max(0, i), Math.max(0, visibleQuestions.length - 1))
-    );
+    setCurrentIndex((i) => Math.min(Math.max(0, i), Math.max(0, visibleQuestions.length - 1)));
   }, [visibleQuestions.length, setCurrentIndex]);
 
   return useMemo(

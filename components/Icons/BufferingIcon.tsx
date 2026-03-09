@@ -6,11 +6,7 @@ type BufferIconProps = React.ComponentProps<typeof Svg> & {
   color?: string;
 };
 
-export function BufferIcon({
-  size = 86,
-  color = "#fff",
-  ...props
-}: BufferIconProps) {
+export function BufferIcon({ size = 86, color = "#fff", ...props }: BufferIconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 86 86" fill="none" {...props}>
       <Path

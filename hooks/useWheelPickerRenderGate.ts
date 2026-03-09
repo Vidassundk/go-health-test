@@ -1,7 +1,4 @@
-import {
-  selectWheelPickerReady,
-  useWheelPickerStore,
-} from "@/stores";
+import { selectWheelPickerReady, useWheelPickerStore } from "@/stores";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { InteractionManager } from "react-native";
 

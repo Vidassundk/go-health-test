@@ -1,8 +1,4 @@
-import {
-  COLORS,
-  type ProgressBarColor,
-  PROGRESS_BAR_COLORS,
-} from "@/constants/colors";
+import { COLORS, type ProgressBarColor, PROGRESS_BAR_COLORS } from "@/constants/colors";
 import { type GlowVariant, useGlow } from "@/stores";
 import React, { useCallback, useEffect } from "react";
 import { type LayoutChangeEvent, StyleSheet, View } from "react-native";
@@ -27,9 +23,7 @@ export default function QuizProgressBar({ progress }: QuizProgressBarProps) {
   const { glowProgress, glowVariant } = useGlow();
   const animatedProgress = useSharedValue(0);
   const trackWidth = useSharedValue(0);
-  const targetColor = useSharedValue<ProgressBarColor>(
-    PROGRESS_BAR_COLORS.default
-  );
+  const targetColor = useSharedValue<ProgressBarColor>(PROGRESS_BAR_COLORS.default);
 
   useEffect(() => {
     targetColor.value =
@@ -39,10 +33,7 @@ export default function QuizProgressBar({ progress }: QuizProgressBarProps) {
   }, [glowVariant, targetColor]);
 
   useEffect(() => {
-    animatedProgress.value = withSpring(
-      Math.max(0, Math.min(1, progress)),
-      SPRING_CONFIG
-    );
+    animatedProgress.value = withSpring(Math.max(0, Math.min(1, progress)), SPRING_CONFIG);
   }, [progress, animatedProgress]);
 
   const onLayout = useCallback(

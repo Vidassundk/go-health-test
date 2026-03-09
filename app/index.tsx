@@ -13,8 +13,7 @@ export default function IntroScreen() {
   const router = useRouter();
   const hasHydrated = useQuizStore((s) => s.hasHydrated);
   const hasStartedJourney = useQuizStore((s) => s.hasStartedJourney);
-  const { isVisible, entering, exiting, fadeOutThen, isTransitioning } =
-    useScreenTransition();
+  const { isVisible, entering, exiting, fadeOutThen, isTransitioning } = useScreenTransition();
   const shouldSkipQuizToSummary = isDebugSkipQuizToSummaryEnabled();
 
   useEffect(() => {
@@ -37,10 +36,7 @@ export default function IntroScreen() {
               disabled: isTransitioning,
               onPress: () =>
                 fadeOutThen(
-                  () =>
-                    router.replace(
-                      shouldSkipQuizToSummary ? "/quiz-summary" : "/health-quiz"
-                    ),
+                  () => router.replace(shouldSkipQuizToSummary ? "/quiz-summary" : "/health-quiz"),
                   "forward"
                 ),
             }}

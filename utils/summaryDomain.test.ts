@@ -74,11 +74,7 @@ describe("getSummaryDisplayData", () => {
 
     expect(result.name).toBe("Vida");
     expect(result.mainGoal).toBe("Get more control");
-    expect(result.complementaryGoals).toEqual([
-      "Quit alcohol",
-      "Improve sleep",
-      "More energy",
-    ]);
+    expect(result.complementaryGoals).toEqual(["Quit alcohol", "Improve sleep", "More energy"]);
   });
 
   it("uses safe fallbacks when key answers are missing", () => {

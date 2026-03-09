@@ -17,24 +17,16 @@ export function getSummaryDisplayData(
   answers: QuizAnswers,
   questions: QuizQuestion[]
 ): SummaryDisplayData {
-  const nameQuestion = questions.find(
-    (q) => q.type === "name" || q.key === QUIZ_KEYS.name
-  );
-  const name = nameQuestion
-    ? String(answers[nameQuestion.key] ?? "").trim()
-    : "";
+  const nameQuestion = questions.find((q) => q.type === "name" || q.key === QUIZ_KEYS.name);
+  const name = nameQuestion ? String(answers[nameQuestion.key] ?? "").trim() : "";
 
   // Goal question from quiz
   const goalQuestion = questions.find((q) => q.key === QUIZ_KEYS.goal);
   // User's selected value (e.g. "more_control")
-  const goalValue = goalQuestion
-    ? (answers[goalQuestion.key] as string | undefined)
-    : undefined;
+  const goalValue = goalQuestion ? (answers[goalQuestion.key] as string | undefined) : undefined;
   // Resolve to option title for display, fallback if none selected
   const mainGoal =
-    goalQuestion && goalValue
-      ? getOptionTitle(goalQuestion, goalValue)
-      : "Improve my health";
+    goalQuestion && goalValue ? getOptionTitle(goalQuestion, goalValue) : "Improve my health";
 
   const programQuestion = questions.find((q) => q.key === QUIZ_KEYS.program);
   const programValue = programQuestion

@@ -79,9 +79,7 @@ const AppButton = ({
       onLayout={(e) => {
         const { width, height } = e.nativeEvent.layout;
         setLayout((prev) =>
-          prev?.width === width && prev?.height === height
-            ? prev
-            : { width, height }
+          prev?.width === width && prev?.height === height ? prev : { width, height }
         );
       }}
       style={styles.container}

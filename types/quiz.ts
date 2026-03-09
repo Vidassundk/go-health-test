@@ -1,10 +1,4 @@
-export type QuestionType =
-  | "single"
-  | "multiple"
-  | "weight"
-  | "name"
-  | "age"
-  | "credentials";
+export type QuestionType = "single" | "multiple" | "weight" | "name" | "age" | "credentials";
 
 export interface QuestionOption {
   title: string;

@@ -6,11 +6,7 @@ type TrashIconProps = React.ComponentProps<typeof Svg> & {
   color?: string;
 };
 
-export function TrashIcon({
-  size = 24,
-  color = "#000",
-  ...props
-}: TrashIconProps) {
+export function TrashIcon({ size = 24, color = "#000", ...props }: TrashIconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
       <Path

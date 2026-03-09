@@ -6,12 +6,7 @@ export {
   type QuizAnswers,
 } from "./quizStore";
 
-export {
-  createSetGlowTarget,
-  useGlow,
-  useGlowStore,
-  type GlowVariant,
-} from "./glowStore";
+export { createSetGlowTarget, useGlow, useGlowStore, type GlowVariant } from "./glowStore";
 
 export {
   selectWheelPickerReady,

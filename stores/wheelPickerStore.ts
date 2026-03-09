@@ -15,5 +15,4 @@ export const useWheelPickerStore = create<WheelPickerState>((set) => ({
 }));
 
 export const selectWheelPickerReady = (s: WheelPickerState) => s.isReady;
-export const selectWheelPickerShowingBuffer = (s: WheelPickerState) =>
-  s.isShowingBuffer;
+export const selectWheelPickerShowingBuffer = (s: WheelPickerState) => s.isShowingBuffer;
