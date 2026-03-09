@@ -7,7 +7,7 @@ import Header from "../Header";
 type QuizFlowLayoutFrameProps = {
   isVisible: boolean;
   animatedHeaderStyle: React.ComponentProps<typeof Animated.View>["style"];
-  onBackPress?: () => void;
+  onBackPress: () => void;
   isBackDisabled: boolean;
   hideBackButton: boolean;
   progress: number;

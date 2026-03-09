@@ -71,11 +71,7 @@ export default function QuizSummaryScreen() {
       }}
       isTransitioning={isTransitioning}
     >
-      {isLoading || !questions ? (
-        <FullScreenBuffer />
-      ) : (
-        <QuizSummary questions={questions} />
-      )}
+      {isLoading || !questions ? <FullScreenBuffer /> : <QuizSummary questions={questions} />}
     </QuizFlowScreenShell>
   );
 }

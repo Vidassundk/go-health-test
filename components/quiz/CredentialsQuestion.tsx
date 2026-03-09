@@ -56,9 +56,9 @@ export function CredentialsQuestion({
       contentContainerStyle={[
         styles.content,
         containerHeight > 0
-          // Keep content slightly taller than viewport so disappearing errors
-          // do not collapse scrollability and drop bottom spacing.
-          ? { minHeight: containerHeight + CONTENT_BOTTOM_PADDING + CONTENT_SCROLL_SLACK }
+          ? // Keep content slightly taller than viewport so disappearing errors
+            // do not collapse scrollability and drop bottom spacing.
+            { minHeight: containerHeight + CONTENT_BOTTOM_PADDING + CONTENT_SCROLL_SLACK }
           : null,
       ]}
       keyboardShouldPersistTaps="handled"

@@ -5,7 +5,7 @@ import { Slot } from "expo-router";
 import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
 import { useShallow } from "zustand/react/shallow";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 // Android can paint one early frame before effects run, causing a slight header jump.
 // Keep the first render hidden and reveal a bit later on Android so layout settles first.
