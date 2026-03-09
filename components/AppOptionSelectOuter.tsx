@@ -1,5 +1,3 @@
-import GradientLayer from "./GradientLayer";
-import { OPTION_INACTIVE_OPACITY } from "@/constants/animations";
 import { COLORS } from "@/constants/colors";
 import {
   Canvas,
@@ -10,6 +8,9 @@ import {
 import React from "react";
 import type { SharedValue } from "react-native-reanimated";
 import { useDerivedValue, useSharedValue } from "react-native-reanimated";
+import GradientLayer from "./GradientLayer";
+
+const OPTION_INACTIVE_OPACITY = 0.5;
 
 type AppOptionSelectOuterProps = {
   width: number;
@@ -43,10 +44,11 @@ export default function AppOptionSelectOuter({
   });
   const innerFillColor = useDerivedValue(() => {
     "worklet";
-    return interpolateColors(innerSelectionProgress.value, [0, 1], [
-      COLORS.background,
-      "#191435",
-    ]);
+    return interpolateColors(
+      innerSelectionProgress.value,
+      [0, 1],
+      [COLORS.background, "#191435"]
+    );
   });
   const innerInset = 1;
   const innerRadius = Math.max(borderRadius - innerInset, 0);

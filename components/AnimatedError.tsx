@@ -1,11 +1,4 @@
 import AppText from "./AppText";
-import {
-  ERROR_ANIMATION_DURATION_MS,
-  ERROR_EXIT_PHASE1_MS,
-  ERROR_EXIT_PHASE2_MS,
-  ERROR_EXIT_TRANSLATE_Y,
-  ERROR_MESSAGE_HEIGHT,
-} from "@/constants/animations";
 import { COLORS } from "@/constants/colors";
 import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
@@ -16,6 +9,12 @@ import Animated, {
   withDelay,
   withTiming,
 } from "react-native-reanimated";
+
+const ERROR_ANIMATION_DURATION_MS = 200;
+const ERROR_EXIT_PHASE1_MS = 120;
+const ERROR_EXIT_PHASE2_MS = 80;
+const ERROR_EXIT_TRANSLATE_Y = -12;
+const ERROR_MESSAGE_HEIGHT = 22;
 
 type Props = {
   error: string | null;

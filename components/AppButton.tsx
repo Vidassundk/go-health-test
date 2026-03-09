@@ -1,12 +1,17 @@
+import { CROSSFADE_DURATION_MS } from "@/constants/animations";
+import { COLORS } from "@/constants/colors";
+import { usePressProgress } from "@/hooks";
+import { Canvas, Group, RoundedRect } from "@shopify/react-native-skia";
 import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import Animated, { useAnimatedStyle , useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated";
-import { Canvas, Group, RoundedRect } from "@shopify/react-native-skia";
+import Animated, {
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import AppText from "./AppText";
 import GradientLayer from "./GradientLayer";
-import { usePressProgress } from "@/hooks";
-import { COLORS } from "@/constants/colors";
-import { CROSSFADE_DURATION_MS } from "@/constants/animations";
 
 type AppButtonProps = {
   label: string;
@@ -41,11 +46,14 @@ const AppButton = ({
   }, [disabled, enabledProgress]);
 
   const solidOpacity = useDerivedValue(() => 1 - enabledProgress.value);
-  const { pressProgress, onPressIn: handlePressIn, onPressOut: handlePressOut } =
-    usePressProgress({
-      onPressIn: onPressIn ?? undefined,
-      onPressOut: onPressOut ?? undefined,
-    });
+  const {
+    pressProgress,
+    onPressIn: handlePressIn,
+    onPressOut: handlePressOut,
+  } = usePressProgress({
+    onPressIn: onPressIn ?? undefined,
+    onPressOut: onPressOut ?? undefined,
+  });
 
   const buttonAnimatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -81,7 +89,13 @@ const AppButton = ({
       <Animated.View style={[styles.buttonInner, buttonAnimatedStyle]}>
         {layout && (
           <>
-            <Canvas style={{ position: "absolute", width: layout.width, height: layout.height }}>
+            <Canvas
+              style={{
+                position: "absolute",
+                width: layout.width,
+                height: layout.height,
+              }}
+            >
               <Group opacity={solidOpacity}>
                 <RoundedRect
                   x={0}

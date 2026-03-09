@@ -1,11 +1,13 @@
-import { PRESS_DURATION_MS, RELEASE_SPRING } from "@/constants/animations";
 import { useCallback, useRef } from "react";
+import type { GestureResponderEvent } from "react-native";
 import {
   useSharedValue,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import type { GestureResponderEvent } from "react-native";
+
+const PRESS_DURATION_MS = 80;
+const RELEASE_SPRING = { damping: 20, stiffness: 200 };
 
 /**
  * Provides a shared press progress value (0→1) and ready-to-use press handlers.

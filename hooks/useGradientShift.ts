@@ -1,7 +1,8 @@
-import { GRADIENT_SHIFT_AMOUNT } from "@/constants/animations";
 import { vec } from "@shopify/react-native-skia";
 import type { SharedValue } from "react-native-reanimated";
 import { useDerivedValue } from "react-native-reanimated";
+
+const GRADIENT_SHIFT_AMOUNT = 80;
 
 /**
  * Computes animated gradient start/end points based on button width,

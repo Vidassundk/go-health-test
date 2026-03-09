@@ -1,13 +1,8 @@
-import AppOptionSelectOuter from "./AppOptionSelectOuter";
-import AppText from "./AppText";
-import { CheckIcon } from "@icons";
-import {
-  CROSSFADE_DURATION_MS,
-  STAGGER_DELAY_MS,
-} from "@/constants/animations";
+import { CROSSFADE_DURATION_MS } from "@/constants/animations";
 import { COLORS } from "@/constants/colors";
 import { usePressProgress } from "@/hooks";
 import type { QuestionOption } from "@/types/quiz";
+import { CheckIcon } from "@icons";
 import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
@@ -18,9 +13,12 @@ import Animated, {
   withDelay,
   withTiming,
 } from "react-native-reanimated";
+import AppOptionSelectOuter from "./AppOptionSelectOuter";
+import AppText from "./AppText";
 
 const BORDER_RADIUS = 20;
 const INSET = 1;
+const STAGGER_DELAY_MS = 50;
 
 export type AppOptionSelectProps = {
   opt: QuestionOption;
