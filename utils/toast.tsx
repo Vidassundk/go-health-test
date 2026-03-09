@@ -1,4 +1,4 @@
-import { AppText } from "@components";
+import AppText from "@components/AppText";
 import { ErrorIcon } from "@icons";
 import { COLORS } from "@/constants/colors";
 import { resolveValue, toast, type Toast } from "@backpackapp-io/react-native-toast";
