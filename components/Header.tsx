@@ -9,19 +9,19 @@ import { StyleSheet, View } from "react-native";
 
 export const HEADER_HEIGHT = 42;
 
-type QuizHeaderProps = {
+type HeaderProps = {
   onBackPress: () => void;
   progress: number;
   isBackDisabled?: boolean;
   hideBackButton?: boolean;
 };
 
-export default function QuizHeader({
+export default function Header({
   onBackPress,
   progress,
   isBackDisabled = false,
   hideBackButton = false,
-}: QuizHeaderProps) {
+}: HeaderProps) {
   const handleBackPress = useCallback(() => {
     if (isBackDisabled) return;
     onBackPress();

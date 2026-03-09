@@ -5,25 +5,30 @@ import {
 } from "@/constants/animations";
 import { COLORS } from "@/constants/colors";
 import { useQuizBottomAction, useQuizEngine, useQuizQuestions, useScreenTransition } from "@/hooks";
-import { selectWheelPickerShowingBuffer, useGlow, useWheelPickerStore } from "@/stores";
+import {
+  selectWheelPickerShowingBuffer,
+  useGlow,
+  useQuizHeaderStore,
+  useWheelPickerStore,
+} from "@/stores";
 import { getSummaryVariant } from "@/utils/getSummaryVariant";
 import { showErrorToast } from "@/utils/toast";
 import {
   HEADER_HEIGHT,
   QuizFlow,
-  QuizHeader,
   ScreenWithBottomAction,
   SpinningBuffer,
   WheelPickerReadyInit,
 } from "@components";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 
 export default function QuizScreen() {
   const { questions, isLoading, isError, error } = useQuizQuestions();
   const { setGlowTarget } = useGlow();
+  const setHeaderState = useQuizHeaderStore((s) => s.setState);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const isWheelPickerShowingBuffer = useWheelPickerStore(selectWheelPickerShowingBuffer);
 
@@ -89,25 +94,28 @@ export default function QuizScreen() {
     startSectionTransition(goBack);
   }, [isFirst, fadeOutThen, router, startSectionTransition, goBack]);
 
+  useLayoutEffect(() => {
+    setHeaderState({
+      onBackPress,
+      isBackDisabled: isTransitioning,
+      hideBackButton: false,
+      progress: totalSteps > 0 ? (currentIndex + 1) / (totalSteps + 1) : 0,
+    });
+  }, [setHeaderState, onBackPress, isTransitioning, totalSteps, currentIndex]);
+
   return (
     <View style={styles.screen}>
       {isVisible ? (
-        <Animated.View style={styles.screen} entering={entering} exiting={exiting}>
+        <Animated.View style={styles.animatedContent} entering={entering} exiting={exiting}>
           <ScreenWithBottomAction
             action={bottomAction}
+            edges={["bottom"]}
             contentStyle={styles.contentNoHorizontalPadding}
             actionPointerEventsDisabled={isTransitioning}
             actionKeyboardAvoiding
             footerStyle={styles.fixedFooter}
           >
             <WheelPickerReadyInit />
-            <View style={styles.headerWrapper}>
-              <QuizHeader
-                onBackPress={onBackPress}
-                isBackDisabled={isTransitioning}
-                progress={totalSteps > 0 ? (currentIndex + 1) / totalSteps : 0}
-              />
-            </View>
             <KeyboardAvoidingView
               style={styles.contentArea}
               behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -157,6 +165,9 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
   },
+  animatedContent: {
+    flex: 1,
+  },
   contentArea: {
     flex: 1,
     marginTop: -HEADER_HEIGHT,
@@ -165,9 +176,6 @@ const styles = StyleSheet.create({
   },
   contentNoHorizontalPadding: {
     paddingHorizontal: 0,
-  },
-  headerWrapper: {
-    paddingHorizontal: 20,
   },
   quizLayout: {
     flex: 1,

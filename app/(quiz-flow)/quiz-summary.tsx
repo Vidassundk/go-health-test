@@ -1,19 +1,13 @@
-import {
-  HEADER_HEIGHT,
-  QuizHeader,
-  QuizSummary,
-  ScreenWithBottomAction,
-  SpinningBuffer,
-} from "@components";
+import { HEADER_HEIGHT, QuizSummary, ScreenWithBottomAction, SpinningBuffer } from "@components";
 import { COLORS, PROGRESS_BAR_COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
 import { isDebugSkipQuizToSummaryEnabled } from "@/config/featureFlags";
-import { useGlow, useQuizStore } from "@/stores";
+import { useGlow, useQuizHeaderStore, useQuizStore } from "@/stores";
 import { useQuizQuestions, useScreenTransition } from "@/hooks";
 import { getSummaryVariant } from "@/utils/getSummaryVariant";
 import { showErrorToast } from "@/utils/toast";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useLayoutEffect } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 
@@ -22,6 +16,7 @@ export default function QuizSummaryScreen() {
   const answers = useQuizStore((s) => s.answers);
   const setHasStartedJourney = useQuizStore((s) => s.setHasStartedJourney);
   const { setGlowTarget } = useGlow();
+  const setHeaderState = useQuizHeaderStore((s) => s.setState);
   const router = useRouter();
   const { isVisible, entering, exiting, fadeOutThen, isTransitioning } = useScreenTransition();
   const shouldHideBackArrow = isDebugSkipQuizToSummaryEnabled();
@@ -40,7 +35,7 @@ export default function QuizSummaryScreen() {
 
   const handleBackPress = useCallback(() => {
     setGlowTarget(0);
-    fadeOutThen(() => router.back(), "backward");
+    fadeOutThen(() => router.replace("/health-quiz"), "backward");
   }, [setGlowTarget, fadeOutThen, router]);
 
   const handleStartJourney = useCallback(() => {
@@ -49,10 +44,19 @@ export default function QuizSummaryScreen() {
     fadeOutThen(() => router.replace("/home"), "forward");
   }, [setHasStartedJourney, setGlowTarget, fadeOutThen, router]);
 
+  useLayoutEffect(() => {
+    setHeaderState({
+      onBackPress: handleBackPress,
+      hideBackButton: shouldHideBackArrow,
+      isBackDisabled: isTransitioning,
+      progress: 1,
+    });
+  }, [setHeaderState, handleBackPress, shouldHideBackArrow, isTransitioning]);
+
   return (
     <View style={styles.screen}>
       {isVisible ? (
-        <Animated.View style={styles.screen} entering={entering} exiting={exiting}>
+        <Animated.View style={styles.animatedContent} entering={entering} exiting={exiting}>
           <ScreenWithBottomAction
             action={{
               label: locale.summary.labels.startJourney,
@@ -60,19 +64,12 @@ export default function QuizSummaryScreen() {
               fillColor: PROGRESS_BAR_COLORS.summary[variant],
               onPress: handleStartJourney,
             }}
+            edges={["bottom"]}
             contentStyle={styles.contentNoHorizontalPadding}
             actionPointerEventsDisabled={isTransitioning}
             actionKeyboardAvoiding
             footerStyle={styles.fixedFooter}
           >
-            <View style={styles.headerWrapper}>
-              <QuizHeader
-                onBackPress={handleBackPress}
-                hideBackButton={shouldHideBackArrow}
-                isBackDisabled={isTransitioning}
-                progress={1}
-              />
-            </View>
             <KeyboardAvoidingView
               style={styles.contentArea}
               behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -97,6 +94,9 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
   },
+  animatedContent: {
+    flex: 1,
+  },
   contentArea: {
     flex: 1,
     marginTop: -HEADER_HEIGHT,
@@ -105,9 +105,6 @@ const styles = StyleSheet.create({
   },
   contentNoHorizontalPadding: {
     paddingHorizontal: 0,
-  },
-  headerWrapper: {
-    paddingHorizontal: 20,
   },
   fixedFooter: {
     backgroundColor: COLORS.background,

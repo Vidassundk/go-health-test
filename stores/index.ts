@@ -13,3 +13,5 @@ export {
   selectWheelPickerShowingBuffer,
   useWheelPickerStore,
 } from "./wheelPickerStore";
+
+export { selectQuizHeaderState, useQuizHeaderStore } from "./quizHeaderStore";

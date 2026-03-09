@@ -41,16 +41,19 @@ export function useScreenTransition() {
     [handleFadeOutComplete]
   );
 
-  const fadeOutThen = (action: () => void, _direction: TransitionDirection = "forward") => {
-    if (isTransitioningRef.current) {
-      return;
-    }
+  const fadeOutThen = useCallback(
+    (action: () => void, _direction: TransitionDirection = "forward") => {
+      if (isTransitioningRef.current) {
+        return;
+      }
 
-    isTransitioningRef.current = true;
-    setIsTransitioning(true);
-    pendingActionRef.current = action;
-    setIsVisible(false);
-  };
+      isTransitioningRef.current = true;
+      setIsTransitioning(true);
+      pendingActionRef.current = action;
+      setIsVisible(false);
+    },
+    []
+  );
 
   return {
     fadeOutThen,

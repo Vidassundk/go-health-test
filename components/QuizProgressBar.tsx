@@ -15,14 +15,22 @@ const SPRING_CONFIG = {
   stiffness: 200,
 };
 
+// Keep continuity when the header/progress bar remounts across route transitions.
+let lastKnownProgress = 0;
+let lastKnownTrackWidth = 0;
+
+function clampProgress(value: number) {
+  return Math.max(0, Math.min(1, value));
+}
+
 type QuizProgressBarProps = {
   progress: number;
 };
 
 export default function QuizProgressBar({ progress }: QuizProgressBarProps) {
   const { glowProgress, glowVariant } = useGlow();
-  const animatedProgress = useSharedValue(0);
-  const trackWidth = useSharedValue(0);
+  const animatedProgress = useSharedValue(lastKnownProgress);
+  const trackWidth = useSharedValue(lastKnownTrackWidth);
   const targetColor = useSharedValue<ProgressBarColor>(PROGRESS_BAR_COLORS.default);
 
   useEffect(() => {
@@ -33,12 +41,16 @@ export default function QuizProgressBar({ progress }: QuizProgressBarProps) {
   }, [glowVariant, targetColor]);
 
   useEffect(() => {
-    animatedProgress.value = withSpring(Math.max(0, Math.min(1, progress)), SPRING_CONFIG);
+    const nextProgress = clampProgress(progress);
+    animatedProgress.value = withSpring(nextProgress, SPRING_CONFIG);
+    lastKnownProgress = nextProgress;
   }, [progress, animatedProgress]);
 
   const onLayout = useCallback(
     ({ nativeEvent }: LayoutChangeEvent) => {
-      trackWidth.value = nativeEvent.layout.width;
+      const width = nativeEvent.layout.width;
+      trackWidth.value = width;
+      lastKnownTrackWidth = width;
     },
     [trackWidth]
   );
