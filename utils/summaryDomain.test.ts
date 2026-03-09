@@ -1,5 +1,5 @@
 import { PROGRAM_VALUES, QUIZ_KEYS } from "@/constants/quiz";
-import type { QuizAnswers } from "@/stores/quizStore";
+import type { QuizAnswers } from "@/stores";
 import type { QuizQuestion } from "@/types/quiz";
 import { getSummaryDisplayData } from "@/utils/getSummaryDisplayData";
 import { getSummaryVariant } from "@/utils/getSummaryVariant";

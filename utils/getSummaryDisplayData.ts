@@ -1,5 +1,5 @@
 import { QUIZ_KEYS } from "@/constants/quiz";
-import type { QuizAnswers } from "@/stores/quizStore";
+import type { QuizAnswers } from "@/stores";
 import type { QuizQuestion } from "@/types/quiz";
 
 export interface SummaryDisplayData {

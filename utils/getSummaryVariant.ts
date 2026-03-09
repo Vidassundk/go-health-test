@@ -1,5 +1,5 @@
 import { PROGRAM_VALUES, QUIZ_KEYS } from "@/constants/quiz";
-import type { QuizAnswers } from "@/stores/quizStore";
+import type { QuizAnswers } from "@/stores";
 
 export type SummaryVariant = "smoking" | "drinking";
 

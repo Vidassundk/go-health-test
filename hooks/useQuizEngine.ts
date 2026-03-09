@@ -2,7 +2,7 @@ import {
   useQuizStore,
   selectCurrentIndex,
   selectSetCurrentIndex,
-} from "@/stores/quizStore";
+} from "@/stores";
 import type { QuizQuestion } from "@/types/quiz";
 import {
   getEmailValidationError,
@@ -11,9 +11,9 @@ import {
 import { useCallback, useEffect, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 
-import type { QuizAnswers } from "@/stores/quizStore";
+import type { QuizAnswers } from "@/stores";
 
-export type { QuizAnswers } from "@/stores/quizStore";
+export type { QuizAnswers } from "@/stores";
 
 /**
  * Keep only answers that control visibility (visibleIf.question keys).

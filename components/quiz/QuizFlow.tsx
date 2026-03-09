@@ -1,6 +1,6 @@
 import AppText from "../AppText";
 import { COLORS } from "@/constants/colors";
-import { selectAnswer, useQuizStore } from "@/stores/quizStore";
+import { selectAnswer, useQuizStore } from "@/stores";
 import type { QuizQuestion } from "@/types/quiz";
 import React, { memo } from "react";
 import { StyleSheet, View } from "react-native";

@@ -1,7 +1,4 @@
-import {
-  createSetGlowTarget,
-  useGlowStore,
-} from "@/stores/glowStore";
+import { createSetGlowTarget, useGlowStore } from "@/stores";
 import type { ReactNode } from "react";
 import { useRef } from "react";
 import { useSharedValue } from "react-native-reanimated";

@@ -1,5 +1,5 @@
 import { COLORS, GLOW_COLORS } from "@/constants/colors";
-import { useGlow } from "@/stores/glowStore";
+import { useGlow } from "@/stores";
 import { usePathname } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import GlowObject from "./GlowObject";

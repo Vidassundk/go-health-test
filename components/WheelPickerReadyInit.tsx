@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { InteractionManager } from "react-native";
-import { useWheelPickerStore } from "@/stores/wheelPickerStore";
+import { useWheelPickerStore } from "@/stores";
 
 export function WheelPickerReadyInit() {
   useEffect(() => {

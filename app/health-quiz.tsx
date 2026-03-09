@@ -12,7 +12,7 @@ import {
   TRANSITION_INITIAL_DELAY_MS,
 } from "@/constants/animations";
 import { COLORS } from "@/constants/colors";
-import { useGlow } from "@/stores/glowStore";
+import { useGlow } from "@/stores";
 import { useQuizBottomAction } from "@/hooks/useQuizBottomAction";
 import { useQuizEngine } from "@/hooks/useQuizEngine";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
@@ -20,7 +20,7 @@ import { useScreenTransition } from "@/hooks/useScreenTransition";
 import {
   selectWheelPickerShowingBuffer,
   useWheelPickerStore,
-} from "@/stores/wheelPickerStore";
+} from "@/stores";
 import { getSummaryVariant } from "@/utils/getSummaryVariant";
 import { showErrorToast } from "@/utils/toast";
 import { useRouter } from "expo-router";

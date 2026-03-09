@@ -3,7 +3,7 @@ import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
 import { isDebugSkipQuizToSummaryEnabled } from "@/config/featureFlags";
 import { useScreenTransition } from "@/hooks/useScreenTransition";
-import { useQuizStore } from "@/stores/quizStore";
+import { useQuizStore } from "@/stores";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";

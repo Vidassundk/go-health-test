@@ -1,9 +1,8 @@
 import { AppText, ScreenWithBottomAction } from "@components";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
-import { useGlow } from "@/stores/glowStore";
+import { useGlow, useQuizStore } from "@/stores";
 import { useScreenTransition } from "@/hooks/useScreenTransition";
-import { useQuizStore } from "@/stores/quizStore";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";

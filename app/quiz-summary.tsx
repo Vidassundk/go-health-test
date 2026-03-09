@@ -8,10 +8,9 @@ import {
 import { COLORS, PROGRESS_BAR_COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
 import { isDebugSkipQuizToSummaryEnabled } from "@/config/featureFlags";
-import { useGlow } from "@/stores/glowStore";
+import { useGlow, useQuizStore } from "@/stores";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
 import { useScreenTransition } from "@/hooks/useScreenTransition";
-import { useQuizStore } from "@/stores/quizStore";
 import { getSummaryVariant } from "@/utils/getSummaryVariant";
 import { showErrorToast } from "@/utils/toast";
 import { useRouter } from "expo-router";

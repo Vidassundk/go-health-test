@@ -1,7 +1,7 @@
 import AppText from "../AppText";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
-import { useQuizStore } from "@/stores/quizStore";
+import { useQuizStore } from "@/stores";
 import type { QuizQuestion } from "@/types/quiz";
 import {
   getSummaryDisplayData,

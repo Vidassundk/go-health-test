@@ -3,7 +3,7 @@ import {
   type ProgressBarColor,
   PROGRESS_BAR_COLORS,
 } from "@/constants/colors";
-import { type GlowVariant, useGlow } from "@/stores/glowStore";
+import { type GlowVariant, useGlow } from "@/stores";
 import React, { useCallback, useEffect } from "react";
 import { type LayoutChangeEvent, StyleSheet, View } from "react-native";
 import Animated, {

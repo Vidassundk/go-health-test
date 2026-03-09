@@ -3,7 +3,7 @@ import { ArrowIcon, TrashIcon } from "@icons";
 import QuizProgressBar from "./QuizProgressBar";
 import { isDebugWipeDataButtonEnabled } from "@/config/featureFlags";
 import { COLORS } from "@/constants/colors";
-import { useQuizStore } from "@/stores/quizStore";
+import { useQuizStore } from "@/stores";
 import React, { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 
