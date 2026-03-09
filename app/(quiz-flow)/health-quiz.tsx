@@ -30,11 +30,13 @@ export default function QuizScreen() {
   const { setGlowTarget } = useGlow();
   const setHeaderState = useQuizHeaderStore((s) => s.setState);
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [keepHeaderVisibleOnExit, setKeepHeaderVisibleOnExit] = useState(false);
   const isWheelPickerShowingBuffer = useWheelPickerStore(selectWheelPickerShowingBuffer);
 
   const engine = useQuizEngine(questions, {
     onSubmit: (answers) => {
       setGlowTarget(1, getSummaryVariant(answers));
+      setKeepHeaderVisibleOnExit(true);
       fadeOutThen(() => router.push("/quiz-summary"), "forward");
     },
   });
@@ -88,6 +90,7 @@ export default function QuizScreen() {
 
   const onBackPress = useCallback(() => {
     if (isFirst) {
+      setKeepHeaderVisibleOnExit(false);
       fadeOutThen(() => router.replace("/"), "forward");
       return;
     }
@@ -99,9 +102,18 @@ export default function QuizScreen() {
       onBackPress,
       isBackDisabled: isTransitioning,
       hideBackButton: false,
+      isVisible: isVisible || keepHeaderVisibleOnExit,
       progress: totalSteps > 0 ? (currentIndex + 1) / (totalSteps + 1) : 0,
     });
-  }, [setHeaderState, onBackPress, isTransitioning, totalSteps, currentIndex]);
+  }, [
+    setHeaderState,
+    onBackPress,
+    isTransitioning,
+    isVisible,
+    keepHeaderVisibleOnExit,
+    totalSteps,
+    currentIndex,
+  ]);
 
   return (
     <View style={styles.screen}>

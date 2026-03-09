@@ -7,7 +7,7 @@ import { useQuizQuestions, useScreenTransition } from "@/hooks";
 import { getSummaryVariant } from "@/utils/getSummaryVariant";
 import { showErrorToast } from "@/utils/toast";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useLayoutEffect } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 
@@ -18,6 +18,7 @@ export default function QuizSummaryScreen() {
   const { setGlowTarget } = useGlow();
   const setHeaderState = useQuizHeaderStore((s) => s.setState);
   const router = useRouter();
+  const [keepHeaderVisibleOnExit, setKeepHeaderVisibleOnExit] = useState(false);
   const { isVisible, entering, exiting, fadeOutThen, isTransitioning } = useScreenTransition();
   const shouldHideBackArrow = isDebugSkipQuizToSummaryEnabled();
 
@@ -35,12 +36,14 @@ export default function QuizSummaryScreen() {
 
   const handleBackPress = useCallback(() => {
     setGlowTarget(0);
+    setKeepHeaderVisibleOnExit(true);
     fadeOutThen(() => router.replace("/health-quiz"), "backward");
   }, [setGlowTarget, fadeOutThen, router]);
 
   const handleStartJourney = useCallback(() => {
     setHasStartedJourney(true);
     setGlowTarget(0);
+    setKeepHeaderVisibleOnExit(false);
     fadeOutThen(() => router.replace("/home"), "forward");
   }, [setHasStartedJourney, setGlowTarget, fadeOutThen, router]);
 
@@ -49,9 +52,17 @@ export default function QuizSummaryScreen() {
       onBackPress: handleBackPress,
       hideBackButton: shouldHideBackArrow,
       isBackDisabled: isTransitioning,
+      isVisible: isVisible || keepHeaderVisibleOnExit,
       progress: 1,
     });
-  }, [setHeaderState, handleBackPress, shouldHideBackArrow, isTransitioning]);
+  }, [
+    setHeaderState,
+    handleBackPress,
+    shouldHideBackArrow,
+    isTransitioning,
+    isVisible,
+    keepHeaderVisibleOnExit,
+  ]);
 
   return (
     <View style={styles.screen}>
