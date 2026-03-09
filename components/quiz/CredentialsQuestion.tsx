@@ -4,7 +4,7 @@ import { locale } from "@/constants/locale";
 import { useFocusOnTransitionEnd } from "@/hooks";
 import { getEmailValidationError, getPasswordValidationError } from "@/utils/validation";
 import React, { useRef, useState } from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import { ScrollView, StyleSheet, TextInput } from "react-native";
 
 type CredentialsValue = { email: string; password: string };
 
@@ -41,7 +41,13 @@ export function CredentialsQuestion({
   const showPasswordError = submitAttempted || touched.password;
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="interactive"
+      showsVerticalScrollIndicator={false}
+    >
       <AppTextInput
         ref={emailRef}
         error={showEmailError && Boolean(emailError)}
@@ -77,13 +83,17 @@ export function CredentialsQuestion({
         }}
       />
       <AnimatedError error={showPasswordError ? passwordError : null} />
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     width: "100%",
+  },
+  content: {
     gap: 12,
+    paddingBottom: 8,
   },
 });

@@ -1,17 +1,20 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import {
-  KeyboardAvoidingView,
+  Animated,
+  Easing,
+  Keyboard,
+  KeyboardEvent,
   Platform,
   StyleProp,
   StyleSheet,
   View,
   ViewStyle,
-  type LayoutChangeEvent,
+  useWindowDimensions,
 } from "react-native";
 import { Edge, SafeAreaView } from "react-native-safe-area-context";
 import AppButton from "./AppButton";
 
-const EXTRA_KEYBOARD_GAP = -10;
+const EXTRA_KEYBOARD_GAP = 30;
 
 export type BottomActionConfig = {
   label: string;
@@ -32,7 +35,6 @@ type Props = {
   footerStyle?: StyleProp<ViewStyle>;
   actionPointerEventsDisabled?: boolean;
   actionKeyboardAvoiding?: boolean;
-  actionKeyboardVerticalOffset?: number;
 };
 
 export default function ScreenWithBottomAction({
@@ -47,37 +49,49 @@ export default function ScreenWithBottomAction({
   footerStyle,
   actionPointerEventsDisabled = false,
   actionKeyboardAvoiding = false,
-  actionKeyboardVerticalOffset = 0,
 }: Props) {
-  const bodyAnchorRef = useRef<View>(null);
-  const [measuredKeyboardOffset, setMeasuredKeyboardOffset] = useState(0);
-
-  const updateMeasuredKeyboardOffset = useCallback(() => {
-    if (!actionKeyboardAvoiding) return;
-
-    bodyAnchorRef.current?.measureInWindow((_x, y) => {
-      if (Number.isFinite(y)) {
-        setMeasuredKeyboardOffset(Math.max(0, y));
-      }
-    });
-  }, [actionKeyboardAvoiding]);
+  const { height: windowHeight } = useWindowDimensions();
+  const keyboardLift = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (!actionKeyboardAvoiding) return;
+    if (!actionKeyboardAvoiding) {
+      keyboardLift.setValue(0);
+      return;
+    }
 
-    const raf = requestAnimationFrame(updateMeasuredKeyboardOffset);
-    return () => cancelAnimationFrame(raf);
-  }, [actionKeyboardAvoiding, updateMeasuredKeyboardOffset]);
+    const getTargetLift = (event: KeyboardEvent) => {
+      const keyboardHeight = Math.max(0, windowHeight - event.endCoordinates.screenY);
+      return Math.max(0, keyboardHeight - EXTRA_KEYBOARD_GAP);
+    };
 
-  const handleBodyAnchorLayout = useCallback(
-    (_event: LayoutChangeEvent) => {
-      updateMeasuredKeyboardOffset();
-    },
-    [updateMeasuredKeyboardOffset]
-  );
+    const animateTo = (toValue: number, duration?: number) => {
+      Animated.timing(keyboardLift, {
+        toValue,
+        duration: duration ?? 220,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
+    };
 
-  const effectiveKeyboardVerticalOffset =
-    measuredKeyboardOffset + actionKeyboardVerticalOffset - EXTRA_KEYBOARD_GAP;
+    const onShow = (event: KeyboardEvent) => {
+      animateTo(getTargetLift(event), event.duration);
+    };
+
+    const onHide = (event?: KeyboardEvent) => {
+      animateTo(0, event?.duration);
+    };
+
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const showSub = Keyboard.addListener(showEvent, onShow);
+    const hideSub = Keyboard.addListener(hideEvent, onHide);
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+      keyboardLift.setValue(0);
+    };
+  }, [actionKeyboardAvoiding, keyboardLift, windowHeight]);
 
   const headerPadding = headerPaddingHorizontal ?? horizontalPadding;
   const footer =
@@ -100,18 +114,21 @@ export default function ScreenWithBottomAction({
       {header ? (
         <View style={[styles.headerWrapper, { paddingHorizontal: headerPadding }]}>{header}</View>
       ) : null}
-      <View ref={bodyAnchorRef} onLayout={handleBodyAnchorLayout} />
-      <KeyboardAvoidingView
-        style={styles.body}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={effectiveKeyboardVerticalOffset}
-        enabled={actionKeyboardAvoiding}
-      >
+      <View style={styles.body}>
         <View style={[styles.content, { paddingHorizontal: horizontalPadding }, contentStyle]}>
           {children}
         </View>
-        <View style={styles.footerAvoider}>{footer}</View>
-      </KeyboardAvoidingView>
+        <Animated.View
+          style={[
+            styles.footerAvoider,
+            actionKeyboardAvoiding
+              ? { transform: [{ translateY: Animated.multiply(keyboardLift, -1) }] }
+              : null,
+          ]}
+        >
+          {footer}
+        </Animated.View>
+      </View>
     </SafeAreaView>
   );
 }
@@ -125,14 +142,17 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
+    minHeight: 0,
   },
   content: {
     flex: 1,
+    minHeight: 0,
   },
   footer: {
     alignItems: "stretch",
   },
   footerAvoider: {
     alignItems: "stretch",
+    flexShrink: 0,
   },
 });
