@@ -16,28 +16,34 @@ export default function QuizSummaryScreen() {
   const setHasStartedJourney = useQuizStore((s) => s.setHasStartedJourney);
   const { setGlowTarget } = useGlow();
   const router = useRouter();
+  // Keeps header visible while navigating back to quiz so top chrome transitions smoothly.
   const [keepHeaderVisibleOnExit, setKeepHeaderVisibleOnExit] = useState(false);
   const { isVisible, entering, exiting, fadeOutThen, isTransitioning } = useScreenTransition();
   const shouldHideBackArrow = isDebugSkipQuizToSummaryEnabled();
 
+  // Summary visual variant is derived from final answers and reused by glow + CTA color.
   const variant = getSummaryVariant(answers);
 
+  // Ensure summary opens with matching glow variant.
   useEffect(() => {
     setGlowTarget(1, variant);
   }, [setGlowTarget, variant]);
 
+  // Surface query failures as toasts.
   useEffect(() => {
     if (isError && error) {
       showErrorToast(error.message);
     }
   }, [isError, error]);
 
+  // Back from summary returns to quiz and restores neutral glow.
   const handleBackPress = useCallback(() => {
     setGlowTarget(0);
     setKeepHeaderVisibleOnExit(true);
     fadeOutThen(() => router.replace("/health-quiz"), "backward");
   }, [setGlowTarget, fadeOutThen, router]);
 
+  // Final CTA marks journey complete and exits quiz flow to home.
   const handleStartJourney = useCallback(() => {
     setHasStartedJourney(true);
     setGlowTarget(0);
@@ -45,6 +51,7 @@ export default function QuizSummaryScreen() {
     fadeOutThen(() => router.replace("/home"), "forward");
   }, [setHasStartedJourney, setGlowTarget, fadeOutThen, router]);
 
+  // Quiz-route header state is store-driven so layout stays persistent across flow screens.
   useQuizHeaderController({
     onBackPress: handleBackPress,
     hideBackButton: shouldHideBackArrow,

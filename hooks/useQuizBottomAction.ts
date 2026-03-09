@@ -9,7 +9,6 @@ type Params = {
   isCurrentStepValid: boolean;
   isWheelPickerShowingBuffer: boolean;
   goNext: () => void;
-  startSectionTransition: (action: () => void) => void;
   setSubmitAttempted: (attempted: boolean) => void;
 };
 
@@ -23,7 +22,6 @@ export function useQuizBottomAction({
   isCurrentStepValid,
   isWheelPickerShowingBuffer,
   goNext,
-  startSectionTransition,
   setSubmitAttempted,
 }: Params): BottomActionConfig | null {
   return useMemo<BottomActionConfig | null>(() => {
@@ -35,11 +33,7 @@ export function useQuizBottomAction({
       label: isLast ? locale.common.submit : locale.common.next,
       onPress: () => {
         setSubmitAttempted(true);
-        if (isLast) {
-          goNext();
-        } else {
-          startSectionTransition(goNext);
-        }
+        goNext();
       },
       disabled:
         currentQuestion.type === "credentials"
@@ -54,7 +48,6 @@ export function useQuizBottomAction({
     isCurrentStepValid,
     isWheelPickerShowingBuffer,
     goNext,
-    startSectionTransition,
     setSubmitAttempted,
   ]);
 }

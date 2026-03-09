@@ -1,15 +1,15 @@
-import { AppText, ScreenWithBottomAction } from "@components";
+import { isDebugSkipQuizToSummaryEnabled } from "@/config/featureFlags";
 import { COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
-import { isDebugSkipQuizToSummaryEnabled } from "@/config/featureFlags";
 import { useScreenTransition } from "@/hooks";
 import { useQuizStore } from "@/stores";
+import { AppText, ScreenWithBottomAction } from "@components";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 
-export default function IntroScreen() {
+export default function LandingScreen() {
   const router = useRouter();
   const hasHydrated = useQuizStore((s) => s.hasHydrated);
   const hasStartedJourney = useQuizStore((s) => s.hasStartedJourney);
