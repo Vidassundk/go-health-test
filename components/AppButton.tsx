@@ -5,6 +5,7 @@ import { Canvas, Group, RoundedRect } from "@shopify/react-native-skia";
 import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -24,6 +25,7 @@ const LABEL_SCALE_DOWN = 0.98;
 const LABEL_TRANSLATE_Y = 0;
 const BUTTON_SCALE_DOWN = 0.99;
 const PRESS_OVERLAY_OPACITY = 0.12;
+const ENABLED_STATE_TRANSITION_MS = CROSSFADE_DURATION_MS + 300;
 
 const AppButton = ({
   label,
@@ -41,7 +43,8 @@ const AppButton = ({
 
   useEffect(() => {
     enabledProgress.value = withTiming(disabled ? 0 : 1, {
-      duration: CROSSFADE_DURATION_MS,
+      duration: ENABLED_STATE_TRANSITION_MS,
+      easing: Easing.inOut(Easing.cubic),
     });
   }, [disabled, enabledProgress]);
 

@@ -196,5 +196,6 @@ const styles = StyleSheet.create({
   bufferingWrapper: {
     alignItems: "center",
     justifyContent: "center",
+    ...StyleSheet.absoluteFillObject,
   },
 });
