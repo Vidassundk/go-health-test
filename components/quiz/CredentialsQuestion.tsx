@@ -1,12 +1,15 @@
-import { AnimatedError } from "../AnimatedError";
-import { AppTextInput } from "../AppTextInput";
 import { locale } from "@/constants/locale";
 import { useFocusOnTransitionEnd } from "@/hooks";
 import { getEmailValidationError, getPasswordValidationError } from "@/utils/validation";
 import React, { useRef, useState } from "react";
-import { ScrollView, StyleSheet, TextInput } from "react-native";
+import { ScrollView, StyleSheet, TextInput, type LayoutChangeEvent } from "react-native";
+import { AnimatedError } from "../AnimatedError";
+import { AppTextInput } from "../AppTextInput";
 
 type CredentialsValue = { email: string; password: string };
+// Keep a stable extra tail so content remains scrollable while error rows animate in/out.
+const CONTENT_BOTTOM_PADDING = 32;
+const CONTENT_SCROLL_SLACK = 24;
 
 type Props = {
   value: CredentialsValue | undefined;
@@ -29,6 +32,7 @@ export function CredentialsQuestion({
   const password = value?.password ?? "";
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
+  const [containerHeight, setContainerHeight] = useState(0);
   const [touched, setTouched] = useState({
     email: false,
     password: false,
@@ -39,11 +43,24 @@ export function CredentialsQuestion({
   const passwordError = getPasswordValidationError(password);
   const showEmailError = submitAttempted || touched.email;
   const showPasswordError = submitAttempted || touched.password;
+  // Capture viewport height to derive a dynamic minHeight for ScrollView content.
+  const handleContainerLayout = ({ nativeEvent }: LayoutChangeEvent) => {
+    const nextHeight = nativeEvent.layout.height;
+    setContainerHeight((prev) => (prev === nextHeight ? prev : nextHeight));
+  };
 
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={styles.content}
+      onLayout={handleContainerLayout}
+      contentContainerStyle={[
+        styles.content,
+        containerHeight > 0
+          // Keep content slightly taller than viewport so disappearing errors
+          // do not collapse scrollability and drop bottom spacing.
+          ? { minHeight: containerHeight + CONTENT_BOTTOM_PADDING + CONTENT_SCROLL_SLACK }
+          : null,
+      ]}
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="interactive"
       showsVerticalScrollIndicator={false}
@@ -94,6 +111,6 @@ const styles = StyleSheet.create({
   },
   content: {
     gap: 12,
-    paddingBottom: 32,
+    paddingBottom: CONTENT_BOTTOM_PADDING,
   },
 });
