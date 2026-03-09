@@ -8,7 +8,7 @@ import {
 import { COLORS, PROGRESS_BAR_COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
 import { isDebugSkipQuizToSummaryEnabled } from "@/config/featureFlags";
-import { useGlowContext } from "@/contexts/GlowContext";
+import { useGlow } from "@/stores/glowStore";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
 import { useScreenTransition } from "@/hooks/useScreenTransition";
 import { useQuizStore } from "@/stores/quizStore";
@@ -23,7 +23,7 @@ export default function QuizSummaryScreen() {
   const { questions, isLoading, isError, error } = useQuizQuestions();
   const answers = useQuizStore((s) => s.answers);
   const setHasStartedJourney = useQuizStore((s) => s.setHasStartedJourney);
-  const { setGlowTarget } = useGlowContext();
+  const { setGlowTarget } = useGlow();
   const router = useRouter();
   const { isVisible, entering, exiting, fadeOutThen, isTransitioning } =
     useScreenTransition();

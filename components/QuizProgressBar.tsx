@@ -3,8 +3,7 @@ import {
   type ProgressBarColor,
   PROGRESS_BAR_COLORS,
 } from "@/constants/colors";
-import { useGlowContext } from "@/contexts/GlowContext";
-import type { GlowVariant } from "@/contexts/GlowContext";
+import { type GlowVariant, useGlow } from "@/stores/glowStore";
 import React, { useCallback, useEffect } from "react";
 import { type LayoutChangeEvent, StyleSheet, View } from "react-native";
 import Animated, {
@@ -25,7 +24,7 @@ type QuizProgressBarProps = {
 };
 
 export default function QuizProgressBar({ progress }: QuizProgressBarProps) {
-  const { glowProgress, glowVariant } = useGlowContext();
+  const { glowProgress, glowVariant } = useGlow();
   const animatedProgress = useSharedValue(0);
   const trackWidth = useSharedValue(0);
   const targetColor = useSharedValue<ProgressBarColor>(

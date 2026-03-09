@@ -12,7 +12,7 @@ import {
   TRANSITION_INITIAL_DELAY_MS,
 } from "@/constants/animations";
 import { COLORS } from "@/constants/colors";
-import { useGlowContext } from "@/contexts/GlowContext";
+import { useGlow } from "@/stores/glowStore";
 import { useQuizBottomAction } from "@/hooks/useQuizBottomAction";
 import { useQuizEngine } from "@/hooks/useQuizEngine";
 import { useQuizQuestions } from "@/hooks/useQuizQuestions";
@@ -30,7 +30,7 @@ import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 
 export default function QuizScreen() {
   const { questions, isLoading, isError, error } = useQuizQuestions();
-  const { setGlowTarget } = useGlowContext();
+  const { setGlowTarget } = useGlow();
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const isWheelPickerShowingBuffer = useWheelPickerStore(
     selectWheelPickerShowingBuffer

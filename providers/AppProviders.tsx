@@ -1,5 +1,5 @@
 import { GlowingBackground } from "@components";
-import { GlowProvider } from "@/contexts/GlowContext";
+import { GlowStoreInitializer } from "@/providers/GlowStoreInitializer";
 import { Toasts } from "@backpackapp-io/react-native-toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
@@ -22,11 +22,11 @@ export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
-        <GlowProvider>
+        <GlowStoreInitializer>
           <StatusBar style="light" />
           <GlowingBackground />
           {children}
-        </GlowProvider>
+        </GlowStoreInitializer>
       </SafeAreaProvider>
       <Toasts />
     </QueryClientProvider>

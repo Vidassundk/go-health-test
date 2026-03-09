@@ -1,12 +1,12 @@
 import { COLORS, GLOW_COLORS } from "@/constants/colors";
-import { useGlowContext } from "@/contexts/GlowContext";
+import { useGlow } from "@/stores/glowStore";
 import { usePathname } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import GlowObject from "./GlowObject";
 
 export default function GlowingBackground() {
   const { glowProgress, glowVariant, isHomeBackgroundEnabled } =
-    useGlowContext();
+    useGlow();
   const pathname = usePathname();
   const isHomeScreen = pathname === "/home" && isHomeBackgroundEnabled;
   const summaryColors = glowVariant
