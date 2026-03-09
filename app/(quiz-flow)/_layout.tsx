@@ -3,14 +3,20 @@ import { CROSSFADE_DURATION_MS } from "@/constants/animations";
 import { selectQuizHeaderState, useQuizHeaderStore } from "@/stores";
 import { Slot } from "expo-router";
 import { useEffect, useRef } from "react";
+import { Platform } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+
+// Android can paint one early frame before effects run, causing a slight header jump.
+// Keep the first render hidden and reveal a bit later on Android so layout settles first.
+const FIRST_HEADER_REVEAL_DELAY_MS = Platform.OS === "android" ? 130 : 70;
 
 export default function QuizFlowLayout() {
   const { progress, isBackDisabled, hideBackButton, isVisible, onBackPress } = useQuizHeaderStore(
     useShallow(selectQuizHeaderState)
   );
-  const opacity = useSharedValue(isVisible ? 1 : 0);
+  // Start hidden to avoid first-frame flash before initial layout calculations complete.
+  const opacity = useSharedValue(0);
   const hasShownHeaderOnce = useRef(false);
 
   useEffect(() => {
@@ -26,7 +32,7 @@ export default function QuizFlowLayout() {
       // Delay first reveal so initial layout work is never rendered.
       const timeoutId = setTimeout(() => {
         opacity.value = withTiming(1, { duration: CROSSFADE_DURATION_MS });
-      }, 70);
+      }, FIRST_HEADER_REVEAL_DELAY_MS);
 
       return () => clearTimeout(timeoutId);
     }
