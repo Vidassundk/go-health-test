@@ -1,6 +1,13 @@
 import { useQuizStore, selectCurrentIndex, selectSetCurrentIndex } from "@/stores";
 import type { QuizQuestion } from "@/types/quiz";
-import { getEmailValidationError, getPasswordValidationError } from "@/utils/validation";
+import {
+  didAnswerValueChange,
+  getDependentQuestionKeysForVisibilityValue,
+  getVisibleQuestions,
+  getVisibilityKeys,
+  isStepValid,
+  pickAnswersByKeys,
+} from "@/utils/quizEngineCore";
 import { useCallback, useEffect, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 
@@ -8,99 +15,9 @@ import type { QuizAnswers } from "@/stores";
 
 export type { QuizAnswers } from "@/stores";
 
-/**
- * Keep only answers that control visibility (visibleIf.question keys).
- * This lets the visibility computation ignore unrelated answer changes.
- */
-function pickAnswersByKeys(answers: QuizAnswers, keys: Set<string>): Partial<QuizAnswers> {
-  if (keys.size === 0) {
-    return {};
-  }
-  return Object.fromEntries(Object.entries(answers).filter(([key]) => keys.has(key)));
-}
-
-/** Normalize unknown store values into comparable string form. */
-function toComparableAnswerValue(value: unknown): string | null {
-  if (value === undefined || value === null) {
-    return null;
-  }
-  return String(value);
-}
-
-/**
- * We only treat this as a branch change when both values exist and differ.
- * (null/undefined -> something does not clear previous branch answers)
- */
-function didAnswerValueChange(previous: unknown, next: unknown): boolean {
-  const previousValue = toComparableAnswerValue(previous);
-  const nextValue = toComparableAnswerValue(next);
-  return previousValue !== null && nextValue !== null && previousValue !== nextValue;
-}
-
-function isVisible(question: QuizQuestion, answers: QuizAnswers): boolean {
-  const condition = question.visibleIf;
-  if (!condition) return true;
-
-  const answer = answers[condition.question];
-  if (answer === undefined || answer === null) return false;
-
-  if (Array.isArray(answer)) {
-    return answer.includes(condition.value);
-  }
-  return String(answer) === condition.value;
-}
-
-function getVisibleQuestions(questions: QuizQuestion[], answers: QuizAnswers): QuizQuestion[] {
-  return questions.filter((q) => isVisible(q, answers));
-}
-
-function isStepValid(question: QuizQuestion, value: unknown): boolean {
-  if (value === undefined || value === null || value === "") {
-    return false;
-  }
-
-  switch (question.type) {
-    case "weight": {
-      const n = Number(value);
-      return !isNaN(n) && n >= 44 && n <= 1100;
-    }
-    case "age": {
-      const n = Number(value);
-      return !isNaN(n) && n >= 1 && n <= 120;
-    }
-    case "credentials": {
-      const v = value as { email?: string; password?: string };
-      return !getEmailValidationError(v?.email) && !getPasswordValidationError(v?.password);
-    }
-    case "single":
-      return !!(value && (typeof value !== "string" || value.trim()));
-    case "multiple":
-      return Array.isArray(value) && value.length > 0;
-    default:
-      return true;
-  }
-}
-
 type UseQuizEngineOptions = {
   onSubmit?: (answers: QuizAnswers) => void;
 };
-
-/** Keys from answers that affect question visibility (visibleIf conditions) */
-function getVisibilityKeys(questions: QuizQuestion[] | null): Set<string> {
-  if (!questions) return new Set();
-  return new Set(questions.flatMap((q) => (q.visibleIf ? [q.visibleIf.question] : [])));
-}
-
-/** Keys controlled by a visibility condition branch; cleared when branch selection changes */
-function getDependentQuestionKeysForVisibilityValue(
-  questions: QuizQuestion[],
-  visibilityKey: string,
-  value: string
-): string[] {
-  return questions
-    .filter((q) => q.visibleIf?.question === visibilityKey && q.visibleIf?.value === value)
-    .map((q) => q.key);
-}
 
 /**
  * Central quiz flow controller:
@@ -112,11 +29,14 @@ function getDependentQuestionKeysForVisibilityValue(
 export function useQuizEngine(questions: QuizQuestion[] | null, options?: UseQuizEngineOptions) {
   const { onSubmit } = options ?? {};
 
+  // Precompute which answer keys can change visibility to avoid broad subscriptions.
   const visibilityKeys = useMemo(() => getVisibilityKeys(questions), [questions]);
+  // Subscribe only to visibility-driving answers for cheaper recomputation.
   const visibilitySlice = useQuizStore(
     useShallow((s) => pickAnswersByKeys(s.answers, visibilityKeys))
   );
 
+  // Cursor/state controls from the store.
   const currentIndex = useQuizStore(selectCurrentIndex);
   const storeSetAnswer = useQuizStore((s) => s.setAnswer);
   const clearAnswers = useQuizStore((s) => s.clearAnswers);
@@ -151,19 +71,23 @@ export function useQuizEngine(questions: QuizQuestion[] | null, options?: UseQui
     [questions, visibilitySlice]
   );
 
+  // Derived step state used by the UI.
   const currentQuestion = visibleQuestions[currentIndex] ?? null;
   const totalSteps = visibleQuestions.length;
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === totalSteps - 1 && totalSteps > 0;
 
+  // Answer value for the currently visible question.
   const currentValue = useQuizStore((s) =>
     currentQuestion ? s.answers[currentQuestion.key] : undefined
   );
+  // Validation gates "next" and "submit".
   const isCurrentStepValid = useMemo(
     () => (currentQuestion ? isStepValid(currentQuestion, currentValue) : true),
     [currentQuestion, currentValue]
   );
 
+  // Advance one visible step, or submit on the last valid step.
   const goNext = useCallback(() => {
     if (!currentQuestion || !isCurrentStepValid) return;
 
@@ -186,10 +110,12 @@ export function useQuizEngine(questions: QuizQuestion[] | null, options?: UseQui
     setCurrentIndex((i) => Math.max(0, i - 1));
   }, [setCurrentIndex]);
 
+  // Keep index in bounds whenever visibility changes the step count.
   useEffect(() => {
     setCurrentIndex((i) => Math.min(Math.max(0, i), Math.max(0, visibleQuestions.length - 1)));
   }, [visibleQuestions.length, setCurrentIndex]);
 
+  // Stable API surface consumed by quiz screens/components.
   return useMemo(
     () => ({
       setAnswer,
