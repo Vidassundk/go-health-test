@@ -5,5 +5,7 @@ export { InputQuestion } from "./InputQuestion";
 export { OptionsQuestion } from "./OptionsQuestion";
 export { QuestionRenderer } from "./QuestionRenderer";
 export { QuizFlow } from "./QuizFlow";
+export { QuizFlowLayoutFrame } from "./QuizFlowLayoutFrame";
+export { QuizQuestionStage } from "./QuizQuestionStage";
 export { QuizFlowScreenShell } from "./QuizFlowScreenShell";
 export { QuizSummary } from "./QuizSummary";

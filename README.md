@@ -4,6 +4,25 @@
 
 An Expo App created as a challenge completion for GO Health - following specific Figma design and Technical Requirements.
 
+## <span style="color:#0f766e">Project Conventions</span>
+
+### <span style="color:#0f766e">Component Structure</span>
+
+- `app/`: route entries/layouts and orchestration only (hooks, store wiring, navigation, transitions).
+- `components/`: reusable UI and screen-level view composition.
+- `components/quiz/`: quiz-domain UI building blocks.
+- `components/icons/`: icon components only.
+- `providers/`: app-wide providers/bootstrap wrappers.
+- `utils/`: pure non-UI helpers (no JSX rendering).
+- `hooks/`: reusable hooks.
+
+### <span style="color:#0f766e">Naming + Boundaries</span>
+
+- Component files use `PascalCase.tsx`; route files in `app/` use route-friendly naming.
+- Keep barrel files as `index.ts`.
+- Shared UI belongs in `components/`, not in route files.
+- If a helper needs to render JSX, move it out of `utils/` into a UI module.
+
 ## <span style="color:#2563eb">Run</span>
 
 ```bash
@@ -87,7 +106,7 @@ We use `react-native-reanimated` for all animations. It runs on the UI thread vi
 
 ### <span style="color:#2563eb">Errors (Toasts)</span>
 
-Async and global failures—API fetch errors, font load failures—are surfaced via `@backpackapp-io/react-native-toast`. We use `showErrorToast(message)` from `utils/toast.tsx`, which triggers `toast.error()` with a custom styled error chip (red background, icon, constrained width). The `Toasts` component lives in `AppProviders` and renders above the app. The imperative API lets any part of the app report errors without prop drilling. Toasts are non-blocking and auto-dismiss; they suit one-off failures where the user may retry or navigate away. Form validation errors stay inline (`AnimatedError` on fields) since they're tied to specific inputs. For this app's scope, a single `showErrorToast` abstraction is enough; we don't need a central error boundary or modal for these cases.
+Async and global failures—API fetch errors, font load failures—are surfaced via `@backpackapp-io/react-native-toast`. We use `showErrorToast(message)` from `components/feedback/toast.tsx`, which triggers `toast.error()` with a custom styled error chip (red background, icon, constrained width). The `Toasts` component lives in `AppProviders` and renders above the app. The imperative API lets any part of the app report errors without prop drilling. Toasts are non-blocking and auto-dismiss; they suit one-off failures where the user may retry or navigate away. Form validation errors stay inline (`AnimatedError` on fields) since they're tied to specific inputs. For this app's scope, a single `showErrorToast` abstraction is enough; we don't need a central error boundary or modal for these cases.
 
 ### <span style="color:#7c3aed">Keyboard Avoidance</span>
 

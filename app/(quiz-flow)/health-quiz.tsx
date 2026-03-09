@@ -1,10 +1,4 @@
 import {
-  TRANSITION_ENTER_MS,
-  TRANSITION_EXIT_MS,
-  TRANSITION_INITIAL_DELAY_MS,
-} from "@/constants/animations";
-import { COLORS } from "@/constants/colors";
-import {
   useQuizBottomAction,
   useQuizEngine,
   useQuizHeaderController,
@@ -13,12 +7,10 @@ import {
 } from "@/hooks";
 import { selectWheelPickerShowingBuffer, useGlow, useWheelPickerStore } from "@/stores";
 import { getSummaryVariant } from "@/utils/getSummaryVariant";
-import { showErrorToast } from "@/utils/toast";
-import { QuizFlow, QuizFlowScreenShell, SpinningBuffer, WheelPickerReadyInit } from "@components";
+import { showErrorToast } from "@/components/feedback/toast";
+import { QuizFlowScreenShell, QuizQuestionStage, WheelPickerReadyInit } from "@components";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 
 export default function QuizScreen() {
   const { questions, isLoading, isError, error } = useQuizQuestions();
@@ -113,58 +105,16 @@ export default function QuizScreen() {
       isTransitioning={isTransitioning}
       beforeContent={<WheelPickerReadyInit />}
     >
-      {isLoading ? (
-        <View style={styles.bufferingWrapper}>
-          <SpinningBuffer size={40} color={COLORS.text} />
-        </View>
-      ) : (
-        <View style={styles.quizLayout}>
-          <View style={styles.quizContent}>
-            <Animated.View
-              key={currentSectionKey}
-              entering={FadeInRight.duration(TRANSITION_ENTER_MS).delay(
-                TRANSITION_INITIAL_DELAY_MS
-              )}
-              exiting={FadeOutLeft.duration(TRANSITION_EXIT_MS)}
-              style={styles.sectionWrapper}
-            >
-              {currentQuestion ? (
-                <QuizFlow
-                  question={currentQuestion}
-                  isLast={isLast}
-                  setAnswer={setAnswer}
-                  onNext={goNext}
-                  isTransitioning={false}
-                  submitAttempted={submitAttempted}
-                  onSubmitAttempt={handleSectionSubmitAttempt}
-                />
-              ) : (
-                <View />
-              )}
-            </Animated.View>
-          </View>
-        </View>
-      )}
+      <QuizQuestionStage
+        isLoading={isLoading}
+        currentSectionKey={currentSectionKey}
+        question={currentQuestion}
+        isLast={isLast}
+        setAnswer={setAnswer}
+        onNext={goNext}
+        submitAttempted={submitAttempted}
+        onSubmitAttempt={handleSectionSubmitAttempt}
+      />
     </QuizFlowScreenShell>
   );
 }
-
-const styles = StyleSheet.create({
-  quizLayout: {
-    flex: 1,
-    minHeight: 0,
-  },
-  quizContent: {
-    flex: 1,
-    position: "relative",
-    overflow: "hidden",
-  },
-  sectionWrapper: {
-    flex: 1,
-  },
-  bufferingWrapper: {
-    alignItems: "center",
-    justifyContent: "center",
-    ...StyleSheet.absoluteFillObject,
-  },
-});

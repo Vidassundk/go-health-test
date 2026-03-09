@@ -8,6 +8,7 @@ export { AppTextInput } from "./AppTextInput";
 export { default as GlowingBackground } from "./GlowingBackground";
 export { default as GlowObject } from "./GlowObject";
 export { default as GradientLayer } from "./GradientLayer";
+export { FullScreenBuffer } from "./FullScreenBuffer";
 export { default as IconButton } from "./IconButton";
 export { default as Header } from "./Header";
 export { HEADER_HEIGHT } from "./Header";

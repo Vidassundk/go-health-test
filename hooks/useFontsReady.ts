@@ -9,7 +9,7 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { locale } from "@/constants/locale";
-import { showErrorToast } from "@/utils/toast";
+import { showErrorToast } from "@/components/feedback/toast";
 
 const FONTS = {
   Merriweather_400Regular,

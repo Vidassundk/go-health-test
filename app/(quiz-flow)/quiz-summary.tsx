@@ -1,15 +1,13 @@
-import { QuizFlowScreenShell, QuizSummary, SpinningBuffer } from "@components";
-import { COLORS, PROGRESS_BAR_COLORS } from "@/constants/colors";
+import { FullScreenBuffer, QuizFlowScreenShell, QuizSummary } from "@components";
+import { PROGRESS_BAR_COLORS } from "@/constants/colors";
 import { locale } from "@/constants/locale";
 import { isDebugSkipQuizToSummaryEnabled } from "@/config/featureFlags";
 import { useGlow, useQuizStore } from "@/stores";
 import { useQuizHeaderController, useQuizQuestions, useScreenTransition } from "@/hooks";
 import { getSummaryVariant } from "@/utils/getSummaryVariant";
-import { showErrorToast } from "@/utils/toast";
+import { showErrorToast } from "@/components/feedback/toast";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
-
 export default function QuizSummaryScreen() {
   const { questions, isLoading, isError, error } = useQuizQuestions();
   const answers = useQuizStore((s) => s.answers);
@@ -74,20 +72,10 @@ export default function QuizSummaryScreen() {
       isTransitioning={isTransitioning}
     >
       {isLoading || !questions ? (
-        <View style={styles.bufferingWrapper}>
-          <SpinningBuffer size={40} color={COLORS.text} />
-        </View>
+        <FullScreenBuffer />
       ) : (
         <QuizSummary questions={questions} />
       )}
     </QuizFlowScreenShell>
   );
 }
-
-const styles = StyleSheet.create({
-  bufferingWrapper: {
-    alignItems: "center",
-    justifyContent: "center",
-    flex: 1,
-  },
-});

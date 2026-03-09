@@ -1,13 +1,9 @@
 import { isDebugSkipQuizToSummaryEnabled } from "@/config/featureFlags";
-import { COLORS } from "@/constants/colors";
-import { locale } from "@/constants/locale";
+import { LandingScreenView } from "@/components/screens/LandingScreenView";
 import { useScreenTransition } from "@/hooks";
 import { useQuizStore } from "@/stores";
-import { AppText, ScreenWithBottomAction } from "@components";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { StyleSheet, View } from "react-native";
-import Animated from "react-native-reanimated";
 
 export default function LandingScreen() {
   const router = useRouter();
@@ -26,47 +22,19 @@ export default function LandingScreen() {
     return null;
   }
 
+  const handleNext = () =>
+    fadeOutThen(
+      () => router.replace(shouldSkipQuizToSummary ? "/quiz-summary" : "/health-quiz"),
+      "forward"
+    );
+
   return (
-    <View style={styles.screen}>
-      {isVisible ? (
-        <Animated.View style={styles.screen} entering={entering} exiting={exiting}>
-          <ScreenWithBottomAction
-            action={{
-              label: locale.common.next,
-              disabled: isTransitioning,
-              onPress: () =>
-                fadeOutThen(
-                  () => router.replace(shouldSkipQuizToSummary ? "/quiz-summary" : "/health-quiz"),
-                  "forward"
-                ),
-            }}
-          >
-            <View style={styles.contentArea}>
-              <View style={styles.appGreetingSection}>
-                <AppText variant="display">{locale.home.greeting}</AppText>
-                <AppText
-                  color={COLORS.textAlt}
-                  style={{ textAlign: "center" }}
-                  variant="bodyCompact"
-                >
-                  {locale.home.subtext}
-                </AppText>
-              </View>
-            </View>
-          </ScreenWithBottomAction>
-        </Animated.View>
-      ) : null}
-    </View>
+    <LandingScreenView
+      isVisible={isVisible}
+      isTransitioning={isTransitioning}
+      entering={entering}
+      exiting={exiting}
+      onNext={handleNext}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  contentArea: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  appGreetingSection: { gap: 24, alignItems: "center" },
-});

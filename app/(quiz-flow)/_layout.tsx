@@ -1,12 +1,10 @@
-import { Header } from "@components";
+import { QuizFlowLayoutFrame } from "@components";
 import { CROSSFADE_DURATION_MS } from "@/constants/animations";
 import { selectQuizHeaderState, useQuizHeaderStore } from "@/stores";
 import { Slot } from "expo-router";
 import { useEffect, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
-import { StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function QuizFlowLayout() {
   const { progress, isBackDisabled, hideBackButton, isVisible, onBackPress } = useQuizHeaderStore(
@@ -41,38 +39,15 @@ export default function QuizFlowLayout() {
   }));
 
   return (
-    <View style={styles.screen}>
-      <SafeAreaView style={styles.staticHeader} edges={["top"]}>
-        <Animated.View
-          pointerEvents={isVisible ? "auto" : "none"}
-          style={[styles.headerPadding, animatedHeaderStyle]}
-        >
-          <Header
-            onBackPress={onBackPress}
-            isBackDisabled={isBackDisabled}
-            hideBackButton={hideBackButton}
-            progress={progress}
-          />
-        </Animated.View>
-      </SafeAreaView>
-      <View style={styles.content}>
-        <Slot />
-      </View>
-    </View>
+    <QuizFlowLayoutFrame
+      isVisible={isVisible}
+      animatedHeaderStyle={animatedHeaderStyle}
+      onBackPress={onBackPress}
+      isBackDisabled={isBackDisabled}
+      hideBackButton={hideBackButton}
+      progress={progress}
+    >
+      <Slot />
+    </QuizFlowLayoutFrame>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  staticHeader: {
-    flexShrink: 0,
-  },
-  headerPadding: {
-    paddingHorizontal: 20,
-  },
-  content: {
-    flex: 1,
-  },
-});

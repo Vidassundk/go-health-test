@@ -5,8 +5,8 @@
     "paths": {
       "@components": ["./components/index.ts"],
       "@components/*": ["./components/*"],
-      "@icons": ["./components/Icons/index.ts"],
-      "@icons/*": ["./components/Icons/*"],
+      "@icons": ["./components/icons/index.ts"],
+      "@icons/*": ["./components/icons/*"],
       "@/*": ["./*"]
     }
   },
