@@ -4,6 +4,7 @@ export { useGradientShift } from "./useGradientShift";
 export { usePressProgress } from "./usePressProgress";
 export { useQuizBottomAction } from "./useQuizBottomAction";
 export { useQuizEngine, type QuizAnswers } from "./useQuizEngine";
+export { useQuizHeaderController } from "./useQuizHeaderController";
 export { QUIZ_QUESTIONS_QUERY_KEY, useQuizQuestions } from "./useQuizQuestions";
 export { useScreenTransition } from "./useScreenTransition";
 export { useWheelPickerRenderGate } from "./useWheelPickerRenderGate";

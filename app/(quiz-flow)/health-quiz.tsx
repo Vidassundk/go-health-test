@@ -4,31 +4,29 @@ import {
   TRANSITION_INITIAL_DELAY_MS,
 } from "@/constants/animations";
 import { COLORS } from "@/constants/colors";
-import { useQuizBottomAction, useQuizEngine, useQuizQuestions, useScreenTransition } from "@/hooks";
+import {
+  useQuizBottomAction,
+  useQuizEngine,
+  useQuizHeaderController,
+  useQuizQuestions,
+  useScreenTransition,
+} from "@/hooks";
 import {
   selectWheelPickerShowingBuffer,
   useGlow,
-  useQuizHeaderStore,
   useWheelPickerStore,
 } from "@/stores";
 import { getSummaryVariant } from "@/utils/getSummaryVariant";
 import { showErrorToast } from "@/utils/toast";
-import {
-  HEADER_HEIGHT,
-  QuizFlow,
-  ScreenWithBottomAction,
-  SpinningBuffer,
-  WheelPickerReadyInit,
-} from "@components";
+import { QuizFlow, QuizFlowScreenShell, SpinningBuffer, WheelPickerReadyInit } from "@components";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
-import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 
 export default function QuizScreen() {
   const { questions, isLoading, isError, error } = useQuizQuestions();
   const { setGlowTarget } = useGlow();
-  const setHeaderState = useQuizHeaderStore((s) => s.setState);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [keepHeaderVisibleOnExit, setKeepHeaderVisibleOnExit] = useState(false);
   const isWheelPickerShowingBuffer = useWheelPickerStore(selectWheelPickerShowingBuffer);
@@ -97,98 +95,58 @@ export default function QuizScreen() {
     startSectionTransition(goBack);
   }, [isFirst, fadeOutThen, router, startSectionTransition, goBack]);
 
-  useLayoutEffect(() => {
-    setHeaderState({
-      onBackPress,
-      isBackDisabled: isTransitioning,
-      hideBackButton: false,
-      isVisible: isVisible || keepHeaderVisibleOnExit,
-      progress: totalSteps > 0 ? (currentIndex + 1) / (totalSteps + 1) : 0,
-    });
-  }, [
-    setHeaderState,
+  useQuizHeaderController({
     onBackPress,
-    isTransitioning,
-    isVisible,
-    keepHeaderVisibleOnExit,
-    totalSteps,
-    currentIndex,
-  ]);
+    hideBackButton: false,
+    isBackDisabled: isTransitioning,
+    isVisible: isVisible || keepHeaderVisibleOnExit,
+    progress: totalSteps > 0 ? (currentIndex + 1) / (totalSteps + 1) : 0,
+  });
 
   return (
-    <View style={styles.screen}>
-      {isVisible ? (
-        <Animated.View style={styles.animatedContent} entering={entering} exiting={exiting}>
-          <ScreenWithBottomAction
-            action={bottomAction}
-            edges={["bottom"]}
-            contentStyle={styles.contentNoHorizontalPadding}
-            actionPointerEventsDisabled={isTransitioning}
-            actionKeyboardAvoiding
-            footerStyle={styles.fixedFooter}
-          >
-            <WheelPickerReadyInit />
-            <KeyboardAvoidingView
-              style={styles.contentArea}
-              behavior={Platform.OS === "ios" ? "padding" : "height"}
-              keyboardVerticalOffset={Platform.OS === "ios" ? HEADER_HEIGHT / 2 : 0}
+    <QuizFlowScreenShell
+      isVisible={isVisible}
+      entering={entering}
+      exiting={exiting}
+      action={bottomAction}
+      isTransitioning={isTransitioning}
+      beforeContent={<WheelPickerReadyInit />}
+    >
+      {isLoading ? (
+        <View style={styles.bufferingWrapper}>
+          <SpinningBuffer size={40} color={COLORS.text} />
+        </View>
+      ) : (
+        <View style={styles.quizLayout}>
+          <View style={styles.quizContent}>
+            <Animated.View
+              key={currentSectionKey}
+              entering={FadeInRight.duration(TRANSITION_ENTER_MS).delay(TRANSITION_INITIAL_DELAY_MS)}
+              exiting={FadeOutLeft.duration(TRANSITION_EXIT_MS)}
+              style={styles.sectionWrapper}
             >
-              {isLoading ? (
-                <View style={styles.bufferingWrapper}>
-                  <SpinningBuffer size={40} color={COLORS.text} />
-                </View>
+              {currentQuestion ? (
+                <QuizFlow
+                  question={currentQuestion}
+                  isLast={isLast}
+                  setAnswer={setAnswer}
+                  onNext={() => (isLast ? goNext() : startSectionTransition(goNext))}
+                  isTransitioning={false}
+                  submitAttempted={submitAttempted}
+                  onSubmitAttempt={handleSectionSubmitAttempt}
+                />
               ) : (
-                <View style={styles.quizLayout}>
-                  <View style={styles.quizContent}>
-                    <Animated.View
-                      key={currentSectionKey}
-                      entering={FadeInRight.duration(TRANSITION_ENTER_MS).delay(
-                        TRANSITION_INITIAL_DELAY_MS
-                      )}
-                      exiting={FadeOutLeft.duration(TRANSITION_EXIT_MS)}
-                      style={styles.sectionWrapper}
-                    >
-                      {currentQuestion ? (
-                        <QuizFlow
-                          question={currentQuestion}
-                          isLast={isLast}
-                          setAnswer={setAnswer}
-                          onNext={() => (isLast ? goNext() : startSectionTransition(goNext))}
-                          isTransitioning={false}
-                          submitAttempted={submitAttempted}
-                          onSubmitAttempt={handleSectionSubmitAttempt}
-                        />
-                      ) : (
-                        <View />
-                      )}
-                    </Animated.View>
-                  </View>
-                </View>
+                <View />
               )}
-            </KeyboardAvoidingView>
-          </ScreenWithBottomAction>
-        </Animated.View>
-      ) : null}
-    </View>
+            </Animated.View>
+          </View>
+        </View>
+      )}
+    </QuizFlowScreenShell>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  animatedContent: {
-    flex: 1,
-  },
-  contentArea: {
-    flex: 1,
-    marginTop: -HEADER_HEIGHT,
-    paddingTop: HEADER_HEIGHT,
-    alignItems: "stretch",
-  },
-  contentNoHorizontalPadding: {
-    paddingHorizontal: 0,
-  },
   quizLayout: {
     flex: 1,
     minHeight: 0,
@@ -200,10 +158,6 @@ const styles = StyleSheet.create({
   },
   sectionWrapper: {
     flex: 1,
-  },
-  fixedFooter: {
-    backgroundColor: COLORS.background,
-    paddingTop: 8,
   },
   bufferingWrapper: {
     alignItems: "center",
