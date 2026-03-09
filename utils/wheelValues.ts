@@ -7,7 +7,7 @@ export function clampNumber(value: number, min: number, max: number): number {
 }
 
 export function resolveAgeValue(
-  value: string | number | undefined,
+  value: string | number | undefined | null,
   min: number,
   max: number,
   fallback: number
@@ -23,7 +23,7 @@ export function resolveAgeValue(
 }
 
 export function resolveWeightValue(
-  value: string | number | undefined,
+  value: string | number | undefined | null,
   wholeMin: number,
   wholeMax: number,
   decimalMin: number,
