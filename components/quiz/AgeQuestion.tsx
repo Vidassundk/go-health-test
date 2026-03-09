@@ -2,6 +2,7 @@ import { SpinningBuffer } from "../SpinningBuffer";
 import { COLORS } from "@/constants/colors";
 import { WHEEL_ITEM_HEIGHT } from "@/constants/wheelPicker";
 import { useWheelPickerRenderGate } from "@/hooks";
+import { triggerSelectionHaptic } from "@/utils/haptics";
 import { isValueUnset, resolveAgeValue } from "@/utils/wheelValues";
 import WheelPicker from "@quidone/react-native-wheel-picker";
 import React, { useCallback, useEffect, useMemo } from "react";
@@ -42,6 +43,7 @@ export function AgeQuestion({ value, onChange, isTransitioning = false }: Props)
 
   const handleChange = useCallback(
     (v: number) => {
+      triggerSelectionHaptic();
       onChange(v);
     },
     [onChange]

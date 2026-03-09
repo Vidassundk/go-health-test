@@ -3,6 +3,7 @@ import { SpinningBuffer } from "../SpinningBuffer";
 import { COLORS } from "@/constants/colors";
 import { WHEEL_ITEM_HEIGHT } from "@/constants/wheelPicker";
 import { useWheelPickerRenderGate } from "@/hooks";
+import { triggerSelectionHaptic } from "@/utils/haptics";
 import { isValueUnset, resolveWeightValue } from "@/utils/wheelValues";
 import WheelPicker from "@quidone/react-native-wheel-picker";
 import React, { useCallback, useEffect, useMemo } from "react";
@@ -49,6 +50,7 @@ export function WeightQuestion({ value, onChange, isTransitioning = false }: Pro
 
   const handleWholeChange = useCallback(
     (v: number) => {
+      triggerSelectionHaptic();
       onChange(v + decimal / 10);
     },
     [decimal, onChange]
@@ -56,6 +58,7 @@ export function WeightQuestion({ value, onChange, isTransitioning = false }: Pro
 
   const handleDecimalChange = useCallback(
     (v: number) => {
+      triggerSelectionHaptic();
       onChange(whole + v / 10);
     },
     [whole, onChange]

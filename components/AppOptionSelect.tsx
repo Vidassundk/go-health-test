@@ -2,8 +2,9 @@ import { CROSSFADE_DURATION_MS } from "@/constants/animations";
 import { COLORS } from "@/constants/colors";
 import { usePressProgress } from "@/hooks";
 import type { QuestionOption } from "@/types/quiz";
+import { triggerImpactHaptic } from "@/utils/haptics";
 import { CheckIcon } from "@icons";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
   interpolate,
@@ -71,6 +72,10 @@ export function AppOptionSelect({ opt, selected, onPress, check = false }: AppOp
   }));
 
   const innerRadius = BORDER_RADIUS - INSET;
+  const handlePress = useCallback(() => {
+    triggerImpactHaptic();
+    onPress();
+  }, [onPress]);
 
   return (
     <View
@@ -94,7 +99,7 @@ export function AppOptionSelect({ opt, selected, onPress, check = false }: AppOp
       )}
       <View style={[styles.inner, { margin: INSET, borderRadius: innerRadius }]}>
         <Pressable
-          onPress={onPress}
+          onPress={handlePress}
           onPressIn={onPressIn}
           onPressOut={onPressOut}
           style={styles.pressable}

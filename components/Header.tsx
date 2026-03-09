@@ -4,6 +4,7 @@ import QuizProgressBar from "./QuizProgressBar";
 import { isDebugWipeDataButtonEnabled } from "@/config/featureFlags";
 import { COLORS } from "@/constants/colors";
 import { useQuizStore } from "@/stores";
+import { triggerImpactHaptic } from "@/utils/haptics";
 import React, { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -24,6 +25,7 @@ export default function Header({
 }: HeaderProps) {
   const handleBackPress = useCallback(() => {
     if (isBackDisabled) return;
+    triggerImpactHaptic();
     onBackPress();
   }, [onBackPress, isBackDisabled]);
 

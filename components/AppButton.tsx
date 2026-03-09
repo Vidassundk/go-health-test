@@ -1,8 +1,9 @@
 import { CROSSFADE_DURATION_MS } from "@/constants/animations";
 import { COLORS } from "@/constants/colors";
 import { usePressProgress } from "@/hooks";
+import { triggerImpactHaptic } from "@/utils/haptics";
 import { Canvas, Group, RoundedRect } from "@shopify/react-native-skia";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
   Easing,
@@ -33,6 +34,7 @@ const AppButton = ({
   fillColor,
   onPressIn,
   onPressOut,
+  onPress,
   ...pressableProps
 }: AppButtonProps) => {
   const [layout, setLayout] = useState<{
@@ -76,6 +78,11 @@ const AppButton = ({
       { translateY: LABEL_TRANSLATE_Y * pressProgress.value },
     ],
   }));
+
+  const handlePress = useCallback(() => {
+    triggerImpactHaptic();
+    onPress?.();
+  }, [onPress]);
 
   return (
     <View
@@ -145,6 +152,7 @@ const AppButton = ({
         <Pressable
           style={styles.pressable}
           disabled={disabled}
+          onPress={handlePress}
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
           {...pressableProps}
