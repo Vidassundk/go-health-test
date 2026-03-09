@@ -1,10 +1,9 @@
-import type { BottomActionConfig } from "../ScreenWithBottomAction";
-import { HEADER_HEIGHT } from "../Header";
-import ScreenWithBottomAction from "../ScreenWithBottomAction";
 import { COLORS } from "@/constants/colors";
 import type { ReactNode } from "react";
-import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
+import type { BottomActionConfig } from "../ScreenWithBottomAction";
+import ScreenWithBottomAction from "../ScreenWithBottomAction";
 
 type Props = {
   isVisible: boolean;
@@ -42,13 +41,7 @@ export function QuizFlowScreenShell({
             footerStyle={styles.fixedFooter}
           >
             {beforeContent}
-            <KeyboardAvoidingView
-              style={styles.contentArea}
-              behavior={Platform.OS === "ios" ? "padding" : "height"}
-              keyboardVerticalOffset={Platform.OS === "ios" ? HEADER_HEIGHT / 2 : 0}
-            >
-              {children}
-            </KeyboardAvoidingView>
+            <View style={styles.contentArea}>{children}</View>
           </ScreenWithBottomAction>
         </Animated.View>
       ) : null}
@@ -65,8 +58,6 @@ const styles = StyleSheet.create({
   },
   contentArea: {
     flex: 1,
-    marginTop: -HEADER_HEIGHT,
-    paddingTop: HEADER_HEIGHT,
     alignItems: "stretch",
   },
   contentNoHorizontalPadding: {
