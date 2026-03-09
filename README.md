@@ -92,3 +92,7 @@ Async and global failures—API fetch errors, font load failures—are surfaced 
 ### <span style="color:#7c3aed">Keyboard Avoidance</span>
 
 When the keyboard opens (e.g. on the credentials question), we lift the bottom CTA so it stays visible above the keys instead of using `KeyboardAvoidingView`. `ScreenWithBottomAction` listens to `keyboardWillShow` / `keyboardWillHide` on iOS and `keyboardDidShow` / `keyboardDidHide` on Android, then animates a `translateY` on the footer based on keyboard height. `QuizFlowScreenShell` enables this via `actionKeyboardAvoiding`. We use the native driver for the lift animation. `KeyboardAvoidingView` can conflict with custom layouts and behave differently across devices; a simple footer lift keeps the CTA in view without touching the rest of the layout. CredentialsQuestion also uses `keyboardShouldPersistTaps="handled"` and `keyboardDismissMode="interactive"` so taps register and the keyboard can be dragged closed.
+
+### <span style="color:#0d9488">Tests</span>
+
+Tests run with Vitest (`yarn test`). We focus on unit tests for pure logic: quiz engine (visibility, validation, branching), validation helpers, wheel value parsing, summary domain logic, and API config. Vitest is Vite-powered and fast, uses `vite-tsconfig-paths` for path resolution, and runs in a node environment. We don't use React Testing Library or component tests; the critical paths are in pure functions that don't need rendering. That keeps the test suite quick and focused on the quiz engine and validation behavior.

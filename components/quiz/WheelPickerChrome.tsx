@@ -35,9 +35,12 @@ export const wheelPickerStyles = StyleSheet.create({
     gap: 12,
   },
   placeholder: {
-    minHeight: 240,
+    ...StyleSheet.absoluteFillObject,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: "center",
-    marginTop: 50,
+    alignItems: "center",
   },
   pickerRowWrapper: {
     position: "relative",
